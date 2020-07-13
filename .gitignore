@@ -3,3 +3,4 @@ p2mt_test_venv
 P2MT_App/__pycache__/__init__.cpython-38.pyc
 P2MT_App/__pycache__/models.cpython-38.pyc
 P2MT_App/__pycache__/routes.cpython-38.pyc
+.vscode
