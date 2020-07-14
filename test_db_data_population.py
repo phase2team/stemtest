@@ -25,11 +25,11 @@ print("\n=========", __file__, "=========\n")
 # print(students)
 
 #  Add student info to database
-chattStateANumber = "A12345"
+chattStateANumber = "A12"
 if len(Student.query.filter_by(chattStateANumber=chattStateANumber).all()) == 0:
     student1 = Student(
         chattStateANumber=chattStateANumber,
-        firstName="Testy",
+        firstName="Max",
         lastName="Tester",
         email="testy@students.hcde.org",
         house="Staupers",
@@ -56,25 +56,25 @@ else:
 # db.session.commit()
 
 # Add staff to database
-staff1 = FacultyAndStaff(
-    firstName="Betsy",
-    lastName="Ross",
-    position="Art Teacher",
-    email="test@demo.com",
-    phoneNumber="423-555-1212",
-    chattStateANumber="A2",
-)
-print(staff1)
-db.session.add(staff1)
-db.session.commit()
+# staff1 = FacultyAndStaff(
+#     firstName="Betsy",
+#     lastName="Ross",
+#     position="Art Teacher",
+#     email="test@demo.com",
+#     phoneNumber="423-555-1212",
+#     chattStateANumber="A2",
+# )
+# print(staff1)
+# db.session.add(staff1)
+# db.session.commit()
 
-dailyAttendanceLog1 = DailyAttendanceLog(
-    absenceDate=datetime(2020, 9, 20),
-    attendanceCode="E",
-    comment="Sick",
-    staffID=2,
-    student_id=1,
-)
-print(dailyAttendanceLog1)
-db.session.add(dailyAttendanceLog1)
-db.session.commit()
+# dailyAttendanceLog1 = DailyAttendanceLog(
+#     absenceDate=datetime(2020, 9, 20),
+#     attendanceCode="E",
+#     comment="Sick",
+#     staffID=2,
+#     student_id=1,
+# )
+# print(dailyAttendanceLog1)
+# db.session.add(dailyAttendanceLog1)
+# db.session.commit()
