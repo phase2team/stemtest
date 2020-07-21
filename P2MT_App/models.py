@@ -15,6 +15,7 @@ class Student(db.Model):
     dailyAttendance = db.relationship(
         "DailyAttendanceLog", backref="Student", lazy=True
     )
+    interventionLog = db.relationship("InterventionLog", backref="Student", lazy=True)
 
     def __repr__(self):
         return (
@@ -51,6 +52,48 @@ class DailyAttendanceLog(db.Model):
         return f"DailyAttendanceLog('{self.absenceDate}','{self.attendanceCode}','{self.comment}')"
 
 
+class InterventionType(db.Model):
+    __tablename__ = "InterventionType"
+    id = db.Column(db.Integer, primary_key=True)
+    interventionType = db.Column(db.String(30), nullable=False)
+    maxLevel = db.Column(db.Integer, nullable=False)
+    interventionLog = db.relationship(
+        "InterventionLog", backref="InterventionType", lazy=True
+    )
+
+    def __repr__(self):
+        return (
+            f"InterventionType('{self.id}','{self.interventionType}','{self.maxLevel}')"
+        )
+
+
+class InterventionLog(db.Model):
+    __tablename__ = "InterventionLog"
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("Student.id"), nullable=False)
+    intervention_id = db.Column(
+        db.Integer, db.ForeignKey("InterventionType.id"), nullable=False
+    )
+    interventionLevel = db.Column(db.Integer, nullable=False)
+    createDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    startDate = db.Column(db.DateTime, nullable=False)
+    endDate = db.Column(db.DateTime, nullable=False)
+    staffID = db.Column(db.Integer, db.ForeignKey("FacultyAndStaff.id"), nullable=False)
+    comment = db.Column(db.Text, nullable=True)
+    tmiMinutes = db.Column(db.Integer, nullable=True)
+    tmiMinutesServed = db.Column(db.Integer, nullable=True)
+    tmiMinutesRemaining = db.Column(db.Integer, nullable=True)
+    inTmiNow = db.Column(db.Boolean, nullable=True, default=True)
+    # learningLabClass_id = db.Column(db.Integer, db.ForeignKey("Classes.id"), nullable=False)
+    erSession = db.Column(db.String(50), nullable=True)
+    erSession = db.Column(db.String(50), nullable=True)
+    interventionStatus = db.Column(db.String(50), nullable=True)
+    recordDeleted = db.Column(db.Boolean, nullable=True, default=False)
+
+    def __repr__(self):
+        return f"InterventionLog('{self.id}','{self.intervention_id}','{self.startDate}','{self.endDate}')"
+
+
 class FacultyAndStaff(db.Model):
     __tablename__ = "FacultyAndStaff"
     id = db.Column(db.Integer, primary_key=True)
@@ -67,6 +110,9 @@ class FacultyAndStaff(db.Model):
     status = db.Column(db.String(20), nullable=True)
     DailyAttendanceLog = db.relationship(
         "DailyAttendanceLog", backref="FacultyAndStaff", lazy=True
+    )
+    InterventionLog = db.relationship(
+        "InterventionLog", backref="FacultyAndStaff", lazy=True
     )
 
     def __repr__(self):

@@ -1,6 +1,49 @@
-from flask import render_template
-from P2MT_App import app
-from P2MT_App.models import Student, ClassSchedule, FacultyAndStaff, DailyAttendanceLog
+from flask import render_template, redirect, url_for, flash, request
+from P2MT_App import app, db
+from P2MT_App.models import (
+    Student,
+    ClassSchedule,
+    FacultyAndStaff,
+    DailyAttendanceLog,
+    InterventionLog,
+)
+from P2MT_App.forms import addDailyAttendanceForm, addInterventionLogForm
+from P2MT_App.referenceData import getInterventionTypes
+from datetime import datetime
+
+
+def add_DailyAttendanceLog(student_id, absenceDate, attendanceCode, comment):
+    print(student_id, attendanceCode, comment, absenceDate)
+    dailyAttendanceLog = DailyAttendanceLog(
+        absenceDate=absenceDate,
+        attendanceCode=attendanceCode,
+        comment=comment,
+        staffID=2,
+        student_id=student_id,
+    )
+    db.session.add(dailyAttendanceLog)
+    db.session.commit()
+    flash("Daily attendance log has been added!", "success")
+    return
+
+
+def add_InterventionLog(
+    student_id, interventionType, interventionLevel, startDate, endDate, comment
+):
+    print(student_id, interventionType, interventionLevel, startDate, endDate)
+    interventionLog = InterventionLog(
+        intervention_id=interventionType,
+        interventionLevel=interventionLevel,
+        startDate=startDate,
+        endDate=endDate,
+        comment=comment,
+        staffID=2,
+        student_id=student_id,
+    )
+    db.session.add(interventionLog)
+    db.session.commit()
+    flash("Intervention log has been added!", "success")
+    return
 
 
 @app.route("/")
@@ -8,20 +51,98 @@ def home():
     return render_template("home.html", title="Home")
 
 
-@app.route("/students")
+@app.route("/students", methods=["GET", "POST"])
 def students():
-    students = Student.query.all()
-    for student in students:
-        print(student.firstName)
-    return render_template("students.html", title="Students", students=students)
+    dailyAttendanceForm = addDailyAttendanceForm()
+    interventionForm = addInterventionLogForm()
+    interventionForm.interventionType.choices = getInterventionTypes()
+    students = Student.query.order_by(
+        Student.yearOfGraduation.asc(), Student.lastName.asc()
+    )
+    if dailyAttendanceForm.validate_on_submit():
+        add_DailyAttendanceLog(
+            int(dailyAttendanceForm.studentID.data),
+            dailyAttendanceForm.absenceDate.data,
+            dailyAttendanceForm.attendanceCode.data,
+            dailyAttendanceForm.comment.data,
+        )
+        print(
+            "===   Completed add_DailyAttendanceLog.  Redirecting to students   ===",
+            datetime.now(),
+            "   ===",
+        )
+        return redirect(url_for("students"))
+    elif interventionForm.validate_on_submit():
+        add_InterventionLog(
+            int(interventionForm.studentID.data),
+            int(interventionForm.interventionType.data),
+            int(interventionForm.interventionLevel.data),
+            interventionForm.startDate.data,
+            interventionForm.endDate.data,
+            interventionForm.comment.data,
+        )
+        print(
+            "===   Completed add_InterventionLog.  Redirecting to students   ===",
+            datetime.now(),
+            "   ===",
+        )
+        return redirect(url_for("students"))
+    elif request.method == "GET":
+        return render_template(
+            "students.html",
+            title="Students",
+            students=students,
+            dailyAttendanceForm=dailyAttendanceForm,
+            interventionForm=interventionForm,
+        )
 
 
 @app.route("/dailyattendancelog")
 def displayDailyAttendanceLogs():
-    DailyAttendanceLogs = DailyAttendanceLog.query.all()
+    DailyAttendanceLogs = DailyAttendanceLog.query.order_by(
+        DailyAttendanceLog.absenceDate.desc()
+    )
     return render_template(
         "dailyattendancelog.html",
         title="Daily Attendance Log",
+        DailyAttendanceLogs=DailyAttendanceLogs,
+    )
+
+
+@app.route("/dailyattendancelog/<int:log_id>/delete", methods=["POST"])
+def delete_DailyAttendanceLog(log_id):
+    log = DailyAttendanceLog.query.get_or_404(log_id)
+    db.session.delete(log)
+    db.session.commit()
+    flash("Daily attendance log has been deleted!", "success")
+    return redirect(url_for("displayDailyAttendanceLogs"))
+
+
+@app.route("/interventionlog")
+def displayInterventionLogs():
+    InterventionLogs = InterventionLog.query.order_by(InterventionLog.endDate.desc())
+    return render_template(
+        "interventionlog.html",
+        title="Intervention Log",
+        InterventionLogs=InterventionLogs,
+    )
+
+
+@app.route("/interventionlog/<int:log_id>/delete", methods=["POST"])
+def delete_InterventionLog(log_id):
+    log = InterventionLog.query.get_or_404(log_id)
+    db.session.delete(log)
+    db.session.commit()
+    flash("Intervention log has been deleted!", "success")
+    return redirect(url_for("displayInterventionLogs"))
+
+
+@app.route("/bootstraptest")
+def displayBootstrapTest():
+    DailyAttendanceLogs = DailyAttendanceLog.query.all()
+    return render_template(
+        "bootstraptest.html",
+        title="Bootstrap Test",
         DailyAttendanceLogs=DailyAttendanceLogs,
     )
 

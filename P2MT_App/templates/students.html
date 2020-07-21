@@ -2,30 +2,218 @@
 {% block content %}
 <h1> Students </h1>
 
-    <table class="table table-sm table-hover">
-      <thead class="thead-light">
-        <tr>
-          <th scope="col">A#</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Email</th>
-          <th scope="col">Year of Graduation</th>
-          <th scope="col">House</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for student in students %}
-        <tr>
-          <th scope="row">{{ student.chattStateANumber }}</th>
-          <td>{{ student.firstName }}</td>
-          <td>{{ student.lastName }}</td>
-          <td>{{ student.email }}</td>
-          <td>{{ student.yearOfGraduation }}</td>
-          <td>{{ student.house }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<table class="table table-sm table-hover">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">A#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Email</th>
+      <th scope="col">Year of Graduation</th>
+      <th scope="col">House</th>
+      <th scope="col">Actions</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students %}
+    <tr>
+      <th scope="row">{{ student.chattStateANumber }}</th>
+      <th>{{ student.firstName }}</th>
+      <th>{{ student.lastName }}</th>
+      <td>{{ student.email }}</td>
+      <td>{{ student.yearOfGraduation }}</td>
+      <td>{{ student.house }}</td>
+      <td><button type="button" class="btn btn-sm m-1" data-toggle="modal"
+          data-target="#addAttendanceModal{{student.id}}">Attendance</button></td>
+      <td><button type="button" class="btn btn-sm m-1" data-toggle="modal"
+          data-target="#addInterventionModal{{student.id}}">Intervention</button></td>
+    </tr>
+    <!-- Attendance Modal -->
+    <div class="modal fade" id="addAttendanceModal{{student.id}}" tabindex="-1" role="dialog"
+      aria-labelledby="addAttendanceModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addAttendanceModalLabel">New Daily Attendance</h5>
+            <div class="content-section">
+              <form method="POST" action="" enctype="multipart/form-data">
+                {{ dailyAttendanceForm.hidden_tag() }}
+                <fieldset class="form-group">
+                  <legend class="border-bottom mb-4">{{student.firstName}} {{student.lastName}}</legend>
+                  {{ dailyAttendanceForm.studentID(value = student.id, class="d-none") }}
+                  <div class="form-group">
+                    {{ dailyAttendanceForm.absenceDate.label(class="form-control-label") }}
+
+                    {% if dailyAttendanceForm.absenceDate.errors %}
+                    {{ dailyAttendanceForm.absenceDate(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in dailyAttendanceForm.absenceDate.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ dailyAttendanceForm.absenceDate(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+                  <div class="form-group">
+                    {{ dailyAttendanceForm.attendanceCode.label(class="form-control-label") }}
+
+                    {% if dailyAttendanceForm.attendanceCode.errors %}
+                    {{ dailyAttendanceForm.attendanceCode(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in dailyAttendanceForm.attendanceCode.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ dailyAttendanceForm.attendanceCode(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+                  <div class="form-group">
+                    {{ dailyAttendanceForm.comment.label(class="form-control-label") }}
+
+                    {% if dailyAttendanceForm.comment.errors %}
+                    {{ dailyAttendanceForm.comment(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in dailyAttendanceForm.comment.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ dailyAttendanceForm.comment(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                </fieldset>
+                <div class="form-group">
+                  {{ dailyAttendanceForm.submit(class="btn btn-outline-info") }}
+                </div>
+              </form>
+            </div>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intevention Modal -->
+    <div class="modal fade" id="addInterventionModal{{student.id}}" tabindex="-1" role="dialog"
+      aria-labelledby="addInterventionModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addInterventionModalLabel">New Intervention</h5>
+            <div class="content-section">
+              <form method="POST" action="" enctype="multipart/form-data">
+                {{ interventionForm.hidden_tag() }}
+                <fieldset class="form-group">
+                  <legend class="border-bottom mb-4">{{student.firstName}} {{student.lastName}}</legend>
+                  {{ interventionForm.studentID(value = student.id, class="d-none") }}
+
+                  <div class="form-group">
+                    {{ interventionForm.interventionType.label(class="form-control-label") }}
+
+                    {% if interventionForm.interventionType.errors %}
+                    {{ interventionForm.interventionType(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in interventionForm.interventionType.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ interventionForm.interventionType(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    {{ interventionForm.interventionLevel.label(class="form-control-label") }}
+
+                    {% if interventionForm.interventionLevel.errors %}
+                    {{ interventionForm.interventionLevel(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in interventionForm.interventionLevel.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ interventionForm.interventionLevel(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    {{ interventionForm.startDate.label(class="form-control-label") }}
+
+                    {% if interventionForm.startDate.errors %}
+                    {{ interventionForm.startDate(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in interventionForm.startDate.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ interventionForm.startDate(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    {{ interventionForm.endDate.label(class="form-control-label") }}
+
+                    {% if interventionForm.endDate.errors %}
+                    {{ interventionForm.endDate(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in interventionForm.endDate.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ interventionForm.endDate(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    {{ interventionForm.comment.label(class="form-control-label") }}
+
+                    {% if interventionForm.comment.errors %}
+                    {{ interventionForm.comment(class="form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                      {% for error in interventionForm.comment.errors %}
+                      <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ interventionForm.comment(class="form-control form-control-sm") }}
+                    {% endif %}
+                  </div>
+
+                </fieldset>
+                <div class="form-group">
+                  {{ interventionForm.submit(class="btn btn-outline-info") }}
+                </div>
+              </form>
+            </div>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </tbody>
+</table>
 
 
 {% endblock content %}
