@@ -6,6 +6,7 @@ from P2MT_App.models import (
     FacultyAndStaff,
     InterventionLog,
     InterventionType,
+    ClassAttendanceLog,
 )
 from datetime import datetime
 
@@ -44,14 +45,100 @@ def test_importStudents():
         email = column[3].strip()
         yearOfGraduation = column[4].strip()
         house = column[5].strip()
+        googleCalendarId = column[6].strip()
         test_addStudent(
-            chattStateANumber, firstName, lastName, email, house, yearOfGraduation
+            chattStateANumber,
+            firstName,
+            lastName,
+            email,
+            house,
+            yearOfGraduation,
+            googleCalendarId,
         )
+
+
+def test_importGoogleCalendarIds():
+    importCSV = open("Schedules for Google Calendar - Students.csv", "r")
+    for row in importCSV:
+        print("row=", row)
+        column = row.split(",")
+        chattStateANumber = column[0].strip()
+        googleCalendarId = column[1].strip()
+        print(chattStateANumber, googleCalendarId)
+        test_addGoogleCalendarId(chattStateANumber, googleCalendarId)
+
+
+def test_importSchedules(fname):
+    importCSV = open(fname, "r")
+    for row in importCSV:
+        print("row=", row)
+        column = row.split(",")
+        print("column=", column)
+        schoolYear = column[0].strip()
+        if schoolYear == "year":
+            continue
+        semester = column[1].strip()
+        chattStateANumber = column[2].strip()
+        campus = column[7].strip()
+        className = column[9].strip()
+        staffID = 1
+        online = column[12].strip()
+        if online == "1":
+            online = True
+        else:
+            online = False
+        indStudy = column[13].strip()
+        if indStudy == "1":
+            indStudy = True
+        else:
+            indStudy = False
+        classDays = column[14].strip()
+        print(column[16].strip())
+        startTime = datetime.strptime(column[16].strip(), "%I:%M %p")
+        endTime = datetime.strptime(column[17].strip(), "%I:%M %p")
+        comment = column[18].strip()
+        googleCalendarEventID = ""
+        test_addClassSchedule(
+            schoolYear,
+            semester,
+            chattStateANumber,
+            campus,
+            className,
+            staffID,
+            online,
+            indStudy,
+            classDays,
+            startTime,
+            endTime,
+            comment,
+            googleCalendarEventID,
+        )
+
+
+#  Add googleCalendarId to a student record
+def test_addGoogleCalendarId(chattStateANumber, googleCalendarId):
+    student = Student.query.filter_by(chattStateANumber=chattStateANumber).first()
+    if student:
+        print(student)
+        student.googleCalendarId = googleCalendarId
+        db.session.commit()
+    else:
+        print("Unable to update googleCalendarId for", chattStateANumber)
+    return
+
+
+# test_importGoogleCalendarIds()
 
 
 #  Add student info to database
 def test_addStudent(
-    chattStateANumber, firstName, lastName, email, house, yearOfGraduation
+    chattStateANumber,
+    firstName,
+    lastName,
+    email,
+    house,
+    yearOfGraduation,
+    googleCalendarId,
 ):
     if len(Student.query.filter_by(chattStateANumber=chattStateANumber).all()) == 0:
         student1 = Student(
@@ -61,6 +148,7 @@ def test_addStudent(
             email=email,
             house=house,
             yearOfGraduation=yearOfGraduation,
+            googleCalendarId=googleCalendarId,
         )
         print(student1)
         db.session.add(student1)
@@ -72,13 +160,35 @@ def test_addStudent(
 # # print(Student.query.all())
 
 # Add class schedule information to database
-def test_addClassSchedule(className, startTime, endTime, classDays, student_id):
+def test_addClassSchedule(
+    schoolYear,
+    semester,
+    chattStateANumber,
+    campus,
+    className,
+    staffID,
+    online,
+    indStudy,
+    classDays,
+    startTime,
+    endTime,
+    comment,
+    googleCalendarEventID,
+):
     classSchedule1 = ClassSchedule(
+        schoolYear=schoolYear,
+        semester=semester,
+        chattStateANumber=chattStateANumber,
+        campus=campus,
         className=className,
+        staffID=staffID,
+        online=online,
+        indStudy=indStudy,
+        classDays=classDays,
         startTime=startTime,
         endTime=endTime,
-        classDays=classDays,
-        student_id=student_id,
+        comment=comment,
+        googleCalendarEventID=googleCalendarEventID,
     )
     print(classSchedule1)
     db.session.add(classSchedule1)
@@ -140,7 +250,22 @@ def test_addInterventionLog(
     db.session.commit()
 
 
-# db.create_all()
+def test_addClassAttendanceLog(
+    classSchedule_id, classDate, attendanceCode, comment, assignTmi
+):
+    classAttendanceLog = ClassAttendanceLog(
+        classSchedule_id=classSchedule_id,
+        classDate=classDate,
+        attendanceCode=attendanceCode,
+        comment=comment,
+        assignTmi=assignTmi,
+    )
+    print(classAttendanceLog)
+    db.session.add(classAttendanceLog)
+    db.session.commit()
+
+
+db.create_all()
 # test_addInterventionType("Conduct Behavior", 6)
 # test_addInterventionType("Academic Behavior", 4)
 # test_addInterventionType("Attendance", 3)
@@ -187,3 +312,8 @@ def test_addInterventionLog(
 #     "Art", datetime(2020, 8, 15, 9, 30, 0), datetime(2020, 8, 15, 10, 30, 0), "MW", 2
 # )
 # test_importStudents()
+
+# test_importSchedules("FET Python Testing - outputFile.csv")
+
+test_addClassAttendanceLog(2, datetime(2020, 9, 15), "T", "late", False)
+

@@ -1,8 +1,18 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import SubmitField, StringField, SelectField, TextAreaField
+from wtforms import (
+    SubmitField,
+    StringField,
+    SelectField,
+    TextAreaField,
+    RadioField,
+    FormField,
+    FieldList,
+    IntegerField,
+)
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
+from datetime import datetime
 
 
 class addDailyAttendanceForm(FlaskForm):
@@ -58,3 +68,17 @@ class addInterventionLogForm(FlaskForm):
     endDate = DateField("End Date")
     comment = TextAreaField("Comment")
     submit = SubmitField("Submit New Intervention")
+
+
+class updateStudentAttendanceForm(FlaskForm):
+    attendanceCode = RadioField(
+        "Attendance Code",
+        choices=[("P", "P"), ("T", "T"), ("E", "E"), ("U", "U"), ("Q", "?"),],
+    )
+    comment = StringField("Comment")
+    submit = SubmitField("Submit Attendance")
+
+
+class updateClassAttendanceForm(FlaskForm):
+    title = StringField("title")
+    classMembers = FieldList(FormField(updateStudentAttendanceForm))

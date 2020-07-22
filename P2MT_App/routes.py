@@ -6,8 +6,14 @@ from P2MT_App.models import (
     FacultyAndStaff,
     DailyAttendanceLog,
     InterventionLog,
+    ClassAttendanceLog,
 )
-from P2MT_App.forms import addDailyAttendanceForm, addInterventionLogForm
+from P2MT_App.forms import (
+    addDailyAttendanceForm,
+    addInterventionLogForm,
+    updateStudentAttendanceForm,
+    updateClassAttendanceForm,
+)
 from P2MT_App.referenceData import getInterventionTypes
 from datetime import datetime
 
@@ -137,6 +143,45 @@ def delete_InterventionLog(log_id):
     return redirect(url_for("displayInterventionLogs"))
 
 
+@app.route("/masterschedule")
+def displayMasterSchedule():
+    ClassSchedules = ClassSchedule.query.order_by(
+        ClassSchedule.chattStateANumber.desc()
+    )
+    return render_template(
+        "masterschedule.html", title="Master Schedule", ClassSchedules=ClassSchedules,
+    )
+
+
+@app.route("/masterschedule/<int:log_id>/delete", methods=["POST"])
+def delete_ClassSchedule(log_id):
+    log = ClassSchedule.query.get_or_404(log_id)
+    db.session.delete(log)
+    db.session.commit()
+    flash("Class schedule has been deleted!", "success")
+    return redirect(url_for("displayMasterSchedule"))
+
+
+@app.route("/classattendancelog")
+def displayClassAttendanceLog():
+    classAttendanceFixedFields = ClassAttendanceLog.query.all()
+    classAttendanceForm = updateClassAttendanceForm()
+    classAttendanceForm.title.data = "My class"
+
+    for studentAttendance in ClassAttendanceLog.query.all():
+        studentAttendanceForm = updateStudentAttendanceForm()
+        studentAttendanceForm.attendanceCode = studentAttendance.attendanceCode
+        studentAttendanceForm.comment = studentAttendance.comment
+        classAttendanceForm.classMembers.append_entry(studentAttendanceForm)
+
+    return render_template(
+        "classattendancelog.html",
+        title="Class Attendance Log",
+        classAttendanceForm=classAttendanceForm,
+        classAttendanceFixedFields=classAttendanceFixedFields,
+    )
+
+
 @app.route("/bootstraptest")
 def displayBootstrapTest():
     DailyAttendanceLogs = DailyAttendanceLog.query.all()
@@ -145,4 +190,9 @@ def displayBootstrapTest():
         title="Bootstrap Test",
         DailyAttendanceLogs=DailyAttendanceLogs,
     )
+
+
+@app.route("/analytics")
+def displayAnalyticsTest():
+    return render_template("analytics.html")
 
