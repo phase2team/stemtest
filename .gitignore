@@ -4,5 +4,10 @@ P2MT_App/__pycache__/__init__.cpython-38.pyc
 P2MT_App/__pycache__/models.cpython-38.pyc
 P2MT_App/__pycache__/routes.cpython-38.pyc
 .vscode
-p2mt.db
+P2MT_App/p2mt.db
 students_export.csv
+Input_Data_Files
+P2MT_App/templates/analytics.html
+P2MT_App/templates/bootstraptest copy.html
+P2MT_App/templates/bootstraptest.html
+P2MT_App/__pycache__
