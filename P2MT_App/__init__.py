@@ -8,4 +8,4 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 app.jinja_env.globals.update(zip=zip)
 
-from P2MT_App import routes
+from P2MT_App import routes, routes_single_form

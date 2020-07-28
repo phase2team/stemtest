@@ -9,6 +9,7 @@ from wtforms import (
     FormField,
     FieldList,
     IntegerField,
+    HiddenField,
 )
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
@@ -52,17 +53,7 @@ class addDailyAttendanceForm(FlaskForm):
 
 class addInterventionLogForm(FlaskForm):
     studentID = StringField("Student ID")
-    interventionType = SelectField(
-        "Intervention Type"
-        # choices=[getInterventionTypes()]
-        # choices=[
-        #     ("1", "Conduct Behavior"),
-        #     ("2", "Academic Behavior"),
-        #     ("3", "Attendance"),
-        #     ("4", "Dress Code"),
-        #     ("5", "Bullying / Harassment"),
-        # ],
-    )
+    interventionType = SelectField("Intervention Type")
     interventionLevel = StringField("Intervention Level")
     startDate = DateField("Start Date")
     endDate = DateField("End Date")
@@ -70,15 +61,31 @@ class addInterventionLogForm(FlaskForm):
     submit = SubmitField("Submit New Intervention")
 
 
+class classAttendanceLogFilters(FlaskForm):
+    identifier = StringField()
+    teacherName = SelectField("Teacher")
+    className = SelectField("Class")
+    classDate = DateField("Class Date")
+    submit = SubmitField("Submit Log Filters")
+
+
 class updateStudentAttendanceForm(FlaskForm):
+    identifier = StringField()
+    log_id = HiddenField()
     attendanceCode = RadioField(
         "Attendance Code",
         choices=[("P", "P"), ("T", "T"), ("E", "E"), ("U", "U"), ("Q", "?"),],
     )
     comment = StringField("Comment")
-    submit = SubmitField("Submit Attendance")
+    className = HiddenField()
+    teacherName = HiddenField()
+    classDate = HiddenField()
 
 
 class updateClassAttendanceForm(FlaskForm):
-    title = StringField("title")
+    identifier = StringField()
     classMembers = FieldList(FormField(updateStudentAttendanceForm))
+    teacherName = SelectField("Teacher", coerce=str)
+    className = SelectField("Class", coerce=str)
+    classDate = DateField("Class Date")
+    submitFilters = SubmitField("Submit Log Filters")

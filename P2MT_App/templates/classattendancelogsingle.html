@@ -1,7 +1,7 @@
 {% extends 'layout.html'%}
 {% block content %}
 <h1> Class Attendance </h1>
-<form method="POST" action="{{ url_for('displayClassAttendanceLogNew') }}" enctype="multipart/form-data">
+<form method="POST" action="{{ url_for('displayClassAttendanceLogSingle') }}" enctype="multipart/form-data">
   {{ classAttendanceForm.hidden_tag() }}
   {{ classAttendanceForm.identifier(hidden=True, value='logFilters') }}
   <div class="form-group">
@@ -83,7 +83,7 @@
 
 
     {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
-    <form method="POST" action="{{ url_for('displayClassAttendanceLogNew') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('displayClassAttendanceLogSingle') }}" enctype="multipart/form-data">
       {{ classAttendanceForm.hidden_tag() }}
       {{ studentAttendanceForm.hidden_tag() }}
       {{ classAttendanceForm.identifier(hidden=True, value='classAttendanceForm') }}

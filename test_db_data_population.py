@@ -288,7 +288,7 @@ db.create_all()
 # )
 # test_addStaff("Ken", "Kranz", "Guru", "guru@demo.com", "423-555-1212", "A1")
 # test_addStaff(
-#     "Betsy", "Ross", "Sewing Teacher", "seamstress@demo.com", "423-555-1212", "A2"
+#     "Andy", "Able", "Gym Teacher", "seamstress@demo.com", "423-555-1212", "A3"
 # )
 
 # test_addClassSchedule(
@@ -315,5 +315,8 @@ db.create_all()
 
 # test_importSchedules("FET Python Testing - outputFile.csv")
 
-test_addClassAttendanceLog(2, datetime(2020, 9, 15), "T", "late", False)
+# test_addClassAttendanceLog(24, datetime(2020, 7, 25), "T", "late", False)
+# test_addClassAttendanceLog(25, datetime(2020, 7, 25), "T", "late", False)
+# test_addClassAttendanceLog(26, datetime(2020, 7, 25), "T", "late", False)
+# test_addClassAttendanceLog(27, datetime(2020, 7, 25), "T", "late", False)
 
