@@ -1,5 +1,11 @@
 from P2MT_App import db
-from P2MT_App.models import Student, ClassSchedule, DailyAttendanceLog, FacultyAndStaff
+from P2MT_App.models import (
+    Student,
+    ClassSchedule,
+    DailyAttendanceLog,
+    FacultyAndStaff,
+    ClassAttendanceLog,
+)
 
 print("\n=========", __file__, "=========\n")
 
@@ -10,7 +16,8 @@ def outputDatabaseContents(dbTable):
     print("\n")
 
 
-outputDatabaseContents(Student)
-outputDatabaseContents(ClassSchedule)
-outputDatabaseContents(FacultyAndStaff)
-outputDatabaseContents(DailyAttendanceLog)
+# outputDatabaseContents(Student)
+# outputDatabaseContents(ClassSchedule)
+# outputDatabaseContents(FacultyAndStaff)
+# outputDatabaseContents(DailyAttendanceLog)
+outputDatabaseContents(ClassAttendanceLog)

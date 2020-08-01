@@ -1,95 +1,69 @@
 {% extends 'layout.html'%}
 {% block content %}
-<h1> Class Attendance </h1>
-<form method="POST" action="{{ url_for('displayClassAttendanceLogNew') }}" enctype="multipart/form-data">
+<h2> Class Attendance </h2>
+<form method="POST" action="{{ url_for('displayClassAttendanceLog') }}" enctype="multipart/form-data">
   {{ classAttendanceForm.hidden_tag() }}
-  {{ classAttendanceForm.identifier(hidden=True, value='logFilters') }}
-  <div class="form-group">
-    {{ classAttendanceForm.teacherName.label(class="form-control-label") }}
+  <div class="row">
+    <div class="form-group">
+      {{ classAttendanceForm.teacherName.label(class="form-control-label") }}
 
-    {% if classAttendanceForm.teacherName.errors %}
-    {{ classAttendanceForm.teacherName(class="form-control form-control-sm is-invalid") }}
-    <div class="invalid-feedback">
-      {% for error in classAttendanceForm.teacherName.errors %}
-      <span>{{ error }}</span>
-      {% endfor %}
+      {% if classAttendanceForm.teacherName.errors %}
+      {{ classAttendanceForm.teacherName(class="form-control form-control-sm is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in classAttendanceForm.teacherName.errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      {{ classAttendanceForm.teacherName(class="form-control form-control-sm", id="teacherName") }}
+      {% endif %}
     </div>
-    {% else %}
-    {{ classAttendanceForm.teacherName(class="form-control form-control-sm", id="teacherName") }}
-    {% endif %}
-  </div>
 
-  <div class="form-group">
-    {{ classAttendanceForm.className.label(class="form-control-label") }}
 
-    {% if classAttendanceForm.className.errors %}
-    {{ classAttendanceForm.className(class="form-control form-control-sm is-invalid") }}
-    <div class="invalid-feedback">
-      {% for error in classAttendanceForm.className.errors %}
-      <span>{{ error }}</span>
-      {% endfor %}
+    <div class="form-group">
+      {{ classAttendanceForm.className.label(class="form-control-label") }}
+
+      {% if classAttendanceForm.className.errors %}
+      {{ classAttendanceForm.className(class="form-control form-control-sm is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in classAttendanceForm.className.errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      {{ classAttendanceForm.className(class="form-control form-control-sm", id="className") }}
+      {% endif %}
     </div>
-    {% else %}
-    {{ classAttendanceForm.className(class="form-control form-control-sm", id="className") }}
-    {% endif %}
-  </div>
-  <div class="form-group">
-    {{ classAttendanceForm.classDate.label(class="form-control-label") }}
+    <div class="form-group">
+      {{ classAttendanceForm.classDate.label(class="form-control-label") }}
 
-    {% if classAttendanceForm.classDate.errors %}
-    {{ classAttendanceForm.classDate(class="form-control form-control-sm is-invalid") }}
-    <div class="invalid-feedback">
-      {% for error in classAttendanceForm.classDate.errors %}
-      <span>{{ error }}</span>
-      {% endfor %}
+      {% if classAttendanceForm.classDate.errors %}
+      {{ classAttendanceForm.classDate(class="form-control form-control-sm is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in classAttendanceForm.classDate.errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      {{ classAttendanceForm.classDate(class="form-control form-control-sm", id="classDate") }}
+      {% endif %}
     </div>
-    {% else %}
-    {{ classAttendanceForm.classDate(class="form-control form-control-sm", id="classDate") }}
-    {% endif %}
   </div>
-  <div class="form-group">
-    {{ classAttendanceForm.submitFilters.label(class="form-control-label") }}
-
-    {% if classAttendanceForm.submitFilters.errors %}
-    {{ classAttendanceForm.submit(class="form-control form-control-sm is-invalid") }}
-    <div class="invalid-feedback">
-      {% for error in classAttendanceForm.submitFilters.errors %}
-      <span>{{ error }}</span>
-      {% endfor %}
-    </div>
-    {% else %}
-    {{ classAttendanceForm.submitFilters(class="form-control form-control-sm") }}
-    {% endif %}
-  </div>
-</form>
-
-
-
-<table class="table table-sm table-hover">
-  <thead class="thead-light">
-    <tr>
-      <th scope="col">Class Name</th>
-      <th scope="col">Start Time</th>
-      <th scope="col">End Time</th>
-      <th scope="col">First Name</th>
-      <th scope="col">Last Name</th>
-      <th scope="col">Attendance Code</th>
-      <th scope="col">Comment</th>
-    </tr>
-  </thead>
-  <tbody>
-
-
-
-
-    {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
-    <form method="POST" action="{{ url_for('displayClassAttendanceLogNew') }}" enctype="multipart/form-data">
-      {{ classAttendanceForm.hidden_tag() }}
+  <table class="table table-sm table-hover">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">Class Name</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">End Time</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Attendance Code</th>
+        <th scope="col">Comment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
       {{ studentAttendanceForm.hidden_tag() }}
-      {{ classAttendanceForm.identifier(hidden=True, value='classAttendanceForm') }}
-      {{ studentAttendanceForm.identifier(hidden=True, value='studentAttendanceForm') }}
-
-
       <tr>
         <td> {{ studentFixedFields.ClassSchedule.className }}</td>
         <td> {{ studentFixedFields.ClassSchedule.startTime.strftime('%-I:%M') }}</td>
@@ -105,17 +79,11 @@
         <td>
           {{ studentAttendanceForm.comment(class="form-control form-control-sm", size="30") }}
         </td>
-
-
       </tr>
-    </form>
-    {% endfor %}
-
-
-
-
-  </tbody>
-</table>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
 
 <script>
   // Keep track of the scroll position so the page reloads to the same position 
@@ -141,6 +109,27 @@
     commentFields[i].addEventListener("blur", function () { submitUpdate(event); });
   }
 
+  // Set event listeners for updates to teacher, class, and class date filter selections
+  var teacherNameElement = document.getElementById("teacherName")
+  teacherNameElement.addEventListener("change", function () { filterUpdateAndSubmit(event); });
+  var classNameElement = document.getElementById("className")
+  classNameElement.addEventListener("change", function () { filterUpdateAndSubmit(event); });
+  var classDateElement = document.getElementById("classDate")
+  classDateElement.addEventListener("change", function () { filterUpdateAndSubmit(event); });
+
+  // Update filterUpdateFlag to indicate change to filter settings and submit form
+  function filterUpdateAndSubmit(event) {
+    console.log('Filter change detected!')
+    console.log(document.getElementById("updateFiltersFlag").value)
+    document.getElementById("updateFiltersFlag").value = 'updated';
+    console.log(document.getElementById("updateFiltersFlag").value)
+    trigger_field = document.getElementById(event.target.id);
+    console.log('trigger_field = ' + trigger_field);
+    form = trigger_field.form;
+    console.log('trigger_form = ' + form)
+    form.submit();
+  }
+
   // Submit update to attendance on changes to attendanceCode or comment
   function submitUpdate(event) {
     // Identify the form which was updated
@@ -152,35 +141,9 @@
     // Update the hidden fields to capture the teacher name, class name, and class date
     event_id = event.target.id;
     event_split_id = event_id.split('-');
-    // form_id_number = parseInt(event_split_id[1]);
-    // form_id = 'form-' + form_id_number.toString();
-    // console.log('form_id = ' + form_id)
-    // var form = document.getElementById(form_id);
-    // console.log(form)
-
-    e = document.getElementById("teacherName");
-    console.log(e)
-    selectedTeacherName = e.options[e.selectedIndex].text;
-    console.log('selectedTeacherName=', selectedTeacherName)
-    teacherNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-teacherName';
-    console.log(teacherNameHiddenInput_id)
-    document.getElementById(teacherNameHiddenInput_id).value = selectedTeacherName;
-
-    e = document.getElementById("className");
-    console.log(e)
-    selectedClassName = e.options[e.selectedIndex].text;
-    console.log('selectedTeacherName=', selectedTeacherName)
-    classNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-className';
+    classNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-updateFlag';
     console.log(classNameHiddenInput_id)
-    document.getElementById(classNameHiddenInput_id).value = selectedClassName;
-
-    e = document.getElementById("classDate");
-    console.log(e)
-    selectedClassDate = e.value;
-    console.log('selectedClassDate=', selectedClassDate)
-    classDateHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-classDate';
-    console.log(classDateHiddenInput_id)
-    document.getElementById(classDateHiddenInput_id).value = selectedClassDate;
+    document.getElementById(classNameHiddenInput_id).value = 'updated';
     form.submit();
   }
 

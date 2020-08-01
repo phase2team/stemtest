@@ -1,0 +1,470 @@
+{% extends 'layout.html'%}
+{% block content %}
+<h2> Schedule Admin </h2>
+
+
+
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ uploadClassScheduleForm.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Upload Class Schedule</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ uploadClassScheduleForm.csvClassScheduleFile.label() }}
+          {{ uploadClassScheduleForm.csvClassScheduleFile(class="form-control-file") }}
+          {% if uploadClassScheduleForm.csvClassScheduleFile.errors %}
+          {% for error in uploadClassScheduleForm.csvClassScheduleFile.errors %}
+          <span class="text-danger">{{ error }}</span></br>
+          {% endfor %}
+          {% endif %}
+        </div>
+    </fieldset>
+    <div class="form-group">
+      {{ uploadClassScheduleForm.submitUploadClassSchedule(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ propagateClassAttendanceLogsForm.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Propagate Class Attendance Logs</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ propagateClassAttendanceLogsForm.schoolYear.label(class="form-control-label") }}
+
+          {% if propagateClassAttendanceLogsForm.schoolYear.errors %}
+          {{ propagateClassAttendanceLogsForm.schoolYear(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in propagateClassAttendanceLogsForm.schoolYear.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ propagateClassAttendanceLogsForm.schoolYear(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ propagateClassAttendanceLogsForm.semester.label(class="form-control-label") }}
+
+          {% if propagateClassAttendanceLogsForm.semester.errors %}
+          {{ propagateClassAttendanceLogsForm.semester(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in propagateClassAttendanceLogsForm.semester.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ propagateClassAttendanceLogsForm.semester(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ propagateClassAttendanceLogsForm.startDate.label(class="form-control-label") }}
+
+          {% if propagateClassAttendanceLogsForm.startDate.errors %}
+          {{ propagateClassAttendanceLogsForm.startDate(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in propagateClassAttendanceLogsForm.startDate.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ propagateClassAttendanceLogsForm.startDate(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ propagateClassAttendanceLogsForm.endDate.label(class="form-control-label") }}
+
+          {% if propagateClassAttendanceLogsForm.endDate.errors %}
+          {{ propagateClassAttendanceLogsForm.endDate(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in propagateClassAttendanceLogsForm.endDate.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ propagateClassAttendanceLogsForm.endDate(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ propagateClassAttendanceLogsForm.submitPropagatelassAttendanceLogs(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ addSingleClassSchedule.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add Class Schedule for Single Student</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ addSingleClassSchedule.schoolYear.label(class="form-control-label") }}
+
+          {% if addSingleClassSchedule.schoolYear.errors %}
+          {{ addSingleClassSchedule.schoolYear(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.schoolYear.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.schoolYear(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.semester.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.semester.errors %}
+          {{ addSingleClassSchedule.semester(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.semester.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.semester(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.studentName.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.studentName.errors %}
+          {{ addSingleClassSchedule.studentName(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.studentName.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.studentName(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.campus.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.campus.errors %}
+          {{ addSingleClassSchedule.campus(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.campus.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.campus(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.className.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.className.errors %}
+          {{ addSingleClassSchedule.className(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.className.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.className(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.teacherName.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.teacherName.errors %}
+          {{ addSingleClassSchedule.teacherName(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.teacherName.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.teacherName(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.classDays.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.classDays.errors %}
+          {{ addSingleClassSchedule.classDays(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.classDays.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {% for choice in addSingleClassSchedule.classDays %}
+          <div class="form-check">
+            {{ choice(class="form-check-input") }}
+            {{ choice.label(class="form-check-label") }}
+          </div>
+          {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ addSingleClassSchedule.startTime.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.startTime.errors %}
+          {{ addSingleClassSchedule.startTime(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.startTime.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.startTime(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.endTime.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.endTime.errors %}
+          {{ addSingleClassSchedule.endTime(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.endTime.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.endTime(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.online.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.online.errors %}
+          {{ addSingleClassSchedule.online(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.online.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.online(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.indStudy.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.indStudy.errors %}
+          {{ addSingleClassSchedule.indStudy(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.indStudy.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.indStudy(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.comment.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.comment.errors %}
+          {{ addSingleClassSchedule.comment(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.comment.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.comment(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ addSingleClassSchedule.googleCalendarEventID.label(class="form-control-label") }}
+          {% if addSingleClassSchedule.googleCalendarEventID.errors %}
+          {{ addSingleClassSchedule.googleCalendarEventID(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in addSingleClassSchedule.googleCalendarEventID.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ addSingleClassSchedule.googleCalendarEventID(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ addSingleClassSchedule.submitAddSingleClassSchedule(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ deleteClassScheduleForm.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Delete Entire Semester Class Schedule</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ deleteClassScheduleForm.schoolYear.label(class="form-control-label") }}
+
+          {% if deleteClassScheduleForm.schoolYear.errors %}
+          {{ deleteClassScheduleForm.schoolYear(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in deleteClassScheduleForm.schoolYear.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ deleteClassScheduleForm.schoolYear(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ deleteClassScheduleForm.semester.label(class="form-control-label") }}
+
+          {% if deleteClassScheduleForm.semester.errors %}
+          {{ deleteClassScheduleForm.semester(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in deleteClassScheduleForm.semester.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ deleteClassScheduleForm.semester(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ deleteClassScheduleForm.confirmDeleteClassSchedule.label(class="form-control-label") }}
+          {% if deleteClassScheduleForm.confirmDeleteClassSchedule.errors %}
+          {{ deleteClassScheduleForm.confirmDeleteClassSchedule(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in deleteClassScheduleForm.confirmDeleteClassSchedule.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ deleteClassScheduleForm.confirmDeleteClassSchedule(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ deleteClassScheduleForm.submitDeleteClassScheduleForm(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ downloadClassScheduleForm.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Download Entire Semester Class Schedule</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ downloadClassScheduleForm.schoolYear.label(class="form-control-label") }}
+
+          {% if downloadClassScheduleForm.schoolYear.errors %}
+          {{ downloadClassScheduleForm.schoolYear(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassScheduleForm.schoolYear.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassScheduleForm.schoolYear(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ downloadClassScheduleForm.semester.label(class="form-control-label") }}
+
+          {% if downloadClassScheduleForm.semester.errors %}
+          {{ downloadClassScheduleForm.semester(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassScheduleForm.semester.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassScheduleForm.semester(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ downloadClassScheduleForm.submitDownloadClassScheduleForm(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+<div class="content-section">
+  <form method="POST" action="{{ url_for('displayScheduleAdmin') }}" enctype="multipart/form-data">
+    {{ downloadClassAttendanceForm.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Download Class Attendance Roster</legend>
+      <div class="row">
+        <div class="form-group">
+          {{ downloadClassAttendanceForm.schoolYear.label(class="form-control-label") }}
+
+          {% if downloadClassAttendanceForm.schoolYear.errors %}
+          {{ downloadClassAttendanceForm.schoolYear(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassAttendanceForm.schoolYear.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassAttendanceForm.schoolYear(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ downloadClassAttendanceForm.semester.label(class="form-control-label") }}
+
+          {% if downloadClassAttendanceForm.semester.errors %}
+          {{ downloadClassAttendanceForm.semester(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassAttendanceForm.semester.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassAttendanceForm.semester(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ downloadClassAttendanceForm.teacherName.label(class="form-control-label") }}
+          {% if downloadClassAttendanceForm.teacherName.errors %}
+          {{ downloadClassAttendanceForm.teacherName(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassAttendanceForm.teacherName.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassAttendanceForm.teacherName(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ downloadClassAttendanceForm.startDate.label(class="form-control-label") }}
+          {% if downloadClassAttendanceForm.startDate.errors %}
+          {{ downloadClassAttendanceForm.startDate(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassAttendanceForm.startDate.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassAttendanceForm.startDate(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ downloadClassAttendanceForm.endDate.label(class="form-control-label") }}
+          {% if downloadClassAttendanceForm.endDate.errors %}
+          {{ downloadClassAttendanceForm.endDate(class="form-control form-control-sm is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in downloadClassAttendanceForm.endDate.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ downloadClassAttendanceForm.endDate(class="form-control form-control-sm") }}
+          {% endif %}
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ downloadClassAttendanceForm.submitDownloadClassAttendanceForm(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+{% endblock content %}

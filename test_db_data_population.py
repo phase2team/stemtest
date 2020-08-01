@@ -7,8 +7,11 @@ from P2MT_App.models import (
     InterventionLog,
     InterventionType,
     ClassAttendanceLog,
+    SchoolCalendar,
 )
-from datetime import datetime
+from datetime import datetime, date, time
+import re
+import pandas as pd
 
 print("\n=========", __file__, "=========\n")
 
@@ -81,7 +84,8 @@ def test_importSchedules(fname):
         chattStateANumber = column[2].strip()
         campus = column[7].strip()
         className = column[9].strip()
-        staffID = 1
+        teacherLastName = column[11].strip()
+        staffID = None
         online = column[12].strip()
         if online == "1":
             online = True
@@ -94,8 +98,8 @@ def test_importSchedules(fname):
             indStudy = False
         classDays = column[14].strip()
         print(column[16].strip())
-        startTime = datetime.strptime(column[16].strip(), "%I:%M %p")
-        endTime = datetime.strptime(column[17].strip(), "%I:%M %p")
+        startTime = datetime.strptime(column[16].strip(), "%I:%M %p").time()
+        endTime = datetime.strptime(column[17].strip(), "%I:%M %p").time()
         comment = column[18].strip()
         googleCalendarEventID = ""
         test_addClassSchedule(
@@ -104,6 +108,7 @@ def test_importSchedules(fname):
             chattStateANumber,
             campus,
             className,
+            teacherLastName,
             staffID,
             online,
             indStudy,
@@ -166,6 +171,7 @@ def test_addClassSchedule(
     chattStateANumber,
     campus,
     className,
+    teacherLastName,
     staffID,
     online,
     indStudy,
@@ -181,6 +187,7 @@ def test_addClassSchedule(
         chattStateANumber=chattStateANumber,
         campus=campus,
         className=className,
+        teacherLastName=teacherLastName,
         staffID=staffID,
         online=online,
         indStudy=indStudy,
@@ -250,19 +257,127 @@ def test_addInterventionLog(
     db.session.commit()
 
 
-def test_addClassAttendanceLog(
-    classSchedule_id, classDate, attendanceCode, comment, assignTmi
-):
-    classAttendanceLog = ClassAttendanceLog(
-        classSchedule_id=classSchedule_id,
-        classDate=classDate,
-        attendanceCode=attendanceCode,
-        comment=comment,
-        assignTmi=assignTmi,
+def test_addClassAttendanceLog(classSchedule_id, list_of_dates):
+    # Adds entries to class attendance log for a given classSchedule_id and list of dates
+    # Ignores classes when inCurrentClassAttendaceLog is true
+    for classDate in list_of_dates:
+        inCurrentClassAttendaceLog = ClassAttendanceLog.query.filter(
+            ClassAttendanceLog.classSchedule_id == classSchedule_id,
+            ClassAttendanceLog.classDate == classDate,
+        ).all()
+        # print("inCurrentClassAttendaceLog=", inCurrentClassAttendaceLog)
+        if not inCurrentClassAttendaceLog:
+            classAttendanceLog = ClassAttendanceLog(
+                classSchedule_id=classSchedule_id,
+                classDate=classDate,
+                # attendanceCode=attendanceCode,
+                # comment=comment,
+                # assignTmi=assignTmi,
+            )
+            print(classAttendanceLog)
+            db.session.add(classAttendanceLog)
+            db.session.commit()
+
+
+def test_addSchoolCalendarDays(startDate, endDate):
+    calendarDays = pd.date_range(start=startDate, end=endDate, freq="D")
+    for calendarDay in calendarDays:
+        classDate = calendarDay.date()
+        dayNumber = calendarDay.weekday()
+        dayNumberList = ("M", "T", "W", "R", "F", "S", "S")
+        if (
+            dayNumber == 0
+            or dayNumber == 1
+            or dayNumber == 2
+            or dayNumber == 3
+            or dayNumber == 4
+        ):
+            stemSchoolDay = True
+            phaseIISchoolDay = True
+        else:
+            stemSchoolDay = False
+            phaseIISchoolDay = False
+        print(
+            classDate,
+            dayNumber,
+            dayNumberList[dayNumber],
+            stemSchoolDay,
+            phaseIISchoolDay,
+        )
+        schoolCalendar = SchoolCalendar(
+            classDate=classDate,
+            day=dayNumberList[dayNumber],
+            dayNumber=dayNumber,
+            stemSchoolDay=stemSchoolDay,
+            phaseIISchoolDay=phaseIISchoolDay,
+        )
+        db.session.add(schoolCalendar)
+        db.session.commit()
+
+
+def test_createListOfDates(SchoolCalendarTableExtract):
+    dateList = []
+    for day in SchoolCalendarTableExtract:
+        dateList.append(day.classDate)
+    return dateList
+
+
+def test_propagateClassSchedule(startDate, endDate, schoolYear, semester):
+    # Create lists of days to use for propagating class schedule
+    schoolCalendar = db.session.query(SchoolCalendar)
+    phaseIIDays = schoolCalendar.filter(SchoolCalendar.phaseIISchoolDay)
+    dateRange = phaseIIDays.filter(
+        SchoolCalendar.classDate >= startDate, SchoolCalendar.classDate <= endDate
     )
-    print(classAttendanceLog)
-    db.session.add(classAttendanceLog)
-    db.session.commit()
+    list_of_mondays = test_createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "M").all()
+    )
+    # print(list_of_mondays)
+    list_of_tuesdays = test_createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "T").all()
+    )
+    # print(list_of_tuesdays)
+    list_of_wednesdays = test_createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "W").all()
+    )
+    list_of_thursdays = test_createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "R").all()
+    )
+    list_of_fridays = test_createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "F").all()
+    )
+    # Extract details from class schedule
+    classSchedules = (
+        ClassSchedule.query.filter(ClassSchedule.semester == semester)
+        .filter(ClassSchedule.schoolYear == schoolYear)
+        .all()
+    )
+    print("Total number of rows in classSchedules:", len(classSchedules))
+    for classSchedule in classSchedules:
+        classSchedule_id = classSchedule.id
+        online = classSchedule.online
+        indStudy = classSchedule.indStudy
+        classDays = classSchedule.classDays
+        meetsOnMonday = re.search("[M]", classDays)
+        meetsOnTuesday = re.search("[T]", classDays)
+        meetsOnWednesday = re.search("[W]", classDays)
+        meetsOnThursday = re.search("[R]", classDays)
+        meetsOnFriday = re.search("[F]", classDays)
+        if meetsOnMonday and not online and not indStudy:
+            # print("Monday:", classSchedule_id, classDays)
+            test_addClassAttendanceLog(classSchedule_id, list_of_mondays)
+        if meetsOnTuesday and not online and not indStudy:
+            # print("Tuesday:", classSchedule_id, classDays)
+            test_addClassAttendanceLog(classSchedule_id, list_of_tuesdays)
+        if meetsOnWednesday and not online and not indStudy:
+            # print("Wednesday:", classSchedule_id, classDays)
+            test_addClassAttendanceLog(classSchedule_id, list_of_wednesdays)
+        if meetsOnThursday and not online and not indStudy:
+            # print("Thursday:", classSchedule_id, classDays)
+            test_addClassAttendanceLog(classSchedule_id, list_of_thursdays)
+        if meetsOnFriday and not online and not indStudy:
+            # print("Friday:", classSchedule_id, classDays)
+            test_addClassAttendanceLog(classSchedule_id, list_of_fridays)
 
 
 db.create_all()
@@ -313,10 +428,12 @@ db.create_all()
 # )
 # test_importStudents()
 
-# test_importSchedules("FET Python Testing - outputFile.csv")
+# test_importSchedules("P2MT_App/Input_Data_Files/outputFile.csv")
 
-# test_addClassAttendanceLog(24, datetime(2020, 7, 25), "T", "late", False)
-# test_addClassAttendanceLog(25, datetime(2020, 7, 25), "T", "late", False)
-# test_addClassAttendanceLog(26, datetime(2020, 7, 25), "T", "late", False)
-# test_addClassAttendanceLog(27, datetime(2020, 7, 25), "T", "late", False)
+# test_addClassAttendanceLog(1, [date(2020, 7, 29)])
+# test_addClassAttendanceLog(6, [date(2020, 7, 29)])
+# test_addClassAttendanceLog(11, [date(2020, 7, 29)])
+# test_addClassAttendanceLog(16, [date(2020, 7, 29)])
 
+test_propagateClassSchedule(date(2020, 7, 1), date(2020, 7, 31), 2098, "Fall")
+# test_addSchoolCalendarDays(datetime(2020, 7, 1), datetime(2021, 6, 30))

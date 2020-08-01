@@ -1,0 +1,344 @@
+from flask import send_file
+from P2MT_App import db, app
+from P2MT_App.models import ClassSchedule, ClassAttendanceLog, SchoolCalendar, Student
+from P2MT_App.utilityfunctions import download_File
+from datetime import datetime, date, time
+import re
+import os
+import pandas as pd
+
+print("\n=========", __file__, "=========\n")
+
+
+def addClassAttendanceLog(classSchedule_id, list_of_dates):
+    # Adds entries to class attendance log for a given classSchedule_id and list of dates
+    # Ignores classes when inCurrentClassAttendaceLog is true
+    for classDate in list_of_dates:
+        inCurrentClassAttendaceLog = ClassAttendanceLog.query.filter(
+            ClassAttendanceLog.classSchedule_id == classSchedule_id,
+            ClassAttendanceLog.classDate == classDate,
+        ).all()
+        # print("inCurrentClassAttendaceLog=", inCurrentClassAttendaceLog)
+        if not inCurrentClassAttendaceLog:
+            classAttendanceLog = ClassAttendanceLog(
+                classSchedule_id=classSchedule_id,
+                classDate=classDate,
+                # attendanceCode=attendanceCode,
+                # comment=comment,
+                # assignTmi=assignTmi,
+            )
+            print(classAttendanceLog)
+            db.session.add(classAttendanceLog)
+            db.session.commit()
+
+
+# Add class schedule information to database
+def addClassSchedule(
+    schoolYear,
+    semester,
+    chattStateANumber,
+    campus,
+    className,
+    teacherLastName,
+    staffID,
+    online,
+    indStudy,
+    classDays,
+    startTime,
+    endTime,
+    comment,
+    googleCalendarEventID,
+):
+    classSchedule1 = ClassSchedule(
+        schoolYear=schoolYear,
+        semester=semester,
+        chattStateANumber=chattStateANumber,
+        campus=campus,
+        className=className,
+        teacherLastName=teacherLastName,
+        staffID=staffID,
+        online=online,
+        indStudy=indStudy,
+        classDays=classDays,
+        startTime=startTime,
+        endTime=endTime,
+        comment=comment,
+        googleCalendarEventID=googleCalendarEventID,
+    )
+    print(classSchedule1)
+    db.session.add(classSchedule1)
+    db.session.commit()
+
+
+def uploadSchedules(fname):
+    importCSV = open(fname, "r")
+    for row in importCSV:
+        print("row=", row)
+        column = row.split(",")
+        print("column=", column)
+        schoolYear = column[0].strip()
+        if schoolYear == "year":
+            continue
+        semester = column[1].strip()
+        chattStateANumber = column[2].strip()
+        campus = column[7].strip()
+        className = column[9].strip()
+        teacherLastName = column[11].strip()
+        staffID = None
+        online = column[12].strip()
+        if online == "1":
+            online = True
+        else:
+            online = False
+        indStudy = column[13].strip()
+        if indStudy == "1":
+            indStudy = True
+        else:
+            indStudy = False
+        classDays = column[14].strip()
+        print(column[16].strip())
+        startTime = datetime.strptime(column[16].strip(), "%I:%M %p").time()
+        endTime = datetime.strptime(column[17].strip(), "%I:%M %p").time()
+        comment = column[18].strip()
+        googleCalendarEventID = ""
+        addClassSchedule(
+            schoolYear,
+            semester,
+            chattStateANumber,
+            campus,
+            className,
+            teacherLastName,
+            staffID,
+            online,
+            indStudy,
+            classDays,
+            startTime,
+            endTime,
+            comment,
+            googleCalendarEventID,
+        )
+
+
+def deleteClassSchedule(schoolYear, semester):
+    classSchedules = ClassSchedule.query.filter(
+        ClassSchedule.schoolYear == schoolYear, ClassSchedule.semester == semester
+    ).all()
+    for classSchedule in classSchedules:
+        db.session.delete(classSchedule)
+        db.session.commit()
+    return
+
+
+def downloadClassSchedule(schoolYear, semester):
+    print("downloadClassSchedule function called")
+    # Create a CSV output file and append with a timestamp
+    output_file_path = os.path.join(app.root_path, "static/download")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
+    csvOutputFile = open(csvFilename, "w")
+    # Write header row for CSV file
+    csvHeaderRow = "year,semester,Chatt_State_A_Number,CSname,firstName,lastName,HSclass,campus,courseNumber,courseName,sectionID,teacher,online,indStudy,days,times,startTime,endTime,comment,googleCalendarEventID\n"
+    csvOutputFile.write(csvHeaderRow)
+    csvOutputFileRowCount = 0
+    # Query the ClassSchedule with a join to include student information
+    ClassSchedules = ClassSchedule.query.filter(
+        ClassSchedule.schoolYear == schoolYear, ClassSchedule.semester == semester
+    ).order_by(ClassSchedule.chattStateANumber.desc())
+    # Process each record in the query and write to the output file
+    for classSchedule in ClassSchedules:
+        chattStateANumber = classSchedule.chattStateANumber
+        lastName = classSchedule.Student.lastName
+        firstName = classSchedule.Student.firstName
+        CSname = lastName + " " + firstName
+        HSclass = classSchedule.Student.yearOfGraduation
+        campus = classSchedule.campus
+        courseNumber = ""
+        courseName = classSchedule.className
+        sectionID = ""
+        teacher = classSchedule.teacherLastName
+        online = classSchedule.online
+        if online:
+            online = "1"
+        else:
+            online = "0"
+        indStudy = classSchedule.indStudy
+        if indStudy:
+            indStudy = "1"
+        else:
+            indStudy = "0"
+        days = classSchedule.classDays
+        startTime = classSchedule.startTime
+        endTime = classSchedule.endTime
+        comment = classSchedule.comment
+        googleCalendarEventID = classSchedule.googleCalendarEventID
+
+        csvRowPrefix = [
+            str(schoolYear),
+            semester,
+            chattStateANumber,
+            CSname,
+            firstName,
+            lastName,
+            str(HSclass),
+        ]
+
+        csvRow = csvRowPrefix + [
+            campus,
+            courseNumber,
+            courseName,
+            str(sectionID),
+            teacher,
+            online,
+            indStudy,
+            days,
+            startTime.strftime("%-I:%M") + " - " + endTime.strftime("%-I:%M"),
+            startTime.strftime("%-I:%M %p"),
+            endTime.strftime("%-I:%M %p"),
+            comment,
+            googleCalendarEventID,
+        ]
+        csvElementCounter = 1
+        for element in csvRow:
+            if element is None:
+                element = ""
+            if csvElementCounter < len(csvRow):
+                csvOutputFile.write(element + ",")
+                csvElementCounter += 1
+            else:
+                csvOutputFile.write(element + "\n")
+        csvOutputFileRowCount = csvOutputFileRowCount + 1
+    csvOutputFile.close()
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
+
+
+def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, endDate):
+    print("downloadClassAttendanceLog function called")
+    # Create a CSV output file and append with a timestamp
+    output_file_path = os.path.join(app.root_path, "static/download")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "class_attendance_" + timestamp + ".csv"
+    csvOutputFile = open(csvFilename, "w")
+    # Write header row for CSV file
+    csvHeaderRow = "teacher, className, day, classDate, startTime, endTime, firstName,lastName,attendanceCode,comment\n"
+    csvOutputFile.write(csvHeaderRow)
+    csvOutputFileRowCount = 0
+    ClassAttendanceLogs = (
+        ClassAttendanceLog.query.join(ClassSchedule)
+        .join(ClassSchedule.Student)
+        .filter(
+            ClassSchedule.schoolYear == schoolYear,
+            ClassSchedule.semester == semester,
+            ClassSchedule.teacherLastName == teacherName,
+            ClassAttendanceLog.classDate >= startDate,
+            ClassAttendanceLog.classDate <= endDate,
+        )
+        .order_by(ClassAttendanceLog.classDate)
+        .order_by(ClassSchedule.startTime)
+        .order_by(ClassSchedule.className)
+        .order_by(Student.lastName)
+    )
+    # for classAttendanceLog in ClassAttendanceLogs:
+    #     print(
+    #         classAttendanceLog.ClassSchedule.teacherLastName,
+    #         classAttendanceLog.ClassSchedule.className,
+    #         classAttendanceLog.classDate.strftime("%a"),
+    #         classAttendanceLog.classDate.strftime("%Y/%m/%d"),
+    #         classAttendanceLog.ClassSchedule.startTime.strftime("%-I:%M %p"),
+    #         classAttendanceLog.ClassSchedule.endTime.strftime("%-I:%M %p"),
+    #         classAttendanceLog.ClassSchedule.Student.firstName,
+    #         classAttendanceLog.ClassSchedule.Student.lastName,
+    #         classAttendanceLog.attendanceCode,
+    #         classAttendanceLog.comment,
+    #     )
+    # Process each record in the query and write to the output file
+    for classAttendanceLog in ClassAttendanceLogs:
+        csvRow = [
+            classAttendanceLog.ClassSchedule.teacherLastName,
+            classAttendanceLog.ClassSchedule.className,
+            classAttendanceLog.classDate.strftime("%a"),
+            classAttendanceLog.classDate.strftime("%Y/%m/%d"),
+            classAttendanceLog.ClassSchedule.startTime.strftime("%-I:%M %p"),
+            classAttendanceLog.ClassSchedule.endTime.strftime("%-I:%M %p"),
+            classAttendanceLog.ClassSchedule.Student.firstName,
+            classAttendanceLog.ClassSchedule.Student.lastName,
+            classAttendanceLog.attendanceCode,
+            classAttendanceLog.comment,
+        ]
+
+        csvElementCounter = 1
+        for element in csvRow:
+            if element is None:
+                element = ""
+            if csvElementCounter < len(csvRow):
+                csvOutputFile.write(element + ",")
+                csvElementCounter += 1
+            else:
+                csvOutputFile.write(element + "\n")
+        csvOutputFileRowCount = csvOutputFileRowCount + 1
+    csvOutputFile.close()
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
+
+
+def createListOfDates(SchoolCalendarTableExtract):
+    dateList = []
+    for day in SchoolCalendarTableExtract:
+        dateList.append(day.classDate)
+    return dateList
+
+
+def propagateClassSchedule(startDate, endDate, schoolYear, semester):
+    # Create lists of days to use for propagating class schedule
+    schoolCalendar = db.session.query(SchoolCalendar)
+    phaseIIDays = schoolCalendar.filter(SchoolCalendar.phaseIISchoolDay)
+    dateRange = phaseIIDays.filter(
+        SchoolCalendar.classDate >= startDate, SchoolCalendar.classDate <= endDate
+    )
+    list_of_mondays = createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "M").all()
+    )
+    # print(list_of_mondays)
+    list_of_tuesdays = createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "T").all()
+    )
+    # print(list_of_tuesdays)
+    list_of_wednesdays = createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "W").all()
+    )
+    list_of_thursdays = createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "R").all()
+    )
+    list_of_fridays = createListOfDates(
+        dateRange.filter(SchoolCalendar.day == "F").all()
+    )
+    # Extract details from class schedule
+    classSchedules = (
+        ClassSchedule.query.filter(ClassSchedule.semester == semester)
+        .filter(ClassSchedule.schoolYear == schoolYear)
+        .all()
+    )
+    print("Total number of rows in classSchedules:", len(classSchedules))
+    for classSchedule in classSchedules:
+        classSchedule_id = classSchedule.id
+        online = classSchedule.online
+        indStudy = classSchedule.indStudy
+        classDays = classSchedule.classDays
+        meetsOnMonday = re.search("[M]", classDays)
+        meetsOnTuesday = re.search("[T]", classDays)
+        meetsOnWednesday = re.search("[W]", classDays)
+        meetsOnThursday = re.search("[R]", classDays)
+        meetsOnFriday = re.search("[F]", classDays)
+        if meetsOnMonday and not online and not indStudy:
+            # print("Monday:", classSchedule_id, classDays)
+            addClassAttendanceLog(classSchedule_id, list_of_mondays)
+        if meetsOnTuesday and not online and not indStudy:
+            # print("Tuesday:", classSchedule_id, classDays)
+            addClassAttendanceLog(classSchedule_id, list_of_tuesdays)
+        if meetsOnWednesday and not online and not indStudy:
+            # print("Wednesday:", classSchedule_id, classDays)
+            addClassAttendanceLog(classSchedule_id, list_of_wednesdays)
+        if meetsOnThursday and not online and not indStudy:
+            # print("Thursday:", classSchedule_id, classDays)
+            addClassAttendanceLog(classSchedule_id, list_of_thursdays)
+        if meetsOnFriday and not online and not indStudy:
+            # print("Friday:", classSchedule_id, classDays)
+            addClassAttendanceLog(classSchedule_id, list_of_fridays)

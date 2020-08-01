@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, send_file
 from P2MT_App import app, db
 from P2MT_App.models import (
     Student,
@@ -14,9 +14,32 @@ from P2MT_App.forms import (
     updateStudentAttendanceForm,
     updateClassAttendanceForm,
     classAttendanceLogFilters,
+    uploadClassScheduleForm,
+    propagateClassAttendanceLogsForm,
+    deleteClassScheduleForm,
+    downloadClassScheduleForm,
+    downloadClassAttendanceForm,
+    addSingleClassSchedule,
 )
-from P2MT_App.referenceData import getInterventionTypes, getTeachers, getClassNames
-from datetime import datetime
+from P2MT_App.referenceData import (
+    getInterventionTypes,
+    getTeachers,
+    getClassNames,
+    getSchoolYear,
+    getSemester,
+    getStudents,
+    getCampusChoices,
+)
+from P2MT_App.ScheduleAdmin import (
+    propagateClassSchedule,
+    uploadSchedules,
+    deleteClassSchedule,
+    downloadClassSchedule,
+    downloadClassAttendanceLog,
+    addClassSchedule,
+)
+from P2MT_App.utilityfunctions import save_File
+from datetime import datetime, date
 
 
 def add_DailyAttendanceLog(student_id, absenceDate, attendanceCode, comment):
@@ -163,220 +186,182 @@ def delete_ClassSchedule(log_id):
     return redirect(url_for("displayMasterSchedule"))
 
 
-@app.route("/classattendancelognew", methods=["GET", "POST"])
-def displayClassAttendanceLogNew():
-    classAttendanceForm = updateClassAttendanceForm()
-    classAttendanceForm.teacherName.choices = getTeachers()
-    classAttendanceForm.className.choices = getClassNames()
-
-    classDateTime = datetime(
-        datetime.today().year, datetime.today().month, datetime.today().day, 0, 0, 0, 0
-    )
-    print(
-        "\nclassAttendanceForm.identifier.data = ", classAttendanceForm.identifier.data
-    )
-    # if request.method == "POST":
-
-    if request.method == "POST":
-        print("request.form =", request.form)
-
-    # if classAttendanceForm.validate_on_submit():
-    #     print("classAttendanceForm.validate_on_submit() =", classAttendanceForm.validate_on_submit())
-    # print("classAttendanceForm.errors =", classAttendanceForm.errors)
-
-    if (
-        classAttendanceForm.identifier.data == "classAttendanceForm"
-        and classAttendanceForm.is_submitted()
-    ):
-
-        log_id = classAttendanceForm.classMembers.data[0]["log_id"]
-        classAttendanceLog = ClassAttendanceLog.query.get_or_404(log_id)
-        classAttendanceLog.attendanceCode = classAttendanceForm.classMembers.data[0][
-            "attendanceCode"
-        ]
-        classAttendanceLog.comment = classAttendanceForm.classMembers.data[0]["comment"]
-        db.session.commit()
-
-        print(
-            "CAF log filter data:",
-            classAttendanceForm.classDate.data,
-            classAttendanceForm.className.data,
-            classAttendanceForm.teacherName.data,
-        )
-        parsedDate = datetime.strptime(
-            classAttendanceForm.classMembers.data[0]["classDate"], "%Y-%m-%d"
-        )
-        print(
-            "CAF classAttendanceFormLogFilters data:",
-            classAttendanceForm.classMembers.data[0]["className"],
-            classAttendanceForm.classMembers.data[0]["teacherName"],
-            classAttendanceForm.classMembers.data[0]["classDate"],
-            parsedDate,
-        )
-        logFilterData = classAttendanceForm.classMembers.data
-        className = logFilterData[0]["className"]
-        teacherName = logFilterData[0]["teacherName"]
-        classDate = datetime.strptime(logFilterData[0]["classDate"], "%Y-%m-%d")
-
-        # classAttendanceForm = updateClassAttendanceForm()
-        # classAttendanceForm.teacherName.choices = getTeachers()
-        # classAttendanceForm.className.choices = getClassNames()
-
-        classAttendanceForm.className.default = className
-        classAttendanceForm.teacherName.default = teacherName
-        classAttendanceForm.classDate.default = classDate
-
-        # classAttendanceForm.className.default = classAttendanceForm.classMembers.data[
-        #     0
-        # ]["className"]
-
-        # classAttendanceForm.teacherName.default = classAttendanceForm.classMembers.data[
-        #     0
-        # ]["teacherName"]
-
-        # classAttendanceForm.classDate.default = datetime.strptime(
-        #     classAttendanceForm.classMembers.data[0]["classDate"], "%Y-%m-%d"
-        # )
-        # classAttendanceForm.process()
-
-        print(
-            "CAF log filter default:",
-            classAttendanceForm.classDate.default,
-            classAttendanceForm.className.default,
-            classAttendanceForm.teacherName.default,
-        )
-
-        classAttendanceForm.process()
-
-        classAttendanceFixedFields = ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == parsedDate
-        ).all()
-        # classAttendanceForm = updateClassAttendanceForm()
-
-        for studentAttendance in ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == parsedDate
-        ).all():
-            studentAttendanceForm = updateStudentAttendanceForm()
-            studentAttendanceForm.log_id = studentAttendance.id
-            studentAttendanceForm.attendanceCode = studentAttendance.attendanceCode
-            studentAttendanceForm.comment = studentAttendance.comment
-            studentAttendanceForm.teacherName = ""
-            studentAttendanceForm.className = ""
-            studentAttendanceForm.classDate = ""
-            # studentAttendanceForm.process()
-            classAttendanceForm.classMembers.append_entry(studentAttendanceForm)
+@app.route("/scheduleadmin", methods=["GET", "POST"])
+def displayScheduleAdmin():
+    uploadClassScheduleFormDetails = uploadClassScheduleForm()
+    propagateClassAttendanceLogsFormDetails = propagateClassAttendanceLogsForm()
+    propagateClassAttendanceLogsFormDetails.schoolYear.choices = getSchoolYear()
+    propagateClassAttendanceLogsFormDetails.semester.choices = getSemester()
+    deleteClassScheduleFormDetails = deleteClassScheduleForm()
+    deleteClassScheduleFormDetails.schoolYear.choices = getSchoolYear()
+    deleteClassScheduleFormDetails.semester.choices = getSemester()
+    downloadClassScheduleFormDetails = downloadClassScheduleForm()
+    downloadClassScheduleFormDetails.schoolYear.choices = getSchoolYear()
+    downloadClassScheduleFormDetails.semester.choices = getSemester()
+    downloadClassAttendanceFormDetails = downloadClassAttendanceForm()
+    downloadClassAttendanceFormDetails.schoolYear.choices = getSchoolYear()
+    downloadClassAttendanceFormDetails.semester.choices = getSemester()
+    downloadClassAttendanceFormDetails.teacherName.choices = getTeachers()
+    addSingleClassScheduleDetails = addSingleClassSchedule()
+    addSingleClassScheduleDetails.schoolYear.choices = getSchoolYear()
+    addSingleClassScheduleDetails.semester.choices = getSemester()
+    addSingleClassScheduleDetails.teacherName.choices = getTeachers()
+    addSingleClassScheduleDetails.studentName.choices = getStudents()
+    addSingleClassScheduleDetails.campus.choices = getCampusChoices()
+    addSingleClassScheduleDetails.className.choices = getClassNames()
+    addSingleClassScheduleDetails.classDays.choices = [
+        ("M", "M"),
+        ("T", "T"),
+        ("W", "W"),
+        ("R", "R"),
+        ("F", "F"),
+    ]
+    print(request.form)
+    if "submitUploadClassSchedule" in request.form:
+        if uploadClassScheduleFormDetails.validate_on_submit():
+            print("Upload Form Submitted")
+            if uploadClassScheduleFormDetails.csvClassScheduleFile.data:
+                uploadedScheduleFile = save_File(
+                    uploadClassScheduleFormDetails.csvClassScheduleFile.data,
+                    "Uploaded_Schedule_File.csv",
+                )
+                uploadSchedules(uploadedScheduleFile)
+    print(uploadClassScheduleFormDetails.errors)
+    if "submitPropagatelassAttendanceLogs" in request.form:
+        if propagateClassAttendanceLogsFormDetails.validate_on_submit():
+            print("Propagate Form Submitted")
+            schoolYear = int(propagateClassAttendanceLogsFormDetails.schoolYear.data)
+            semester = propagateClassAttendanceLogsFormDetails.semester.data
+            startDate = propagateClassAttendanceLogsFormDetails.startDate.data
+            endDate = propagateClassAttendanceLogsFormDetails.endDate.data
             print(
-                "SAF ",
-                studentAttendanceForm.log_id,
-                studentAttendanceForm.attendanceCode,
-                studentAttendanceForm.comment,
+                "schoolYear=",
+                schoolYear,
+                "semester=",
+                semester,
+                "startDate=",
+                startDate,
+                "endDate=",
+                endDate,
             )
-        print("classAttendanceForm =", classAttendanceForm)
+            propagateClassSchedule(startDate, endDate, schoolYear, semester)
+    print(propagateClassAttendanceLogsFormDetails.errors)
+    if "submitDeleteClassScheduleForm" in request.form:
+        if deleteClassScheduleFormDetails.validate_on_submit():
+            if (
+                deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data
+                == "DELETE"
+            ):
+                schoolYear = deleteClassScheduleFormDetails.schoolYear.data
+                semester = deleteClassScheduleFormDetails.semester.data
+                print(
+                    "Delete Class Schedule Form Submitted: SchoolYear=",
+                    schoolYear,
+                    " Semester=",
+                    semester,
+                )
+                deleteClassSchedule(
+                    schoolYear, semester,
+                )
+                deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
+                # deleteClassScheduleFormDetails.process()
+            else:
+                deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
+                print("Type DELETE in the text box to confirm delete")
+    if "submitAddSingleClassSchedule" in request.form:
+        if addSingleClassScheduleDetails.validate():
+            schoolYear = addSingleClassScheduleDetails.schoolYear.data
+            semester = addSingleClassScheduleDetails.semester.data
+            chattStateANumber = addSingleClassScheduleDetails.studentName.data
+            teacherLastName = addSingleClassScheduleDetails.teacherName.data
+            className = addSingleClassScheduleDetails.className.data
+            classDaysList = addSingleClassScheduleDetails.classDays.data
+            classDays = ""
+            for classDay in classDaysList:
+                classDays = classDays + classDay
+            startTime = addSingleClassScheduleDetails.startTime.data
+            endTime = addSingleClassScheduleDetails.endTime.data
+            online = addSingleClassScheduleDetails.online.data
+            indStudy = addSingleClassScheduleDetails.indStudy.data
+            comment = addSingleClassScheduleDetails.comment.data
+            googleCalendarEventID = (
+                addSingleClassScheduleDetails.googleCalendarEventID.data
+            )
+            campus = "STEM School"
+            staffID = None
 
-    elif classAttendanceForm.identifier.data == "logFilters":
-        print(
-            "LF log filter data:",
-            classAttendanceForm.classDate.data,
-            classAttendanceForm.className.data,
-            classAttendanceForm.teacherName.data,
-        )
-
-        classAttendanceForm.classDate.default = classAttendanceForm.classDate.data
-        classDate = classAttendanceForm.classDate.data
-        classAttendanceForm.className.default = classAttendanceForm.className.data
-        classAttendanceForm.teacherName.default = classAttendanceForm.teacherName.data
-
-        print(
-            "LF log filter default:",
-            classAttendanceForm.classDate.default,
-            classAttendanceForm.className.default,
-            classAttendanceForm.teacherName.default,
-        )
-
-        print(
-            "LF log filter choices:",
-            classAttendanceForm.className.choices,
-            classAttendanceForm.teacherName.choices,
-        )
-
-        # print(type(classDate))
-        classDateTime = datetime(
-            classDate.year, classDate.month, classDate.day, 0, 0, 0, 0
-        )
-        # print(type(classDate), classDateTime)
-        # print(logFilters.className.data)
-        # print(logFilters.teacherName.data)
-
-        classAttendanceFixedFields = ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == classDateTime
-        ).all()
-        # classAttendanceForm = updateClassAttendanceForm()
-        for studentAttendance in ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == classDateTime
-        ).all():
-            studentAttendanceForm = updateStudentAttendanceForm()
-            studentAttendanceForm.log_id = studentAttendance.id
-            studentAttendanceForm.attendanceCode = studentAttendance.attendanceCode
-            studentAttendanceForm.comment = studentAttendance.comment
-            studentAttendanceForm.teacherName = ""
-            studentAttendanceForm.className = ""
-            studentAttendanceForm.classDate = ""
-            classAttendanceForm.classMembers.append_entry(studentAttendanceForm)
-
-        print(
-            "LF log filter default:",
-            classAttendanceForm.classDate.default,
-            classAttendanceForm.className.default,
-            classAttendanceForm.teacherName.default,
-        )
-
-        print(
-            "LF log filter choices:",
-            classAttendanceForm.className.choices,
-            classAttendanceForm.teacherName.choices,
-        )
-    elif classAttendanceForm.identifier.data is None:
-        print(
-            "classAttendanceForm.identifier.data =", classAttendanceForm.identifier.data
-        )
-        # classDate = datetime(
-        #     datetime.today().year, datetime.today().month, datetime.today().day
-        # )
-
-        classAttendanceFixedFields = ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == classDateTime
-        ).all()
-        # classAttendanceForm = updateClassAttendanceForm()
-
-        for studentAttendance in ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate == classDateTime
-        ).all():
-            studentAttendanceForm = updateStudentAttendanceForm()
-            studentAttendanceForm.log_id = studentAttendance.id
-            studentAttendanceForm.attendanceCode = studentAttendance.attendanceCode
-            studentAttendanceForm.comment = studentAttendance.comment
-            studentAttendanceForm.teacherName = ""
-            studentAttendanceForm.className = ""
-            studentAttendanceForm.classDate = ""
-            classAttendanceForm.classMembers.append_entry(studentAttendanceForm)
-
-        print(
-            "NONE log filter default:",
-            classAttendanceForm.classDate.default,
-            classAttendanceForm.className.default,
-            classAttendanceForm.teacherName.default,
-        )
-        print(
-            "NONE log filter choices:",
-            classAttendanceForm.className.choices,
-            classAttendanceForm.teacherName.choices,
-        )
-    print("Final before render_template")
+            print(
+                schoolYear,
+                semester,
+                chattStateANumber,
+                teacherLastName,
+                className,
+                classDays,
+                startTime,
+                endTime,
+                online,
+                indStudy,
+                comment,
+                googleCalendarEventID,
+            )
+            addClassSchedule(
+                schoolYear,
+                semester,
+                chattStateANumber,
+                campus,
+                className,
+                teacherLastName,
+                staffID,
+                online,
+                indStudy,
+                classDays,
+                startTime,
+                endTime,
+                comment,
+                googleCalendarEventID,
+            )
+    if "submitDownloadClassScheduleForm" in request.form:
+        if downloadClassScheduleFormDetails.validate_on_submit():
+            schoolYear = downloadClassScheduleFormDetails.schoolYear.data
+            semester = downloadClassScheduleFormDetails.semester.data
+            print(
+                "Download Class Schedule Form Submitted: SchoolYear=",
+                schoolYear,
+                " Semester=",
+                semester,
+            )
+            return downloadClassSchedule(schoolYear, semester)
+    if "submitDownloadClassAttendanceForm" in request.form:
+        if downloadClassAttendanceFormDetails.validate_on_submit():
+            schoolYear = downloadClassAttendanceFormDetails.schoolYear.data
+            semester = downloadClassAttendanceFormDetails.semester.data
+            teacherName = downloadClassAttendanceFormDetails.teacherName.data
+            startDate = downloadClassAttendanceFormDetails.startDate.data
+            endDate = downloadClassAttendanceFormDetails.endDate.data
+            print(
+                "Download Class Attendance Form Submitted: SchoolYear=",
+                schoolYear,
+                " Semester=",
+                semester,
+                " teacherName=",
+                teacherName,
+                " startDate=",
+                startDate,
+                " endDate=",
+                endDate,
+            )
+            return downloadClassAttendanceLog(
+                schoolYear, semester, teacherName, startDate, endDate
+            )
     return render_template(
-        "classattendancelog.html",
-        title="Class Attendance Log",
-        classAttendanceForm=classAttendanceForm,
-        classAttendanceFixedFields=classAttendanceFixedFields,
+        "scheduleadmin.html",
+        title="Schedule Admin",
+        propagateClassAttendanceLogsForm=propagateClassAttendanceLogsFormDetails,
+        uploadClassScheduleForm=uploadClassScheduleFormDetails,
+        deleteClassScheduleForm=deleteClassScheduleFormDetails,
+        downloadClassScheduleForm=downloadClassScheduleFormDetails,
+        downloadClassAttendanceForm=downloadClassAttendanceFormDetails,
+        addSingleClassSchedule=addSingleClassScheduleDetails,
     )
 
 
@@ -394,3 +379,141 @@ def displayBootstrapTest():
 def displayAnalyticsTest():
     return render_template("analytics.html")
 
+
+@app.route("/classattendancelog", methods=["GET", "POST"])
+def displayClassAttendanceLog():
+    print("\n---THIS IS displayClassAttendanceLog()---")
+    classAttendanceForm = updateClassAttendanceForm()
+    classAttendanceForm.teacherName.choices = getTeachers()
+    classAttendanceForm.className.choices = getClassNames()
+
+    classDateTime = date.today()
+    # classDateTime = datetime(
+    #     datetime.today().year, datetime.today().month, datetime.today().day, 0, 0, 0, 0
+    # )
+    # print(
+    #     "\nclassAttendanceForm.identifier.data = ", classAttendanceForm.identifier.data
+    # )
+    print(
+        "classAttendanceForm.updateFiltersFlag.data =",
+        classAttendanceForm.updateFiltersFlag.data,
+    )
+
+    print("request.method =", request.method)
+
+    if classAttendanceForm.validate_on_submit():
+        print(
+            "classAttendanceForm.validate_on_submit() =",
+            classAttendanceForm.validate_on_submit(),
+        )
+    print("classAttendanceForm.errors =", classAttendanceForm.errors)
+
+    # if classAttendanceForm.identifier.data is None:
+    if request.method == "GET":
+
+        if classAttendanceForm.classDate.data:
+            classDateTime = classAttendanceForm.classDate.data
+            classAttendanceForm.classDate.default = classDateTime
+        else:
+            classDateTime = date.today()
+            # classDateTime = datetime.now()
+            # classDateTime = classDateTime.replace(
+            #     hour=0, minute=0, second=0, microsecond=0
+            # )
+            classAttendanceForm.classDate.data = classDateTime
+            # classAttendanceForm.classDate.data = classDateTime.date()
+
+        classAttendanceForm.className.default = classAttendanceForm.className.data
+        classAttendanceForm.teacherName.default = classAttendanceForm.teacherName.data
+        classAttendanceForm.updateFiltersFlag.data = ""
+
+    if classAttendanceForm.validate_on_submit():
+
+        # Update default values for teacher name and class name
+        classAttendanceForm.className.default = classAttendanceForm.className.data
+        classAttendanceForm.teacherName.default = classAttendanceForm.teacherName.data
+
+        # Format class date for compatibility with database
+        classDate = classAttendanceForm.classDate.data
+        classDateTime = classDate
+        print(classDate, classDateTime)
+        # classDateTime = datetime(
+        #     classDate.year, classDate.month, classDate.day, 0, 0, 0, 0
+        # )
+        print(
+            "classAttendanceForm.updateFiltersFlag.data =",
+            classAttendanceForm.updateFiltersFlag.data,
+        )
+
+        # Update database with attendance updates
+        if (
+            classAttendanceForm.classMembers
+            and classAttendanceForm.updateFiltersFlag.data != "updated"
+        ):
+            print("Class attendance submitted")
+            print(len(classAttendanceForm.classMembers.data))
+            for studentForm in classAttendanceForm.classMembers.data:
+                if studentForm["updateFlag"] == "updated":
+                    log_id = studentForm["log_id"]
+                    print("log_id = ", log_id)
+                    classAttendanceLog = ClassAttendanceLog.query.get_or_404(log_id)
+                    classAttendanceLog.attendanceCode = studentForm["attendanceCode"]
+                    classAttendanceLog.comment = studentForm["comment"]
+                    db.session.commit()
+
+        # Need to run the next statement [classAttendanceForm.process()]
+        # or the updated values for the studentAttendanceForm won't display
+        classAttendanceForm.process()
+
+    # Retrive updated fixed-value attendance fields from database
+    classAttendanceFixedFields = (
+        ClassAttendanceLog.query.filter(ClassAttendanceLog.classDate == classDateTime)
+        .join(ClassSchedule)
+        .join(ClassSchedule.Student)
+        .filter(
+            ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
+        )
+        .filter(ClassSchedule.className == classAttendanceForm.className.default)
+        .order_by(ClassSchedule.startTime)
+        .order_by(ClassSchedule.className)
+        .order_by(Student.lastName)
+        .all()
+    )
+
+    # Retrieve updated student attendance fields from database
+    for studentAttendance in classAttendanceFixedFields:
+        studentAttendanceForm = updateStudentAttendanceForm()
+        studentAttendanceForm.log_id = studentAttendance.id
+        studentAttendanceForm.attendanceCode = studentAttendance.attendanceCode
+        studentAttendanceForm.comment = studentAttendance.comment
+        studentAttendanceForm.updateFlag = ""
+        print(
+            "ROSTER ",
+            studentAttendanceForm.log_id,
+            studentAttendance.ClassSchedule.className,
+            studentAttendance.ClassSchedule.startTime,
+            studentAttendance.ClassSchedule.endTime,
+            studentAttendance.ClassSchedule.Student.firstName,
+            studentAttendance.ClassSchedule.Student.lastName,
+            studentAttendanceForm.attendanceCode,
+            studentAttendanceForm.comment,
+        )
+        classAttendanceForm.classMembers.append_entry(studentAttendanceForm)
+
+    # Reset the updateFiltersFlag before rendering page
+    classAttendanceForm.updateFiltersFlag.data = ""
+
+    print("Final before render_template")
+    print(
+        "classAttendanceForm.classDate.default =",
+        classAttendanceForm.classDate.default,
+    )
+    print(
+        "classAttendanceForm.classDate.data =", classAttendanceForm.classDate.data,
+    )
+    return render_template(
+        "classattendancelog.html",
+        title="Class Attendance Log",
+        classAttendanceForm=classAttendanceForm,
+        classAttendanceFixedFields=classAttendanceFixedFields,
+    )

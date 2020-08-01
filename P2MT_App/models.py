@@ -40,12 +40,13 @@ class ClassSchedule(db.Model):
     )
     campus = db.Column(db.String(50), nullable=False)
     className = db.Column(db.String(50), nullable=False)
+    teacherLastName = db.Column(db.String(50), nullable=False)
     staffID = db.Column(db.Integer, db.ForeignKey("FacultyAndStaff.id"), nullable=True)
     online = db.Column(db.Boolean, nullable=False, default=False)
     indStudy = db.Column(db.Boolean, nullable=False, default=False)
     classDays = db.Column(db.String(10), nullable=False)
-    startTime = db.Column(db.DateTime, nullable=True)
-    endTime = db.Column(db.DateTime, nullable=True)
+    startTime = db.Column(db.Time, nullable=True)
+    endTime = db.Column(db.Time, nullable=True)
     comment = db.Column(db.String(250), nullable=True)
     googleCalendarEventID = db.Column(db.String(250), nullable=True)
     ClassAttendanceLog = db.relationship(
@@ -64,7 +65,8 @@ class ClassAttendanceLog(db.Model):
         db.ForeignKey("ClassSchedule.id", ondelete="CASCADE"),
         nullable=False,
     )
-    classDate = db.Column(db.DateTime, nullable=False)
+    # classDate = db.Column(db.DateTime, nullable=False)
+    classDate = db.Column(db.Date, nullable=False)
     attendanceCode = db.Column(db.String(2), nullable=True)
     comment = db.Column(db.Text, nullable=True)
     assignTmi = db.Column(db.Boolean, nullable=False, default=False)
@@ -170,3 +172,17 @@ class FacultyAndStaff(db.Model):
             f"FacultyAndStaff('{self.firstName}','{self.lastName}','{self.position}')"
         )
 
+
+class SchoolCalendar(db.Model):
+    __tablename__ = "SchoolCalendar"
+    id = db.Column(db.Integer, primary_key=True)
+    classDate = db.Column(db.Date, nullable=False)
+    day = db.Column(db.String(1), nullable=False)
+    dayNumber = db.Column(db.Integer, nullable=False)
+    stemSchoolDay = db.Column(db.Boolean, nullable=True)
+    phaseIISchoolDay = db.Column(db.Boolean, nullable=True)
+    chattStateSchoolDay = db.Column(db.Boolean, nullable=True)
+    seniorErDay = db.Column(db.Boolean, nullable=True)
+    seniorUpDay = db.Column(db.Boolean, nullable=True)
+    juniorErDay = db.Column(db.Boolean, nullable=True)
+    juniorUpDay = db.Column(db.Boolean, nullable=True)

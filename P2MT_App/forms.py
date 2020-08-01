@@ -10,9 +10,13 @@ from wtforms import (
     FieldList,
     IntegerField,
     HiddenField,
+    TimeField,
+    BooleanField,
+    SelectMultipleField,
+    widgets,
 )
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from datetime import datetime
 
 
@@ -70,22 +74,93 @@ class classAttendanceLogFilters(FlaskForm):
 
 
 class updateStudentAttendanceForm(FlaskForm):
-    identifier = StringField()
+    # identifier = StringField()
     log_id = HiddenField()
     attendanceCode = RadioField(
         "Attendance Code",
         choices=[("P", "P"), ("T", "T"), ("E", "E"), ("U", "U"), ("Q", "?"),],
+        validators=[Optional()],
     )
     comment = StringField("Comment")
-    className = HiddenField()
-    teacherName = HiddenField()
-    classDate = HiddenField()
+    # className = HiddenField()
+    # teacherName = HiddenField()
+    # classDate = HiddenField()
+    updateFlag = HiddenField()
 
 
 class updateClassAttendanceForm(FlaskForm):
-    identifier = StringField()
+    # identifier = StringField()
     classMembers = FieldList(FormField(updateStudentAttendanceForm))
     teacherName = SelectField("Teacher", coerce=str)
     className = SelectField("Class", coerce=str)
     classDate = DateField("Class Date")
-    submitFilters = SubmitField("Submit Log Filters")
+    updateFiltersFlag = HiddenField()
+
+
+class uploadClassScheduleForm(FlaskForm):
+    csvClassScheduleFile = FileField(
+        "Class Schedule File (*.csv format)",
+        validators=[FileAllowed(["csv"]), FileRequired()],
+    )
+    submitUploadClassSchedule = SubmitField("Upload Class Schedule")
+
+
+class MultiCheckboxField(SelectMultipleField):
+    """
+    A multiple-select, except displays a list of checkboxes.
+
+    Iterating the field will produce subfields, allowing custom rendering of
+    the enclosed checkbox fields.
+    """
+
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
+
+class addSingleClassSchedule(FlaskForm):
+    schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
+    semester = SelectField("Semester", validators=[DataRequired()])
+    studentName = SelectField("Student Name", validators=[DataRequired()])
+    campus = SelectField("Campus", validators=[DataRequired()])
+    className = SelectField("Class Name", validators=[DataRequired()])
+    teacherName = SelectField("Teacher", coerce=str, validators=[DataRequired()])
+    classDays = MultiCheckboxField("Class Days", validators=[DataRequired()])
+    startTime = TimeField("Start Time", validators=[DataRequired()])
+    endTime = TimeField("End Time", validators=[DataRequired()])
+    online = BooleanField("Online")
+    indStudy = BooleanField("Independent Study")
+    comment = StringField("Comment")
+    googleCalendarEventID = StringField("Google Calendar Event ID")
+    submitAddSingleClassSchedule = SubmitField("Add Class Schedule for Single Student")
+
+
+class propagateClassAttendanceLogsForm(FlaskForm):
+    schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
+    semester = SelectField("Semester", validators=[DataRequired()])
+    startDate = DateField("Start Date", validators=[DataRequired()])
+    endDate = DateField("End Date", validators=[DataRequired()])
+    submitPropagatelassAttendanceLogs = SubmitField("Propagate Class Attendance Logs")
+
+
+class deleteClassScheduleForm(FlaskForm):
+    schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
+    semester = SelectField("Semester", validators=[DataRequired()])
+    confirmDeleteClassSchedule = StringField(
+        "Type DELETE to confirm", validators=[DataRequired()]
+    )
+    submitDeleteClassScheduleForm = SubmitField("Delete Class Schedule")
+
+
+class downloadClassScheduleForm(FlaskForm):
+    schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
+    semester = SelectField("Semester", validators=[DataRequired()])
+    submitDownloadClassScheduleForm = SubmitField("Download Class Schedule")
+
+
+class downloadClassAttendanceForm(FlaskForm):
+    schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
+    semester = SelectField("Semester", validators=[DataRequired()])
+    teacherName = SelectField("Teacher", coerce=str, validators=[DataRequired()])
+    startDate = DateField("Start Date", validators=[DataRequired()])
+    endDate = DateField("End Date", validators=[DataRequired()])
+    submitDownloadClassAttendanceForm = SubmitField("Download Class Attendance Log")
