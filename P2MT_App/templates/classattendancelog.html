@@ -1,53 +1,30 @@
 {% extends 'layout.html'%}
 {% block content %}
 <h2> Class Attendance </h2>
+
+{% macro macro_display_formfield(formfield) %}
+<div class="form-group">
+  {{ formfield.label(class="form-control-label") }}
+  {% if formfield.errors %}
+  {{ formfield(class="form-control form-control-sm is-invalid") }}
+  <div class="invalid-feedback">
+    {% for error in formfield.errors %}
+    <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% else %}
+  {{ formfield(class="form-control form-control-sm") }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+
 <form method="POST" action="{{ url_for('displayClassAttendanceLog') }}" enctype="multipart/form-data">
   {{ classAttendanceForm.hidden_tag() }}
   <div class="row">
-    <div class="form-group">
-      {{ classAttendanceForm.teacherName.label(class="form-control-label") }}
-
-      {% if classAttendanceForm.teacherName.errors %}
-      {{ classAttendanceForm.teacherName(class="form-control form-control-sm is-invalid") }}
-      <div class="invalid-feedback">
-        {% for error in classAttendanceForm.teacherName.errors %}
-        <span>{{ error }}</span>
-        {% endfor %}
-      </div>
-      {% else %}
-      {{ classAttendanceForm.teacherName(class="form-control form-control-sm", id="teacherName") }}
-      {% endif %}
-    </div>
-
-
-    <div class="form-group">
-      {{ classAttendanceForm.className.label(class="form-control-label") }}
-
-      {% if classAttendanceForm.className.errors %}
-      {{ classAttendanceForm.className(class="form-control form-control-sm is-invalid") }}
-      <div class="invalid-feedback">
-        {% for error in classAttendanceForm.className.errors %}
-        <span>{{ error }}</span>
-        {% endfor %}
-      </div>
-      {% else %}
-      {{ classAttendanceForm.className(class="form-control form-control-sm", id="className") }}
-      {% endif %}
-    </div>
-    <div class="form-group">
-      {{ classAttendanceForm.classDate.label(class="form-control-label") }}
-
-      {% if classAttendanceForm.classDate.errors %}
-      {{ classAttendanceForm.classDate(class="form-control form-control-sm is-invalid") }}
-      <div class="invalid-feedback">
-        {% for error in classAttendanceForm.classDate.errors %}
-        <span>{{ error }}</span>
-        {% endfor %}
-      </div>
-      {% else %}
-      {{ classAttendanceForm.classDate(class="form-control form-control-sm", id="classDate") }}
-      {% endif %}
-    </div>
+    {{ macro_display_formfield(classAttendanceForm.teacherName) }}
+    {{ macro_display_formfield(classAttendanceForm.className) }}
+    {{ macro_display_formfield(classAttendanceForm.classDate) }}
   </div>
   <table class="table table-sm table-hover">
     <thead class="thead-light">
