@@ -14,3 +14,4 @@ P2MT_App/__pycache__
 P2MT_App/p2mt.db
 test 
 P2MT_App/Old
+*.pyc

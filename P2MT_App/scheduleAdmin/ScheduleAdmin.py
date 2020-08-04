@@ -1,7 +1,7 @@
-from flask import send_file
-from P2MT_App import db, app
+from flask import send_file, current_app
+from P2MT_App import db
 from P2MT_App.models import ClassSchedule, ClassAttendanceLog, SchoolCalendar, Student
-from P2MT_App.utilityfunctions import download_File
+from P2MT_App.main.utilityfunctions import download_File
 from datetime import datetime, date, time
 import re
 import os
@@ -144,7 +144,7 @@ def deleteClassSchedule(schoolYear, semester, yearOfGraduation):
 def downloadClassSchedule(schoolYear, semester):
     print("downloadClassSchedule function called")
     # Create a CSV output file and append with a timestamp
-    output_file_path = os.path.join(app.root_path, "static/download")
+    output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
@@ -226,7 +226,7 @@ def downloadClassSchedule(schoolYear, semester):
 def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, endDate):
     print("downloadClassAttendanceLog function called")
     # Create a CSV output file and append with a timestamp
-    output_file_path = os.path.join(app.root_path, "static/download")
+    output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_attendance_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")

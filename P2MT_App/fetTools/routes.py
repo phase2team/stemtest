@@ -1,20 +1,28 @@
 import os
-import secrets
 from datetime import datetime
-from P2MT_App import app
-from flask import Flask, render_template, url_for, flash, redirect, request
-from P2MT_App.forms import UploadFetDataForm
-from P2MT_App.generateFetOutputFiles import ripFetFiles
+from flask import (
+    render_template,
+    url_for,
+    flash,
+    redirect,
+    request,
+    Blueprint,
+    current_app,
+)
+from P2MT_App.fetTools.forms import UploadFetDataForm
+from P2MT_App.fetTools.generateFetOutputFiles import ripFetFiles
+
+fetTools = Blueprint("fetTools", __name__)
 
 
-@app.route("/fettoolshelp")
+@fetTools.route("/fettoolshelp")
 def fetToolsHelp():
     print("===   Displaying Help page   ===  ", datetime.now(), "   ===")
     return render_template("fettoolshelp.html", title="Help")
 
 
 def save_csvFile(form_csvFetFile, filename):
-    file_path = os.path.join(app.root_path, "static/fet_data_files", filename)
+    file_path = os.path.join(current_app.root_path, "static/fet_data_files", filename)
     form_csvFetFile.save(file_path)
     # file1 = open(file_path, "w")
     # file1.write(form_csvFetFile.data)
@@ -22,7 +30,7 @@ def save_csvFile(form_csvFetFile, filename):
     return file_path
 
 
-@app.route("/fettools", methods=["GET", "POST"])
+@fetTools.route("/fettools", methods=["GET", "POST"])
 def displayFetTools():
     form = UploadFetDataForm()
     if form.validate_on_submit():
@@ -40,7 +48,7 @@ def displayFetTools():
                 form.csvFetTimetableInputFile.data, "FET_Timetable_File.csv"
             )
         flash("Your account has been updated!", "success")
-        output_file_path = os.path.join(app.root_path, "static/fet_data_files")
+        output_file_path = os.path.join(current_app.root_path, "static/fet_data_files")
         ripFetFiles(
             form.yearOfGraduation.data,
             form.schoolYear.data,
@@ -55,7 +63,7 @@ def displayFetTools():
             datetime.now(),
             "   ===",
         )
-        return redirect(url_for("fetOutputFiles"))
+        return redirect(url_for("fetTools.fetOutputFiles"))
     elif request.method == "GET":
         return render_template(
             "fettools.html", title="FET Tools", UploadFetDataForm=form
@@ -63,7 +71,7 @@ def displayFetTools():
     print(form.errors)
 
 
-@app.route("/fetoutputfiles", methods=["GET"])
+@fetTools.route("/fetoutputfiles", methods=["GET"])
 def fetOutputFiles():
     print("===  Arriving at fetOutputFiles   ===", datetime.now(), "   ===")
     return render_template("fetoutputfiles.html", title="FET Output Files")
