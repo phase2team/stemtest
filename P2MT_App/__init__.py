@@ -4,6 +4,8 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from P2MT_App.config import Config
 from sqlite3 import Connection as SQLite3Connection
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
 
 # This function is necessary to perform cacade deletes in SQLite
@@ -16,6 +18,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(config_class=Config):
@@ -24,6 +27,8 @@ def create_app(config_class=Config):
     app.jinja_env.globals.update(zip=zip)
 
     db.init_app(app)
+    migrate.init_app(app, db)
+
     from P2MT_App.main.routes import main
     from P2MT_App.classAttendance.routes import classAttendance
     from P2MT_App.dailyAttendance.routes import dailyAttendance
