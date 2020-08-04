@@ -381,6 +381,10 @@ def test_propagateClassSchedule(startDate, endDate, schoolYear, semester):
 
 
 db.create_all()
+
+# test_addDailyAttendanceLog()
+
+
 # test_addInterventionType("Conduct Behavior", 6)
 # test_addInterventionType("Academic Behavior", 4)
 # test_addInterventionType("Attendance", 3)
@@ -388,7 +392,7 @@ db.create_all()
 # test_addInterventionType("Bullying / Harassment", 4)
 # test_addInterventionType("Extended Remediation", 1)
 
-# test_addInterventionLog(1, 1, 1, datetime(2020, 1, 1), datetime(2020, 1, 15), "comment")
+# test_addInterventionLog(1, 1, 1, datetime.date(2020, 1, 1), datetime.date(2020, 1, 15), "comment")
 # test_addStudent(
 #     "A12345678", "Testy", "Tester", "tester@students.hcde.org", "Staupers", 2021
 # )
@@ -435,5 +439,5 @@ db.create_all()
 # test_addClassAttendanceLog(11, [date(2020, 7, 29)])
 # test_addClassAttendanceLog(16, [date(2020, 7, 29)])
 
-test_propagateClassSchedule(date(2020, 7, 1), date(2020, 7, 31), 2098, "Fall")
+# test_propagateClassSchedule(date(2020, 7, 1), date(2020, 7, 31), 2098, "Fall")
 # test_addSchoolCalendarDays(datetime(2020, 7, 1), datetime(2021, 6, 30))

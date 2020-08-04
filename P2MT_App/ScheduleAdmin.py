@@ -20,11 +20,17 @@ def addClassAttendanceLog(classSchedule_id, list_of_dates):
         ).all()
         # print("inCurrentClassAttendaceLog=", inCurrentClassAttendaceLog)
         if not inCurrentClassAttendaceLog:
+            commentTuple = (
+                db.session.query(ClassSchedule.comment)
+                .filter(ClassSchedule.id == classSchedule_id)
+                .first()
+            )
+            # comment = [item for item in commentTuple]
             classAttendanceLog = ClassAttendanceLog(
                 classSchedule_id=classSchedule_id,
                 classDate=classDate,
+                comment=commentTuple[0],
                 # attendanceCode=attendanceCode,
-                # comment=comment,
                 # assignTmi=assignTmi,
             )
             print(classAttendanceLog)
@@ -119,10 +125,16 @@ def uploadSchedules(fname):
         )
 
 
-def deleteClassSchedule(schoolYear, semester):
-    classSchedules = ClassSchedule.query.filter(
-        ClassSchedule.schoolYear == schoolYear, ClassSchedule.semester == semester
-    ).all()
+def deleteClassSchedule(schoolYear, semester, yearOfGraduation):
+    classSchedules = (
+        ClassSchedule.query.join(Student)
+        .filter(
+            ClassSchedule.schoolYear == schoolYear,
+            ClassSchedule.semester == semester,
+            Student.yearOfGraduation == yearOfGraduation,
+        )
+        .all()
+    )
     for classSchedule in classSchedules:
         db.session.delete(classSchedule)
         db.session.commit()

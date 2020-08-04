@@ -75,6 +75,16 @@ def getSchoolYear():
     return schoolYearValueLabelTupleList
 
 
+def getYearOfGraduation():
+    yearOfGraduationValueLabelTupleList = (
+        db.session.query(Student.yearOfGraduation, Student.yearOfGraduation)
+        .distinct()
+        .order_by(Student.yearOfGraduation.desc())
+        .all()
+    )
+    return yearOfGraduationValueLabelTupleList
+
+
 def getSemester():
     semesterValueLabelTupleList = (
         db.session.query(ClassSchedule.semester, ClassSchedule.semester)

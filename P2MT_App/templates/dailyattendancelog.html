@@ -1,9 +1,12 @@
 {% extends 'layout.html'%}
 {% block content %}
-<h1> Daily Attendance Log </h1>
 
-<table class="table table-sm table-hover">
-  <thead class="thead-light">
+<div class="w3-container w3-green">
+  <h2>{{title}}</h2>
+</div>
+
+<table class="w3-table-all w3-hoverable">
+  <thead class="w3-light-grey">
     <tr>
       <th scope="col">First Name</th>
       <th scope="col">Last Name</th>
@@ -25,28 +28,30 @@
       <td>{{ DailyAttendanceLog.comment }}</td>
       <td>{{ DailyAttendanceLog.createDate.strftime('%-m/%-d/%Y') }}</td>
       <td>{{ DailyAttendanceLog.FacultyAndStaff.lastName}}</td>
-      <td><button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal"
-          data-target="#deleteModal{{DailyAttendanceLog.id}}">Delete</button></td>
+      <td><button type="button" class="w3-btn w3-red"
+          onclick="document.getElementById('deleteModal{{DailyAttendanceLog.id}}').style.display='block'">Delete</button>
+      </td>
     </tr>
 
 
     <!-- Modal -->
-    <div class="modal fade" id="deleteModal{{DailyAttendanceLog.id}}" tabindex="-1" role="dialog"
-      aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Delete Daily Attendance Log?</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <form action="{{ url_for('delete_DailyAttendanceLog', log_id=DailyAttendanceLog.id) }}" method="POST">
-              <input class="btn btn-danger" type="submit" value="Delete">
-            </form>
-          </div>
+    <div class="w3-modal" id="deleteModal{{DailyAttendanceLog.id}}">
+      <div class="w3-container">
+        <div class="w3-modal-content" style="width:50%">
+          <header class="w3-container w3-red">
+            <span onclick="document.getElementById('deleteModal{{DailyAttendanceLog.id}}').style.display='none'"
+              class="w3-button w3-display-topright">&times;</span>
+            <h2>Delete Daily Attendance Log?</h2>
+          </header>
+          <footer class="w3-container w3-margin-top w3-white w3-center">
+            <div class="w3-bar">
+              <form action="{{ url_for('delete_DailyAttendanceLog', log_id=DailyAttendanceLog.id) }}" method="POST">
+                <button type="button" class="w3-button w3-large"
+                  onclick="document.getElementById('deleteModal{{DailyAttendanceLog.id}}').style.display='none'">Cancel</button>
+                <input class="w3-button w3-red w3-large" type="submit" value="Delete">
+              </form>
+            </div>
+          </footer>
         </div>
       </div>
     </div>

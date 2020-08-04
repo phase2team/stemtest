@@ -1,66 +1,72 @@
 {% extends 'layout.html'%}
 {% block content %}
-<h2> Class Attendance </h2>
 
 {% macro macro_display_formfield(formfield) %}
-<div class="form-group">
-  {{ formfield.label(class="form-control-label") }}
+<div class="w3-third">
+  {{ formfield.label(class="w3-text-green w3-large") }}
   {% if formfield.errors %}
-  {{ formfield(class="form-control form-control-sm is-invalid") }}
+  {{ formfield(class="w3-select is-invalid") }}
   <div class="invalid-feedback">
     {% for error in formfield.errors %}
     <span>{{ error }}</span>
     {% endfor %}
   </div>
   {% else %}
-  {{ formfield(class="form-control form-control-sm") }}
+  {{ formfield(class="w3-select w3-border") }}
   {% endif %}
 </div>
 {% endmacro %}
 
+<div class="w3-card-4">
 
-<form method="POST" action="{{ url_for('displayClassAttendanceLog') }}" enctype="multipart/form-data">
-  {{ classAttendanceForm.hidden_tag() }}
-  <div class="row">
-    {{ macro_display_formfield(classAttendanceForm.teacherName) }}
-    {{ macro_display_formfield(classAttendanceForm.className) }}
-    {{ macro_display_formfield(classAttendanceForm.classDate) }}
+  <div class="w3-container w3-green">
+    <h2>{{title}}</h2>
   </div>
-  <table class="table table-sm table-hover">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">Class Name</th>
-        <th scope="col">Start Time</th>
-        <th scope="col">End Time</th>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">Attendance Code</th>
-        <th scope="col">Comment</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
-      {{ studentAttendanceForm.hidden_tag() }}
-      <tr>
-        <td> {{ studentFixedFields.ClassSchedule.className }}</td>
-        <td> {{ studentFixedFields.ClassSchedule.startTime.strftime('%-I:%M') }}</td>
-        <td> {{ studentFixedFields.ClassSchedule.endTime.strftime('%-I:%M') }}</td>
-        <td> {{ studentFixedFields.ClassSchedule.Student.firstName }}</td>
-        <td> {{ studentFixedFields.ClassSchedule.Student.lastName }} </td>
-        <td>
-          {% for subfield in studentAttendanceForm.attendanceCode %}
-          {{ subfield }}
-          {{ subfield.label }}
-          {% endfor %}
-        </td>
-        <td>
-          {{ studentAttendanceForm.comment(class="form-control form-control-sm", size="30") }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</form>
+
+  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('displayClassAttendanceLog') }}"
+    enctype="multipart/form-data">
+    {{ classAttendanceForm.hidden_tag() }}
+    <div class="w3-row-padding">
+      {{ macro_display_formfield(classAttendanceForm.teacherName) }}
+      {{ macro_display_formfield(classAttendanceForm.className) }}
+      {{ macro_display_formfield(classAttendanceForm.classDate) }}
+    </div>
+    <table class="w3-table-all w3-hoverable">
+      <thead class="w3-light-grey">
+        <tr>
+          <th scope="col">Class Name</th>
+          <th scope="col">Start Time</th>
+          <th scope="col">End Time</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Attendance Code</th>
+          <th scope="col">Comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
+        {{ studentAttendanceForm.hidden_tag() }}
+        <tr>
+          <td> {{ studentFixedFields.ClassSchedule.className }}</td>
+          <td> {{ studentFixedFields.ClassSchedule.startTime.strftime('%-I:%M') }}</td>
+          <td> {{ studentFixedFields.ClassSchedule.endTime.strftime('%-I:%M') }}</td>
+          <td> {{ studentFixedFields.ClassSchedule.Student.firstName }}</td>
+          <td> {{ studentFixedFields.ClassSchedule.Student.lastName }} </td>
+          <td>
+            {% for subfield in studentAttendanceForm.attendanceCode %}
+            {{ subfield }}
+            {{ subfield.label }}
+            {% endfor %}
+          </td>
+          <td>
+            {{ studentAttendanceForm.comment(class="w3-input", size="30") }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+</div>
 
 <script>
   // Keep track of the scroll position so the page reloads to the same position 

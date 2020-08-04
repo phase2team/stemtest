@@ -20,6 +20,7 @@ from P2MT_App.forms import (
     downloadClassScheduleForm,
     downloadClassAttendanceForm,
     addSingleClassSchedule,
+    editSchoolCalendar,
 )
 from P2MT_App.referenceData import (
     getInterventionTypes,
@@ -29,6 +30,7 @@ from P2MT_App.referenceData import (
     getSemester,
     getStudents,
     getCampusChoices,
+    getYearOfGraduation,
 )
 from P2MT_App.ScheduleAdmin import (
     propagateClassSchedule,
@@ -48,7 +50,7 @@ def add_DailyAttendanceLog(student_id, absenceDate, attendanceCode, comment):
         absenceDate=absenceDate,
         attendanceCode=attendanceCode,
         comment=comment,
-        staffID=2,
+        staffID=5,
         student_id=student_id,
     )
     db.session.add(dailyAttendanceLog)
@@ -67,7 +69,7 @@ def add_InterventionLog(
         startDate=startDate,
         endDate=endDate,
         comment=comment,
-        staffID=2,
+        staffID=5,
         student_id=student_id,
     )
     db.session.add(interventionLog)
@@ -82,42 +84,48 @@ def home():
 
 
 @app.route("/students", methods=["GET", "POST"])
-def students():
+def displayStudents():
     dailyAttendanceForm = addDailyAttendanceForm()
     interventionForm = addInterventionLogForm()
     interventionForm.interventionType.choices = getInterventionTypes()
     students = Student.query.order_by(
         Student.yearOfGraduation.asc(), Student.lastName.asc()
     )
-    if dailyAttendanceForm.validate_on_submit():
-        add_DailyAttendanceLog(
-            int(dailyAttendanceForm.studentID.data),
-            dailyAttendanceForm.absenceDate.data,
-            dailyAttendanceForm.attendanceCode.data,
-            dailyAttendanceForm.comment.data,
-        )
-        print(
-            "===   Completed add_DailyAttendanceLog.  Redirecting to students   ===",
-            datetime.now(),
-            "   ===",
-        )
-        return redirect(url_for("students"))
-    elif interventionForm.validate_on_submit():
-        add_InterventionLog(
-            int(interventionForm.studentID.data),
-            int(interventionForm.interventionType.data),
-            int(interventionForm.interventionLevel.data),
-            interventionForm.startDate.data,
-            interventionForm.endDate.data,
-            interventionForm.comment.data,
-        )
-        print(
-            "===   Completed add_InterventionLog.  Redirecting to students   ===",
-            datetime.now(),
-            "   ===",
-        )
-        return redirect(url_for("students"))
-    elif request.method == "GET":
+    if "submitDailyAttendance" in request.form:
+        if dailyAttendanceForm.validate_on_submit():
+            print("Running dailyAttendanceForm")
+            add_DailyAttendanceLog(
+                int(dailyAttendanceForm.studentID.data),
+                dailyAttendanceForm.absenceDate.data,
+                dailyAttendanceForm.attendanceCode.data,
+                dailyAttendanceForm.comment.data,
+            )
+            print(
+                "===   Completed add_DailyAttendanceLog.  Redirecting to students   ===",
+                datetime.now(),
+                "   ===",
+            )
+            return redirect(url_for("displayStudents"))
+
+    if "submitIntervention" in request.form:
+        if interventionForm.validate_on_submit():
+            print("Running interventionForm")
+            add_InterventionLog(
+                int(interventionForm.studentID.data),
+                int(interventionForm.interventionType.data),
+                int(interventionForm.interventionLevel.data),
+                interventionForm.startDate.data,
+                interventionForm.endDate.data,
+                interventionForm.comment.data,
+            )
+            print(
+                "===   Completed add_InterventionLog.  Redirecting to students   ===",
+                datetime.now(),
+                "   ===",
+            )
+            return redirect(url_for("displayStudents"))
+
+    if request.method == "GET":
         return render_template(
             "students.html",
             title="Students",
@@ -195,6 +203,7 @@ def displayScheduleAdmin():
     deleteClassScheduleFormDetails = deleteClassScheduleForm()
     deleteClassScheduleFormDetails.schoolYear.choices = getSchoolYear()
     deleteClassScheduleFormDetails.semester.choices = getSemester()
+    deleteClassScheduleFormDetails.yearOfGraduation.choices = getYearOfGraduation()
     downloadClassScheduleFormDetails = downloadClassScheduleForm()
     downloadClassScheduleFormDetails.schoolYear.choices = getSchoolYear()
     downloadClassScheduleFormDetails.semester.choices = getSemester()
@@ -254,15 +263,15 @@ def displayScheduleAdmin():
             ):
                 schoolYear = deleteClassScheduleFormDetails.schoolYear.data
                 semester = deleteClassScheduleFormDetails.semester.data
+                yearOfGraduation = deleteClassScheduleFormDetails.yearOfGraduation.data
                 print(
                     "Delete Class Schedule Form Submitted: SchoolYear=",
                     schoolYear,
                     " Semester=",
                     semester,
+                    yearOfGraduation,
                 )
-                deleteClassSchedule(
-                    schoolYear, semester,
-                )
+                deleteClassSchedule(schoolYear, semester, yearOfGraduation)
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
                 # deleteClassScheduleFormDetails.process()
             else:
@@ -374,10 +383,27 @@ def displayBootstrapTest():
         DailyAttendanceLogs=DailyAttendanceLogs,
     )
 
+@app.route("/about")
+def displayAbout():
+    return render_template(
+        "about.html",
+        title="About"
+    )
+
 
 @app.route("/analytics")
 def displayAnalyticsTest():
     return render_template("analytics.html")
+
+
+@app.route("/sidebar")
+def displaySidebar():
+    return render_template("sidebar.html")
+
+
+@app.route("/analytics2")
+def displayAnalyticsTest2():
+    return render_template("layout2.html")
 
 
 @app.route("/classattendancelog", methods=["GET", "POST"])

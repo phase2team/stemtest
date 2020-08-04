@@ -52,17 +52,24 @@ class addDailyAttendanceForm(FlaskForm):
     )
     absenceDate = DateField("Absence Date", validators=[DataRequired()])
     comment = TextAreaField("Comment")
-    submit = SubmitField("Submit New Daily Attendance")
+    submitDailyAttendance = SubmitField("Submit New Daily Attendance")
 
 
 class addInterventionLogForm(FlaskForm):
     studentID = StringField("Student ID")
-    interventionType = SelectField("Intervention Type")
-    interventionLevel = StringField("Intervention Level")
-    startDate = DateField("Start Date")
-    endDate = DateField("End Date")
+    interventionType = SelectField(
+        "Intervention Type", coerce=int, validators=[DataRequired()]
+    )
+    interventionLevel = SelectField(
+        "Intervention Level",
+        coerce=int,
+        choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6)],
+        validators=[DataRequired()],
+    )
+    startDate = DateField("Start Date", validators=[DataRequired()])
+    endDate = DateField("End Date", validators=[DataRequired()])
     comment = TextAreaField("Comment")
-    submit = SubmitField("Submit New Intervention")
+    submitIntervention = SubmitField("Submit New Intervention")
 
 
 class classAttendanceLogFilters(FlaskForm):
@@ -145,6 +152,7 @@ class propagateClassAttendanceLogsForm(FlaskForm):
 class deleteClassScheduleForm(FlaskForm):
     schoolYear = SelectField("Year", coerce=int, validators=[DataRequired()])
     semester = SelectField("Semester", validators=[DataRequired()])
+    yearOfGraduation = SelectField("Year of Graduation", coerce=int)
     confirmDeleteClassSchedule = StringField(
         "Type DELETE to confirm", validators=[DataRequired()]
     )
@@ -164,3 +172,38 @@ class downloadClassAttendanceForm(FlaskForm):
     startDate = DateField("Start Date", validators=[DataRequired()])
     endDate = DateField("End Date", validators=[DataRequired()])
     submitDownloadClassAttendanceForm = SubmitField("Download Class Attendance Log")
+
+
+class editSchoolCalendar(FlaskForm):
+    classDate = DateField("Start Date", validators=[DataRequired()])
+    stemSchoolDay = BooleanField("STEM School Day")
+    phaseIIDay = BooleanField("Phase II Day")
+    chattStateSchoolDay = BooleanField("Chatt State School Day")
+    seniorErDay = BooleanField("Senior ER Day")
+    juniorErDay = BooleanField("Junior ER Day")
+    seniorUpDay = BooleanField("Senior UP Day")
+    juniorUpDay = BooleanField("Junior UP Day")
+
+
+class UploadFetDataForm(FlaskForm):
+    yearOfGraduation = StringField(
+        "Year of Graduation (YYYY)", validators=[DataRequired()]
+    )
+    schoolYear = StringField("Schedule Year (YYYY)", validators=[DataRequired()])
+    semester = StringField(
+        "Schedule Semester (Fall or Spring)", validators=[DataRequired()]
+    )
+    csvFetStudentInputFile = FileField(
+        "FET Student Input File (*.csv format)",
+        validators=[FileAllowed(["csv"]), FileRequired()],
+    )
+    csvFetClassTeacherInputFile = FileField(
+        "FET Class Teacher Input File (*.csv format)",
+        validators=[FileAllowed(["csv"]), FileRequired()],
+    )
+    csvFetTimetableInputFile = FileField(
+        "FET Timetable Input File (*.csv format)",
+        validators=[FileAllowed(["csv"]), FileRequired()],
+    )
+    submitFetDataForm = SubmitField("Generate Schedule File")
+
