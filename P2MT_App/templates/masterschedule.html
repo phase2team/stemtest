@@ -1,7 +1,13 @@
 {% extends 'layout.html'%}
 {% block content %}
-<div class="w3-container w3-green">
-  <h2>{{title}}</h2>
+<div class="w3-container w3-green w3-row">
+  <div class="w3-third">
+    <h2>{{title}}</h2>
+  </div>
+  <div>
+    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
+      placeholder="Search by student name...">
+  </div>
 </div>
 
 <table class="w3-table-all w3-hoverable">
@@ -23,14 +29,14 @@
       <th scope="col">Comment</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="filteredTable">
     {% for ClassSchedule in ClassSchedules %}
     <tr>
-      <th scope="row">{{ ClassSchedule.schoolYear }}</th>
-      <th>{{ ClassSchedule.semester }}</th>
-      <th>{{ ClassSchedule.chattStateANumber }}</th>
-      <th>{{ ClassSchedule.Student.firstName }}</th>
-      <th>{{ ClassSchedule.Student.lastName }}</th>
+      <td scope="row">{{ ClassSchedule.schoolYear }}</td>
+      <td>{{ ClassSchedule.semester }}</td>
+      <td>{{ ClassSchedule.chattStateANumber }}</td>
+      <td>{{ ClassSchedule.Student.firstName }}</td>
+      <td>{{ ClassSchedule.Student.lastName }}</td>
       <td>{{ ClassSchedule.campus }}</td>
       <td>{{ ClassSchedule.className }}</td>
       <td>{{ ClassSchedule.teacherLastName}}</td>
@@ -73,6 +79,15 @@
   </tbody>
 </table>
 
-
+<!-- Search Filter -->
+<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
+<script>
+  // Note: the table does not include the header rows
+  var tableBody = document.getElementById('filteredTable');
+  var searchFilter = document.getElementById('searchFilter');
+  searchFilter.firstNameCellPosition = 3;
+  searchFilter.lastNameCellPosition = 4;
+  searchFilter.addEventListener('keyup', filterFirstLastNames);
+</script>
 
 {% endblock content %}

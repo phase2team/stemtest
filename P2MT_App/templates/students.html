@@ -17,8 +17,14 @@
 </div>
 {% endmacro %}
 
-<div class="w3-container w3-green">
-  <h2>{{title}}</h2>
+<div class="w3-container w3-green w3-row">
+  <div class="w3-third">
+    <h2>{{title}}</h2>
+  </div>
+  <div>
+    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
+      placeholder="Search by student name...">
+  </div>
 </div>
 
 <table class="w3-table-all w3-hoverable">
@@ -34,12 +40,12 @@
       <th scope="col"></th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="filteredTable" class="w3-main">
     {% for student in students %}
     <tr>
-      <th scope="row">{{ student.chattStateANumber }}</th>
-      <th>{{ student.firstName }}</th>
-      <th>{{ student.lastName }}</th>
+      <td scope="row">{{ student.chattStateANumber }}</td>
+      <td>{{ student.firstName }}</td>
+      <td>{{ student.lastName }}</td>
       <td>{{ student.email }}</td>
       <td>{{ student.yearOfGraduation }}</td>
       <td>{{ student.house }}</td>
@@ -119,10 +125,20 @@
       </div>
     </div>
 
-
     {% endfor %}
   </tbody>
 </table>
+
+<!-- Search Filter -->
+<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
+<script>
+  // Note: the table does not include the header rows
+  var tableBody = document.getElementById('filteredTable');
+  var searchFilter = document.getElementById('searchFilter');
+  searchFilter.firstNameCellPosition = 1;
+  searchFilter.lastNameCellPosition = 2;
+  searchFilter.addEventListener('keyup', filterFirstLastNames);
+</script>
 
 
 {% endblock content %}

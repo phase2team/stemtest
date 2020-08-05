@@ -1,7 +1,13 @@
 {% extends 'layout.html'%}
 {% block content %}
-<div class="w3-container w3-green">
-  <h2>{{title}}</h2>
+<div class="w3-container w3-green w3-row">
+  <div class="w3-third">
+    <h2>{{title}}</h2>
+  </div>
+  <div>
+    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
+      placeholder="Search by student name...">
+  </div>
 </div>
 
 <table class="w3-table-all w3-hoverable">
@@ -19,11 +25,11 @@
       <th scope="col">Delete</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="filteredTable">
     {% for InterventionLog in InterventionLogs %}
     <tr>
-      <th scope="row">{{ InterventionLog.Student.firstName }}</th>
-      <th>{{ InterventionLog.Student.lastName }}</th>
+      <td scope="row">{{ InterventionLog.Student.firstName }}</td>
+      <td>{{ InterventionLog.Student.lastName }}</td>
       <td>{{ InterventionLog.InterventionType.interventionType }}</td>
       <td>{{ InterventionLog.interventionLevel }}</td>
       <td>{{ InterventionLog.createDate.strftime('%-m/%-d/%Y') }}</td>
@@ -63,6 +69,16 @@
   </tbody>
 </table>
 
+<!-- Search Filter -->
+<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
+<script>
+  // Note: the table does not include the header rows
+  var tableBody = document.getElementById('filteredTable');
+  var searchFilter = document.getElementById('searchFilter');
+  searchFilter.firstNameCellPosition = 0;
+  searchFilter.lastNameCellPosition = 1;
+  searchFilter.addEventListener('keyup', filterFirstLastNames);
+</script>
 
 
 {% endblock content %}
