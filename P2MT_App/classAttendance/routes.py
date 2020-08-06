@@ -8,10 +8,10 @@ from P2MT_App.classAttendance.forms import (
 from P2MT_App.main.referenceData import getTeachers, getClassNames
 from datetime import date
 
-classAttendance = Blueprint("classAttendance", __name__)
+classAttendance_bp = Blueprint("classAttendance_bp", __name__)
 
 
-@classAttendance.route("/classattendancelog", methods=["GET", "POST"])
+@classAttendance_bp.route("/classattendancelog", methods=["GET", "POST"])
 def displayClassAttendanceLog():
     print("\n---THIS IS displayClassAttendanceLog()---")
     classAttendanceForm = updateClassAttendanceForm()

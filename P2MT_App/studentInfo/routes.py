@@ -8,10 +8,10 @@ from P2MT_App.dailyAttendance.forms import addDailyAttendanceForm
 from P2MT_App.main.referenceData import getInterventionTypes
 from datetime import datetime
 
-studentInfo = Blueprint("studentInfo", __name__)
+studentInfo_bp = Blueprint("studentInfo_bp", __name__)
 
 
-@studentInfo.route("/students", methods=["GET", "POST"])
+@studentInfo_bp.route("/students", methods=["GET", "POST"])
 def displayStudents():
     dailyAttendanceForm = addDailyAttendanceForm()
     interventionForm = addInterventionLogForm()
@@ -33,7 +33,7 @@ def displayStudents():
                 datetime.now(),
                 "   ===",
             )
-            return redirect(url_for("studentInfo.displayStudents"))
+            return redirect(url_for("studentInfo_bp.displayStudents"))
 
     if "submitIntervention" in request.form:
         if interventionForm.validate_on_submit():
@@ -51,7 +51,7 @@ def displayStudents():
                 datetime.now(),
                 "   ===",
             )
-            return redirect(url_for("studentInfo.displayStudents"))
+            return redirect(url_for("studentInfo_bp.displayStudents"))
 
     if request.method == "GET":
         return render_template(

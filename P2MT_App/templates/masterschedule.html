@@ -64,7 +64,7 @@
           </header>
           <footer class="w3-container w3-margin-top w3-white w3-center">
             <div class="w3-bar">
-              <form action="{{ url_for('masterSchedule.delete_ClassSchedule', log_id=ClassSchedule.id) }}"
+              <form action="{{ url_for('masterSchedule_bp.delete_ClassSchedule', log_id=ClassSchedule.id) }}"
                 method="POST">
                 <button type="button" class="w3-button w3-large"
                   onclick="document.getElementById('deleteModal{{ClassSchedule.id}}').style.display='none'">Cancel</button>

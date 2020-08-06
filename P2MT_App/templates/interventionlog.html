@@ -54,7 +54,7 @@
           </header>
           <footer class="w3-container w3-margin-top w3-white w3-center">
             <div class="w3-bar">
-              <form action="{{ url_for('interventionInfo.delete_InterventionLog', log_id=InterventionLog.id) }}"
+              <form action="{{ url_for('interventionInfo_bp.delete_InterventionLog', log_id=InterventionLog.id) }}"
                 method="POST">
                 <button type="button" class="w3-button w3-large"
                   onclick="document.getElementById('deleteModal{{InterventionLog.id}}').style.display='none'">Cancel</button>

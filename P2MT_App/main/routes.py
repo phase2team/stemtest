@@ -1,15 +1,15 @@
 from flask import render_template, redirect, flash, request, Blueprint
 from P2MT_App import db
 
-main = Blueprint("main", __name__)
+main_bp = Blueprint("main_bp", __name__)
 
 
-@main.route("/")
+@main_bp.route("/")
 def home():
     return render_template("home.html", title="Home")
 
 
-@main.route("/about")
+@main_bp.route("/about")
 def displayAbout():
     return render_template("about.html", title="About")
 
@@ -17,6 +17,6 @@ def displayAbout():
 # Temporary routes for testing new features
 
 
-@main.route("/analytics")
+@main_bp.route("/analytics")
 def displayAnalyticsTest():
     return render_template("analytics.html")

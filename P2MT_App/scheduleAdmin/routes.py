@@ -31,10 +31,10 @@ from P2MT_App.scheduleAdmin.ScheduleAdmin import (
 )
 from P2MT_App.main.utilityfunctions import save_File
 
-scheduleAdmin = Blueprint("scheduleAdmin", __name__)
+scheduleAdmin_bp = Blueprint("scheduleAdmin_bp", __name__)
 
 
-@scheduleAdmin.route("/scheduleadmin", methods=["GET", "POST"])
+@scheduleAdmin_bp.route("/scheduleadmin", methods=["GET", "POST"])
 def displayScheduleAdmin():
     uploadClassScheduleFormDetails = uploadClassScheduleForm()
     propagateClassAttendanceLogsFormDetails = propagateClassAttendanceLogsForm()

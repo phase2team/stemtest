@@ -29,24 +29,25 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from P2MT_App.main.routes import main
-    from P2MT_App.classAttendance.routes import classAttendance
-    from P2MT_App.dailyAttendance.routes import dailyAttendance
-    from P2MT_App.fetTools.routes import fetTools
-    from P2MT_App.interventionInfo.routes import interventionInfo
-    from P2MT_App.masterSchedule.routes import masterSchedule
-    from P2MT_App.scheduleAdmin.routes import scheduleAdmin
-    from P2MT_App.schoolCalendar.routes import schoolCalendar
-    from P2MT_App.studentInfo.routes import studentInfo
+    from P2MT_App.main.routes import main_bp
+    from P2MT_App.classAttendance.routes import classAttendance_bp
+    from P2MT_App.dailyAttendance.routes import dailyAttendance_bp
+    from P2MT_App.fetTools.routes import fetTools_bp
+    from P2MT_App.interventionInfo.routes import interventionInfo_bp
+    from P2MT_App.masterSchedule.routes import masterSchedule_bp
+    from P2MT_App.scheduleAdmin.routes import scheduleAdmin_bp
 
-    app.register_blueprint(main)
-    app.register_blueprint(classAttendance)
-    app.register_blueprint(dailyAttendance)
-    app.register_blueprint(fetTools)
-    app.register_blueprint(interventionInfo)
-    app.register_blueprint(masterSchedule)
-    app.register_blueprint(scheduleAdmin)
-    app.register_blueprint(schoolCalendar)
-    app.register_blueprint(studentInfo)
+    # from P2MT_App.schoolCalendar.routes import schoolCalendar_bp
+    from P2MT_App.studentInfo.routes import studentInfo_bp
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(classAttendance_bp)
+    app.register_blueprint(dailyAttendance_bp)
+    app.register_blueprint(fetTools_bp)
+    app.register_blueprint(interventionInfo_bp)
+    app.register_blueprint(masterSchedule_bp)
+    app.register_blueprint(scheduleAdmin_bp)
+    # app.register_blueprint(schoolCalendar_bp)
+    app.register_blueprint(studentInfo_bp)
 
     return app

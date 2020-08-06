@@ -12,13 +12,7 @@ from flask import (
 from P2MT_App.fetTools.forms import UploadFetDataForm
 from P2MT_App.fetTools.generateFetOutputFiles import ripFetFiles
 
-fetTools = Blueprint("fetTools", __name__)
-
-
-@fetTools.route("/fettoolshelp")
-def fetToolsHelp():
-    print("===   Displaying Help page   ===  ", datetime.now(), "   ===")
-    return render_template("fettoolshelp.html", title="Help")
+fetTools_bp = Blueprint("fetTools_bp", __name__)
 
 
 def save_csvFile(form_csvFetFile, filename):
@@ -30,7 +24,7 @@ def save_csvFile(form_csvFetFile, filename):
     return file_path
 
 
-@fetTools.route("/fettools", methods=["GET", "POST"])
+@fetTools_bp.route("/fettools", methods=["GET", "POST"])
 def displayFetTools():
     form = UploadFetDataForm()
     if form.validate_on_submit():
@@ -63,7 +57,7 @@ def displayFetTools():
             datetime.now(),
             "   ===",
         )
-        return redirect(url_for("fetTools.fetOutputFiles"))
+        return redirect(url_for("fetTools_bp.fetOutputFiles"))
     elif request.method == "GET":
         return render_template(
             "fettools.html", title="FET Tools", UploadFetDataForm=form
@@ -71,7 +65,7 @@ def displayFetTools():
     print(form.errors)
 
 
-@fetTools.route("/fetoutputfiles", methods=["GET"])
+@fetTools_bp.route("/fetoutputfiles", methods=["GET"])
 def fetOutputFiles():
     print("===  Arriving at fetOutputFiles   ===", datetime.now(), "   ===")
     return render_template("fetoutputfiles.html", title="FET Output Files")

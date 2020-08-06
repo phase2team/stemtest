@@ -40,8 +40,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ downloadClassAttendanceForm.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Download Class Attendance Roster</legend>
@@ -60,8 +60,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ downloadClassScheduleForm.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Download Entire Semester Class Schedule</legend>
@@ -77,8 +77,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ uploadClassScheduleForm.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Upload Class Schedule</legend>
@@ -93,8 +93,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ propagateClassAttendanceLogsForm.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Propagate Class Attendance Logs</legend>
@@ -112,8 +112,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ addSingleClassSchedule.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Add Class Schedule for Single Student</legend>
@@ -162,8 +162,8 @@
 </div>
 
 <div class="w3-container">
-  <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('scheduleAdmin.displayScheduleAdmin') }}"
-    enctype="multipart/form-data">
+  <form class="w3-container w3-padding-large" method="POST"
+    action="{{ url_for('scheduleAdmin_bp.displayScheduleAdmin') }}" enctype="multipart/form-data">
     {{ deleteClassScheduleForm.hidden_tag() }}
     <fieldset class="w3-container w3-padding-large w3-hover-border-green">
       <legend class="w3-xlarge">Delete Entire Semester Class Schedule</legend>
