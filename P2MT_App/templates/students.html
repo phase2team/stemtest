@@ -1,7 +1,7 @@
 {% extends 'layout.html'%}
 {% block content %}
 
-{% macro macro_display_formfield(formfield, w3ResponsiveGridClass) %}
+{% macro macro_display_formfield(formfield, w3ResponsiveGridClass, uniqueId) %}
 <div class="{{w3ResponsiveGridClass}}">
   {{ formfield.label(class="w3-text-green w3-large") }}
   {% if formfield.errors %}
@@ -12,7 +12,7 @@
     {% endfor %}
   </div>
   {% else %}
-  {{ formfield(class="w3-select w3-section") }}
+  {{ formfield(id=uniqueId, class="w3-select w3-section") }}
   {% endif %}
 </div>
 {% endmacro %}
@@ -68,21 +68,21 @@
           </header>
           <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('studentInfo.displayStudents') }}" enctype="multipart/form-data">
-            {{ dailyAttendanceForm.hidden_tag() }}
+            {{ dailyAttendanceForm.csrf_token(id="csrfAttendance_" + student.id|string) }}
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
-              {{ dailyAttendanceForm.studentID(value = student.id, class="w3-hide") }}
+              {{ dailyAttendanceForm.studentID(id="attendanceStudentId_" + student.id|string, value = student.id, class="w3-hide") }}
               <legend class="w3-xlarge">{{student.firstName}} {{student.lastName}}</legend>
               <div class="w3-row-padding">
-                {{ macro_display_formfield(dailyAttendanceForm.absenceDate, "w3-half") }}
-                {{ macro_display_formfield(dailyAttendanceForm.attendanceCode, "w3-half") }}
-                {{ macro_display_formfield(dailyAttendanceForm.comment, "w3-half") }}
+                {{ macro_display_formfield(dailyAttendanceForm.absenceDate, "w3-half", "absenceDate_" + student.id|string) }}
+                {{ macro_display_formfield(dailyAttendanceForm.attendanceCode, "w3-half", "attendanceCode_" + student.id|string) }}
+                {{ macro_display_formfield(dailyAttendanceForm.comment, "w3-half", "commentAttendance_" + student.id|string) }}
               </div>
             </fieldset>
             <footer class="w3-container w3-margin-top w3-white w3-center">
               <div class="w3-bar">
                 <button type="button" class="w3-button w3-large"
                   onclick="document.getElementById('addAttendanceModal{{student.id}}').style.display='none'">Cancel</button>
-                {{ dailyAttendanceForm.submitDailyAttendance(class="w3-btn w3-blue w3-large") }}
+                {{ dailyAttendanceForm.submitDailyAttendance(id="submitAttendance_" + student.id|string, class="w3-btn w3-blue w3-large") }}
               </div>
             </footer>
           </form>
@@ -101,23 +101,24 @@
           </header>
           <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('studentInfo.displayStudents') }}" enctype="multipart/form-data">
-            {{ interventionForm.hidden_tag() }}
+
+            {{ interventionForm.csrf_token(id="csrfIntervention_" + student.id|string) }}
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
-              {{ interventionForm.studentID(value = student.id, class="w3-hide") }}
+              {{ interventionForm.studentID(id="interventionStudentId_" + student.id|string, value = student.id, class="w3-hide") }}
               <legend class="w3-xlarge">{{student.firstName}} {{student.lastName}}</legend>
               <div class="w3-row-padding">
-                {{ macro_display_formfield(interventionForm.interventionType, "w3-half") }}
-                {{ macro_display_formfield(interventionForm.interventionLevel, "w3-half") }}
-                {{ macro_display_formfield(interventionForm.startDate, "w3-half") }}
-                {{ macro_display_formfield(interventionForm.endDate, "w3-half") }}
-                {{ macro_display_formfield(interventionForm.comment, "w3-half") }}
+                {{ macro_display_formfield(interventionForm.interventionType, "w3-half", "interventionType_" + student.id|string) }}
+                {{ macro_display_formfield(interventionForm.interventionLevel, "w3-half", "interventionLevel_" + student.id|string) }}
+                {{ macro_display_formfield(interventionForm.startDate, "w3-half", "startDate_" + student.id|string) }}
+                {{ macro_display_formfield(interventionForm.endDate, "w3-half", "endDate_" + student.id|string) }}
+                {{ macro_display_formfield(interventionForm.comment, "w3-half", "interventionComment_" + student.id|string) }}
               </div>
             </fieldset>
             <footer class="w3-container w3-margin-top w3-white w3-center">
               <div class="w3-bar">
                 <button type="button" class="w3-button w3-large"
                   onclick="document.getElementById('addInterventionModal{{student.id}}').style.display='none'">Cancel</button>
-                {{ interventionForm.submitIntervention(class="w3-btn w3-blue w3-large") }}
+                {{ interventionForm.submitIntervention(id="submitIntervention_" + student.id|string, class="w3-btn w3-blue w3-large") }}
               </div>
             </footer>
           </form>
