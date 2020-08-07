@@ -6,6 +6,7 @@ from P2MT_App.interventionInfo.interventionInfo import add_InterventionLog
 from P2MT_App.interventionInfo.forms import addInterventionLogForm
 from P2MT_App.dailyAttendance.forms import addDailyAttendanceForm
 from P2MT_App.main.referenceData import getInterventionTypes
+from P2MT_App.main.utilityfunctions import printLogEntry
 from datetime import datetime
 
 studentInfo_bp = Blueprint("studentInfo_bp", __name__)
@@ -13,6 +14,7 @@ studentInfo_bp = Blueprint("studentInfo_bp", __name__)
 
 @studentInfo_bp.route("/students", methods=["GET", "POST"])
 def displayStudents():
+    printLogEntry("Running displayStudents()")
     dailyAttendanceForm = addDailyAttendanceForm()
     interventionForm = addInterventionLogForm()
     interventionForm.interventionType.choices = getInterventionTypes()
@@ -21,23 +23,19 @@ def displayStudents():
     )
     if "submitDailyAttendance" in request.form:
         if dailyAttendanceForm.validate_on_submit():
-            print("Running dailyAttendanceForm")
+            printLogEntry("Running dailyAttendanceForm")
             add_DailyAttendanceLog(
                 int(dailyAttendanceForm.studentID.data),
                 dailyAttendanceForm.absenceDate.data,
                 dailyAttendanceForm.attendanceCode.data,
                 dailyAttendanceForm.comment.data,
             )
-            print(
-                "===   Completed add_DailyAttendanceLog.  Redirecting to students   ===",
-                datetime.now(),
-                "   ===",
-            )
+            printLogEntry("Completed add_DailyAttendanceLog.  Redirecting to students")
             return redirect(url_for("studentInfo_bp.displayStudents"))
 
     if "submitIntervention" in request.form:
         if interventionForm.validate_on_submit():
-            print("Running interventionForm")
+            printLogEntry("Running interventionForm")
             add_InterventionLog(
                 int(interventionForm.studentID.data),
                 int(interventionForm.interventionType.data),
@@ -46,11 +44,7 @@ def displayStudents():
                 interventionForm.endDate.data,
                 interventionForm.comment.data,
             )
-            print(
-                "===   Completed add_InterventionLog.  Redirecting to students   ===",
-                datetime.now(),
-                "   ===",
-            )
+            printLogEntry("Completed add_InterventionLog.  Redirecting to students")
             return redirect(url_for("studentInfo_bp.displayStudents"))
 
     if request.method == "GET":

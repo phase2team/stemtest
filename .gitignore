@@ -15,3 +15,6 @@ P2MT_App/p2mt.db
 test 
 P2MT_App/Old
 *.pyc
+P2MT_App/static/download/class_attendance*
+P2MT_App/static/download/class_schedule*
+P2MT_App/static/download/Uploaded_Schedule*

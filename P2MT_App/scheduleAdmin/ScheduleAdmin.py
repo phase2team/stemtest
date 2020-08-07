@@ -1,7 +1,7 @@
 from flask import send_file, current_app
 from P2MT_App import db
 from P2MT_App.models import ClassSchedule, ClassAttendanceLog, SchoolCalendar, Student
-from P2MT_App.main.utilityfunctions import download_File
+from P2MT_App.main.utilityfunctions import download_File, printLogEntry
 from datetime import datetime, date, time
 import re
 import os
@@ -13,6 +13,7 @@ print("\n=========", __file__, "=========\n")
 def addClassAttendanceLog(classSchedule_id, list_of_dates):
     # Adds entries to class attendance log for a given classSchedule_id and list of dates
     # Ignores classes when inCurrentClassAttendaceLog is true
+    printLogEntry("addClassAttendanceLog() function called")
     for classDate in list_of_dates:
         inCurrentClassAttendaceLog = ClassAttendanceLog.query.filter(
             ClassAttendanceLog.classSchedule_id == classSchedule_id,
@@ -71,12 +72,14 @@ def addClassSchedule(
         comment=comment,
         googleCalendarEventID=googleCalendarEventID,
     )
+    printLogEntry("addClassSchedule() function called")
     print(classSchedule1)
     db.session.add(classSchedule1)
     db.session.commit()
 
 
 def uploadSchedules(fname):
+    printLogEntry("uploadSchedules() function called")
     importCSV = open(fname, "r")
     for row in importCSV:
         print("row=", row)
@@ -126,6 +129,7 @@ def uploadSchedules(fname):
 
 
 def deleteClassSchedule(schoolYear, semester, yearOfGraduation):
+    printLogEntry("deleteClassSchedule() function called")
     classSchedules = (
         ClassSchedule.query.join(Student)
         .filter(
@@ -142,7 +146,7 @@ def deleteClassSchedule(schoolYear, semester, yearOfGraduation):
 
 
 def downloadClassSchedule(schoolYear, semester):
-    print("downloadClassSchedule function called")
+    printLogEntry("downloadClassSchedule() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -224,7 +228,7 @@ def downloadClassSchedule(schoolYear, semester):
 
 
 def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, endDate):
-    print("downloadClassAttendanceLog function called")
+    printLogEntry("downloadClassAttendanceLog() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -299,6 +303,7 @@ def createListOfDates(SchoolCalendarTableExtract):
 
 
 def propagateClassSchedule(startDate, endDate, schoolYear, semester):
+    printLogEntry("propagateClassSchedule() function called")
     # Create lists of days to use for propagating class schedule
     schoolCalendar = db.session.query(SchoolCalendar)
     phaseIIDays = schoolCalendar.filter(SchoolCalendar.phaseIISchoolDay)

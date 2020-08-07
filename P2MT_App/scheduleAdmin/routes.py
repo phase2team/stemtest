@@ -30,12 +30,14 @@ from P2MT_App.scheduleAdmin.ScheduleAdmin import (
     addClassSchedule,
 )
 from P2MT_App.main.utilityfunctions import save_File
+from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
 
 scheduleAdmin_bp = Blueprint("scheduleAdmin_bp", __name__)
 
 
 @scheduleAdmin_bp.route("/scheduleadmin", methods=["GET", "POST"])
 def displayScheduleAdmin():
+    printLogEntry("Running displayScheduleAdmin()")
     uploadClassScheduleFormDetails = uploadClassScheduleForm()
     propagateClassAttendanceLogsFormDetails = propagateClassAttendanceLogsForm()
     propagateClassAttendanceLogsFormDetails.schoolYear.choices = getSchoolYear()
@@ -65,20 +67,21 @@ def displayScheduleAdmin():
         ("R", "R"),
         ("F", "F"),
     ]
-    print(request.form)
+    if request.method == "POST":
+        printLogEntry("form= " + str(request.form))
     if "submitUploadClassSchedule" in request.form:
         if uploadClassScheduleFormDetails.validate_on_submit():
-            print("Upload Form Submitted")
+            printLogEntry("Upload Form Submitted")
             if uploadClassScheduleFormDetails.csvClassScheduleFile.data:
                 uploadedScheduleFile = save_File(
                     uploadClassScheduleFormDetails.csvClassScheduleFile.data,
                     "Uploaded_Schedule_File.csv",
                 )
                 uploadSchedules(uploadedScheduleFile)
-    print(uploadClassScheduleFormDetails.errors)
+    printFormErrors(uploadClassScheduleFormDetails)
     if "submitPropagatelassAttendanceLogs" in request.form:
         if propagateClassAttendanceLogsFormDetails.validate_on_submit():
-            print("Propagate Form Submitted")
+            printLogEntry("Propagate Form Submitted")
             schoolYear = int(propagateClassAttendanceLogsFormDetails.schoolYear.data)
             semester = propagateClassAttendanceLogsFormDetails.semester.data
             startDate = propagateClassAttendanceLogsFormDetails.startDate.data
@@ -94,31 +97,29 @@ def displayScheduleAdmin():
                 endDate,
             )
             propagateClassSchedule(startDate, endDate, schoolYear, semester)
-    print(propagateClassAttendanceLogsFormDetails.errors)
+    printFormErrors(propagateClassAttendanceLogsFormDetails)
     if "submitDeleteClassScheduleForm" in request.form:
         if deleteClassScheduleFormDetails.validate_on_submit():
             if (
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data
                 == "DELETE"
             ):
+                printLogEntry("Delete Class Schedule Form Submitted")
                 schoolYear = deleteClassScheduleFormDetails.schoolYear.data
                 semester = deleteClassScheduleFormDetails.semester.data
                 yearOfGraduation = deleteClassScheduleFormDetails.yearOfGraduation.data
                 print(
-                    "Delete Class Schedule Form Submitted: SchoolYear=",
-                    schoolYear,
-                    " Semester=",
-                    semester,
-                    yearOfGraduation,
+                    "SchoolYear=", schoolYear, " Semester=", semester, yearOfGraduation,
                 )
                 deleteClassSchedule(schoolYear, semester, yearOfGraduation)
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
                 # deleteClassScheduleFormDetails.process()
             else:
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
-                print("Type DELETE in the text box to confirm delete")
+                printLogEntry("Type DELETE in the text box to confirm delete")
     if "submitAddSingleClassSchedule" in request.form:
         if addSingleClassScheduleDetails.validate():
+            printLogEntry("Add Single Class Schedule submitted")
             schoolYear = addSingleClassScheduleDetails.schoolYear.data
             semester = addSingleClassScheduleDetails.semester.data
             chattStateANumber = addSingleClassScheduleDetails.studentName.data
@@ -173,11 +174,9 @@ def displayScheduleAdmin():
         if downloadClassScheduleFormDetails.validate_on_submit():
             schoolYear = downloadClassScheduleFormDetails.schoolYear.data
             semester = downloadClassScheduleFormDetails.semester.data
+            printLogEntry("Download Class Schedule Form Submitted")
             print(
-                "Download Class Schedule Form Submitted: SchoolYear=",
-                schoolYear,
-                " Semester=",
-                semester,
+                "SchoolYear=", schoolYear, " Semester=", semester,
             )
             return downloadClassSchedule(schoolYear, semester)
     if "submitDownloadClassAttendanceForm" in request.form:
@@ -187,8 +186,9 @@ def displayScheduleAdmin():
             teacherName = downloadClassAttendanceFormDetails.teacherName.data
             startDate = downloadClassAttendanceFormDetails.startDate.data
             endDate = downloadClassAttendanceFormDetails.endDate.data
+            printLogEntry("Download Class Attendance Form Submitted")
             print(
-                "Download Class Attendance Form Submitted: SchoolYear=",
+                "SchoolYear=",
                 schoolYear,
                 " Semester=",
                 semester,
