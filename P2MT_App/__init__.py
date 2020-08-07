@@ -36,8 +36,7 @@ def create_app(config_class=Config):
     from P2MT_App.interventionInfo.routes import interventionInfo_bp
     from P2MT_App.masterSchedule.routes import masterSchedule_bp
     from P2MT_App.scheduleAdmin.routes import scheduleAdmin_bp
-
-    # from P2MT_App.schoolCalendar.routes import schoolCalendar_bp
+    from P2MT_App.schoolCalendar.routes import schoolCalendar_bp
     from P2MT_App.studentInfo.routes import studentInfo_bp
 
     app.register_blueprint(main_bp)
@@ -47,7 +46,7 @@ def create_app(config_class=Config):
     app.register_blueprint(interventionInfo_bp)
     app.register_blueprint(masterSchedule_bp)
     app.register_blueprint(scheduleAdmin_bp)
-    # app.register_blueprint(schoolCalendar_bp)
+    app.register_blueprint(schoolCalendar_bp)
     app.register_blueprint(studentInfo_bp)
 
     return app
