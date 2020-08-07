@@ -10,13 +10,18 @@ def getInterventionTypes():
     return interventionValueLabelTupleList
 
 
-def getTeachersFromFacultyAndStaff():
-    teacherValueLabelTupleList = (
-        db.session.query(FacultyAndStaff.lastName, FacultyAndStaff.lastName)
+def getStaffFromFacultyAndStaff():
+    teacherTupleList = (
+        db.session.query(
+            FacultyAndStaff.id, FacultyAndStaff.firstName, FacultyAndStaff.lastName
+        )
         .distinct()
         .order_by(FacultyAndStaff.lastName)
         .all()
     )
+    teacherValueLabelTupleList = [
+        (item[0], item[1] + " " + item[2]) for item in teacherTupleList
+    ]
     return teacherValueLabelTupleList
 
 

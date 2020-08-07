@@ -118,7 +118,7 @@ def displayScheduleAdmin():
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")
     if "submitAddSingleClassSchedule" in request.form:
-        if addSingleClassScheduleDetails.validate():
+        if addSingleClassScheduleDetails.validate_on_submit():
             printLogEntry("Add Single Class Schedule submitted")
             schoolYear = addSingleClassScheduleDetails.schoolYear.data
             semester = addSingleClassScheduleDetails.semester.data

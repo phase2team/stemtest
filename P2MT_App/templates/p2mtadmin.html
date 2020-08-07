@@ -96,5 +96,66 @@
     </form>
 </div>
 
+<div class="w3-container">
+    <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}"
+        enctype="multipart/form-data">
+        {{ addStaffForm.hidden_tag() }}
+        <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <legend class="w3-xlarge">Add Staff Member</legend>
+            <div class="w3-row-padding">
+                {{ macro_display_formfield(addStaffForm.firstName, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.lastName, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.position, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.email, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.phoneNumber, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.chattStateANumber, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.myersBriggs, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.house, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.houseGrade, "w3-half") }}
+                {{ macro_display_formfield(addStaffForm.twitterAccount, "w3-half") }}
+            </div>
+            <div class="w3-row w3-padding-large">
+                {{ addStaffForm.submitAddStaff(class="w3-btn w3-blue w3-large") }}
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<div class="w3-container">
+    <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}"
+        enctype="multipart/form-data">
+        {{ uploadStaffListForm.hidden_tag() }}
+        <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <legend class="w3-xlarge">Upload Staff List</legend>
+            <div class="w3-row-padding">
+                {{ macro_display_formfield(uploadStaffListForm.csvStaffListFile, "w3-half") }}
+            </div>
+            <div class="w3-row w3-padding-large">
+                {{ uploadStaffListForm.submitUploadStaffList(class="w3-btn w3-blue w3-large") }}
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<div class="w3-container">
+    <form class="w3-container w3-padding-large" method="POST" action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}"
+        enctype="multipart/form-data">
+        {{ deleteStaffForm.hidden_tag() }}
+        <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <legend class="w3-xlarge">Delete Staff from P2MT Database</legend>
+            <p> This action will permamently delete the staff member from the P2MT database. This action will NOT affect
+                associated
+                information such as class schedules, attendance, and interventions. You cannot undo this action.</p>
+            <div class="w3-row-padding">
+                {{ macro_display_formfield(deleteStaffForm.staffName, "w3-half") }}
+                {{ macro_display_formfield(deleteStaffForm.confirmDeleteStaff, "w3-half") }}
+            </div>
+            <div class="w3-row w3-padding-large">
+                {{ deleteStaffForm.submitDeleteStaff(class="w3-btn w3-blue w3-large") }}
+            </div>
+        </fieldset>
+    </form>
+</div>
+
 
 {% endblock content %}
