@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, Blueprint
 from P2MT_App import db
+from datetime import date, datetime
 from P2MT_App.models import SchoolCalendar
 from P2MT_App.schoolCalendar.forms import (
     updateSchoolCalendarFieldListForm,
@@ -13,10 +14,6 @@ schoolCalendar_bp = Blueprint("schoolCalendar_bp", __name__)
 def displaySchoolCalendar():
     # Create top level form for school calendar
     updateSchoolCalendarContainerFormDetails = updateSchoolCalendarContainerForm()
-
-    if request.method == "POST":
-        print("request.method == POST")
-        # print(request.form)
 
     if updateSchoolCalendarContainerFormDetails.validate_on_submit():
         print("Form submitted!")
@@ -46,13 +43,12 @@ def displaySchoolCalendar():
     print(updateSchoolCalendarContainerFormDetails.errors)
 
     # Query database for school calendar day info
-    schoolCalendarDays = SchoolCalendar.query.filter(SchoolCalendar.day != "S").all()
-    schoolCalendarDates = (
-        db.session.query(SchoolCalendar.classDate)
-        .filter(SchoolCalendar.day != "S")
-        .all()
-    )
-    # print(schoolCalendarDates)
+    # startCalendarDate must correspond to a Monday for correct display on School Calendar
+    startCalendarDate = date(2020, 8, 3)
+    schoolCalendarDays = SchoolCalendar.query.filter(
+        SchoolCalendar.day != "S", SchoolCalendar.classDate >= startCalendarDate
+    ).all()
+
     # Populate form info with database values
     for schoolCalendarDay in schoolCalendarDays:
         # Create sub-form for school calendar day details
@@ -90,5 +86,5 @@ def displaySchoolCalendar():
         "schoolcalendar.html",
         title="School Calendar",
         schoolCalendarForm=updateSchoolCalendarContainerFormDetails,
-        schoolCalendarDates=schoolCalendarDates,
+        schoolCalendarDates=schoolCalendarDays,
     )
