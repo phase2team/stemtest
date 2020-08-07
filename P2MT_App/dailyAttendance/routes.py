@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, Blueprint
 from P2MT_App import db
 from P2MT_App.models import DailyAttendanceLog
+from P2MT_App.main.utilityfunctions import printLogEntry
 
 dailyAttendance_bp = Blueprint("dailyAttendance_bp", __name__)
 
