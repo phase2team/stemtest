@@ -21,8 +21,8 @@ def displayMasterSchedule():
 def delete_ClassSchedule(log_id):
 
     log = ClassSchedule.query.get_or_404(log_id)
-    classScheduleLogDetails = f"{(log_id)} {log.chattStateANumber} {log.className}"
-    printLogEntry("Running deleteClassSchedule(" + classScheduleLogDetails + ")")
+    LogDetails = f"{(log_id)} {log.chattStateANumber} {log.className}"
+    printLogEntry("Running deleteClassSchedule(" + LogDetails + ")")
     db.session.delete(log)
     db.session.commit()
     flash("Class schedule has been deleted!", "success")
