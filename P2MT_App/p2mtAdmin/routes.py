@@ -1,5 +1,7 @@
 from flask import (
     render_template,
+    redirect,
+    url_for,
     flash,
     request,
     Blueprint,
@@ -63,6 +65,7 @@ def displayP2MTAdmin():
                 yearOfGraduation,
                 googleCalendarId,
             )
+            return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(addStudentFormDetails)
 
     if "submitUploadStudentList" in request.form:
@@ -74,6 +77,7 @@ def displayP2MTAdmin():
                     "Uploaded_StudentList_File.csv",
                 )
                 uploadStudentList(uploadedStudentListFile)
+                return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(uploadStudentListFormDetails)
 
     if "submitDeleteStudent" in request.form:
@@ -86,6 +90,7 @@ def displayP2MTAdmin():
                 deleteStudent(chattStateANumber)
                 deleteStudentFormDetails.confirmDeleteStudent.data = ""
                 # deleteClassScheduleFormDetails.process()
+                return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
             else:
                 deleteStudentFormDetails.confirmDeleteStudent.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")
@@ -117,6 +122,7 @@ def displayP2MTAdmin():
                 houseGrade,
                 twitterAccount,
             )
+            return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(addStaffFormDetails)
 
     if "submitUploadStaffList" in request.form:
@@ -128,6 +134,7 @@ def displayP2MTAdmin():
                     "Uploaded_StaffList_File.csv",
                 )
                 uploadStaffList(uploadedStaffListFile)
+                return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(uploadStaffListFormDetails)
 
     if "submitDeleteStaff" in request.form:
@@ -140,6 +147,7 @@ def displayP2MTAdmin():
                 deleteStaff(log_id)
                 deleteStaffFormDetails.confirmDeleteStaff.data = ""
                 # deleteClassScheduleFormDetails.process()
+                return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
             else:
                 deleteStaffFormDetails.confirmDeleteStaff.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")

@@ -1,5 +1,7 @@
 from flask import (
     render_template,
+    redirect,
+    url_for,
     flash,
     request,
     Blueprint,
@@ -78,6 +80,7 @@ def displayScheduleAdmin():
                     "Uploaded_Schedule_File.csv",
                 )
                 uploadSchedules(uploadedScheduleFile)
+                return redirect(url_for("scheduleAdmin_bp.displayScheduleAdmin"))
     printFormErrors(uploadClassScheduleFormDetails)
     if "submitPropagatelassAttendanceLogs" in request.form:
         if propagateClassAttendanceLogsFormDetails.validate_on_submit():
@@ -97,6 +100,7 @@ def displayScheduleAdmin():
                 endDate,
             )
             propagateClassSchedule(startDate, endDate, schoolYear, semester)
+            return redirect(url_for("scheduleAdmin_bp.displayScheduleAdmin"))
     printFormErrors(propagateClassAttendanceLogsFormDetails)
     if "submitDeleteClassScheduleForm" in request.form:
         if deleteClassScheduleFormDetails.validate_on_submit():
@@ -114,6 +118,7 @@ def displayScheduleAdmin():
                 deleteClassSchedule(schoolYear, semester, yearOfGraduation)
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
                 # deleteClassScheduleFormDetails.process()
+                return redirect(url_for("scheduleAdmin_bp.displayScheduleAdmin"))
             else:
                 deleteClassScheduleFormDetails.confirmDeleteClassSchedule.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")
@@ -170,6 +175,7 @@ def displayScheduleAdmin():
                 comment,
                 googleCalendarEventID,
             )
+            return redirect(url_for("scheduleAdmin_bp.displayScheduleAdmin"))
     if "submitDownloadClassScheduleForm" in request.form:
         if downloadClassScheduleFormDetails.validate_on_submit():
             schoolYear = downloadClassScheduleFormDetails.schoolYear.data
