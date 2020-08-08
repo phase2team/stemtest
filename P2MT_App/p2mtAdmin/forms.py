@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import SubmitField, StringField, SelectField, HiddenField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired
-from P2MT_App.main.referenceData import getHouseNames
+from P2MT_App.main.referenceData import getHouseNames, getGradeLevels
 
 
 class addStudentForm(FlaskForm):
@@ -68,13 +68,36 @@ class addStaffForm(FlaskForm):
     myersBriggs = StringField("Myers Briggs Personality Type (Optional)")
     house = SelectField("House (Optional)", choices=getHouseNames())
     houseGrade = SelectField(
-        "House Grade (for House Teachers) (Optional)",
-        choices=[("", ""), ("12", "12"), ("11", "11"), ("10", "10"), ("9", "9")],
+        "House Grade (for House Teachers) (Optional)", choices=getGradeLevels(),
     )
     twitterAccount = StringField(
         "Twitter Account (Optional)", render_kw={"placeholder": "@"}
     )
     submitAddStaff = SubmitField("Add Staff")
+
+
+class selectStaffToEditForm(FlaskForm):
+    staffName = SelectField("Staff Member Name", validators=[DataRequired()])
+    submitStaffToEdit = SubmitField("Edit Staff Member")
+
+
+class updateStaffForm(FlaskForm):
+    staff_id = HiddenField()
+    firstName = StringField("First Name", validators=[DataRequired()])
+    lastName = StringField("Last Name", validators=[DataRequired()])
+    position = StringField("Position", validators=[DataRequired()])
+    email = EmailField("Email", validators=[DataRequired()])
+    phoneNumber = StringField("Phone Number (Optional)")
+    chattStateANumber = StringField("Chatt State A Number (Optional)")
+    myersBriggs = StringField("Myers Briggs Personality Type (Optional)")
+    house = SelectField("House (Optional)", choices=getHouseNames())
+    houseGrade = SelectField(
+        "House Grade (for House Teachers) (Optional)", choices=getGradeLevels(),
+    )
+    twitterAccount = StringField(
+        "Twitter Account (Optional)", render_kw={"placeholder": "@"}
+    )
+    submitUpdateStaff = SubmitField("Update Staff Member Info")
 
 
 class uploadStaffListForm(FlaskForm):

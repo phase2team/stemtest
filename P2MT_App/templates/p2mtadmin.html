@@ -184,6 +184,22 @@
     <div class="w3-container">
         <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
+            {{ selectStaffToEditForm.hidden_tag() }}
+            <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+                <legend class="w3-xlarge">Edit Staff Member</legend>
+                <div class="w3-row-padding">
+                    {{ macro_display_formfield(selectStaffToEditForm.staffName, "w3-select", "w3-half") }}
+                </div>
+                <div class="w3-row w3-padding-large">
+                    {{ selectStaffToEditForm.submitStaffToEdit(class="w3-btn w3-blue w3-large") }}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="w3-container">
+        <form class="w3-container w3-padding-large" method="POST"
+            action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
             {{ uploadStaffListForm.hidden_tag() }}
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Upload Staff List</legend>

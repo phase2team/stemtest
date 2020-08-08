@@ -124,3 +124,13 @@ def getHouseNames():
     ]
     return houseValueLableTupleList
 
+
+def getGradeLevels():
+    gradeLevelTupleList = [
+        ("", ""),
+        ("9", "9"),
+        ("10", "10"),
+        ("11", "11"),
+        ("12", "12"),
+    ]
+    return gradeLevelTupleList

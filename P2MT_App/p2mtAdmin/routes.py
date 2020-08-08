@@ -15,6 +15,8 @@ from P2MT_App.p2mtAdmin.forms import (
     uploadStudentListForm,
     deleteStudentForm,
     addStaffForm,
+    selectStaffToEditForm,
+    updateStaffForm,
     uploadStaffListForm,
     deleteStaffForm,
 )
@@ -48,6 +50,8 @@ def displayP2MTAdmin():
     deleteStudentFormDetails = deleteStudentForm()
     deleteStudentFormDetails.studentName.choices = getStudents()
     addStaffFormDetails = addStaffForm()
+    selectStaffToEditFormDetails = selectStaffToEditForm()
+    selectStaffToEditFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
     uploadStaffListFormDetails = uploadStaffListForm()
     deleteStaffFormDetails = deleteStaffForm()
     deleteStaffFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
@@ -146,6 +150,14 @@ def displayP2MTAdmin():
             return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(addStaffFormDetails)
 
+    if "submitStaffToEdit" in request.form:
+        if selectStaffToEditFormDetails.validate_on_submit:
+            printLogEntry("Staff to Edit Form Submitted")
+            staff_id = int(selectStaffToEditFormDetails.staffName.data)
+            print("staff_id = ", staff_id)
+            return redirect(url_for("p2mtAdmin_bp.updateStaff", staff_id=staff_id))
+    printFormErrors(selectStaffToEditFormDetails)
+
     if "submitUploadStaffList" in request.form:
         if uploadStaffListFormDetails.validate_on_submit():
             printLogEntry("Upload Staff List Form Submitted")
@@ -183,6 +195,7 @@ def displayP2MTAdmin():
         uploadStudentListForm=uploadStudentListFormDetails,
         deleteStudentForm=deleteStudentFormDetails,
         addStaffForm=addStaffFormDetails,
+        selectStaffToEditForm=selectStaffToEditFormDetails,
         uploadStaffListForm=uploadStaffListFormDetails,
         deleteStaffForm=deleteStaffFormDetails,
     )
@@ -230,3 +243,42 @@ def updateStudent(student_id):
         updateStudentForm=updateStudentFormDetails,
     )
 
+
+@p2mtAdmin_bp.route("/p2mtadmin/<int:staff_id>/staffupdate", methods=["GET", "POST"])
+def updateStaff(staff_id):
+    printLogEntry("Running updateStaff()")
+    staff = FacultyAndStaff.query.get_or_404(staff_id)
+    updateStaffFormDetails = updateStaffForm()
+    if "submitUpdateStaff" in request.form:
+        if updateStaffFormDetails.validate_on_submit():
+            staff.firstName = updateStaffFormDetails.firstName.data
+            staff.lastName = updateStaffFormDetails.lastName.data
+            staff.email = updateStaffFormDetails.email.data
+            staff.position = updateStaffFormDetails.position.data
+            staff.chattStateANumber = updateStaffFormDetails.chattStateANumber.data
+            staff.phoneNumber = updateStaffFormDetails.phoneNumber.data
+            staff.house = updateStaffFormDetails.house.data
+            staff.houseGrade = updateStaffFormDetails.houseGrade.data
+            staff.myersBrigg = updateStaffFormDetails.myersBriggs.data
+            staff.twitterAccount = updateStaffFormDetails.twitterAccount.data
+            db.session.commit()
+            staffUpdateString = staff.firstName + " " + staff.lastName
+            printLogEntry("Staff info updated for " + staffUpdateString)
+            flash("Staff details for " + staffUpdateString + " updated!", "success")
+            return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
+    elif request.method == "GET":
+        updateStaffFormDetails.staff_id.data = staff.id
+        updateStaffFormDetails.firstName.data = staff.firstName
+        updateStaffFormDetails.lastName.data = staff.lastName
+        updateStaffFormDetails.position.data = staff.position
+        updateStaffFormDetails.email.data = staff.email
+        updateStaffFormDetails.chattStateANumber.data = staff.chattStateANumber
+        updateStaffFormDetails.house.data = staff.house
+        updateStaffFormDetails.houseGrade.data = str(staff.houseGrade)
+        updateStaffFormDetails.myersBriggs.data = staff.myersBrigg
+        updateStaffFormDetails.twitterAccount.data = staff.twitterAccount
+    return render_template(
+        "updatestaff.html",
+        title="Update Staff Member",
+        updateStaffForm=updateStaffFormDetails,
+    )
