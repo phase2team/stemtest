@@ -111,3 +111,16 @@ def getSemester():
         .all()
     )
     return semesterValueLabelTupleList
+
+
+def getHouseNames():
+    houseValueLableTupleList = [
+        ("", ""),
+        ("TBD", "TBD"),
+        ("Staupers", "Staupers"),
+        ("Tesla", "Tesla"),
+        ("Einstein", "Einstein"),
+        ("Mirzakhani", "Mirzakhani"),
+    ]
+    return houseValueLableTupleList
+

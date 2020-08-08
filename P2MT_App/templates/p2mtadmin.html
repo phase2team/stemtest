@@ -1,7 +1,7 @@
 {% extends 'layout.html'%}
 {% block content %}
 
-{% macro macro_display_formfield(formfield, w3ResponsiveGridClass) %}
+{% macro macro_display_formfield(formfield, w3InputClass, w3ResponsiveGridClass) %}
 <div class="{{w3ResponsiveGridClass}}">
     {{ formfield.label(class="w3-text-green w3-large") }}
     {% if formfield.errors %}
@@ -12,7 +12,13 @@
         {% endfor %}
     </div>
     {% else %}
-    {{ formfield(class="w3-select  w3-section") }}
+    {% if w3InputClass == "w3-input" %}
+    {{ formfield(class="w3-input w3-section") }}
+    {% elif w3InputClass == "w3-select" %}
+    {{ formfield(class="w3-select w3-section") }}
+    {% else %}
+    {{ formfield(class="w3-select w3-section") }}
+    {% endif %}
     {% endif %}
 </div>
 {% endmacro %}
@@ -53,13 +59,13 @@
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Add Student</legend>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(addStudentForm.firstName, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.lastName, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.chattStateANumber, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.email, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.yearOfGraduation, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.house, "w3-half") }}
-                    {{ macro_display_formfield(addStudentForm.googleCalendarId, "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.firstName, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.lastName, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.chattStateANumber, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.email, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.yearOfGraduation, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.house, "w3-select", "w3-half") }}
+                    {{ macro_display_formfield(addStudentForm.googleCalendarId, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
                     {{ addStudentForm.submitAddStudent(class="w3-btn w3-blue w3-large") }}
@@ -76,7 +82,7 @@
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Edit Student</legend>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(selectStudentToEditForm.studentName, "w3-half") }}
+                    {{ macro_display_formfield(selectStudentToEditForm.studentName, "w3-select", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
                     {{ selectStudentToEditForm.submitStudentToEdit(class="w3-btn w3-blue w3-large") }}
@@ -92,7 +98,7 @@
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Upload Student List</legend>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(uploadStudentListForm.csvStudentListFile, "w3-half") }}
+                    {{ macro_display_formfield(uploadStudentListForm.csvStudentListFile, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
                     {{ uploadStudentListForm.submitUploadStudentList(class="w3-btn w3-blue w3-large") }}
@@ -105,16 +111,16 @@
         <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
             {{ deleteStudentForm.hidden_tag() }}
-            <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <fieldset class="w3-container w3-padding-large w3-hover-border-red">
                 <legend class="w3-xlarge">Delete Student from P2MT Database</legend>
                 <p> This action will permamently delete the student from the P2MT database including all associated
                     information such as class schedules, attendance, and interventions. You cannot undo this action.</p>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(deleteStudentForm.studentName, "w3-half") }}
-                    {{ macro_display_formfield(deleteStudentForm.confirmDeleteStudent, "w3-half") }}
+                    {{ macro_display_formfield(deleteStudentForm.studentName, "w3-select", "w3-half") }}
+                    {{ macro_display_formfield(deleteStudentForm.confirmDeleteStudent, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
-                    {{ deleteStudentForm.submitDeleteStudent(class="w3-btn w3-blue w3-large") }}
+                    {{ deleteStudentForm.submitDeleteStudent(class="w3-btn w3-red w3-large") }}
                 </div>
             </fieldset>
         </form>
@@ -122,23 +128,51 @@
 </div>
 
 <div class="infoTab" id="StaffInfoTab" style="display:none">
-    <div class="w3-container">
+    <div class="w3-container w3-padding-large w3-margin-right w3-margin-left w3-section">
+        <table class="w3-padding-large w3-table-all w3-hoverable">
+            <thead>
+                <tr class="w3-dark-grey">
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Position</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">House</th>
+                    <th scope="col">House Grade</th>
+
+                </tr>
+            </thead>
+            <tbody class="w3-main">
+                {% for staff in staffInfo %}
+                <tr>
+                    <td>{{ staff.firstName }}</td>
+                    <td>{{ staff.lastName }}</td>
+                    <td>{{ staff.position }}</td>
+                    <td>{{ staff.email }}</td>
+                    <td>{{ staff.house }}</td>
+                    <td>{{ staff.houseGrade }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="w3-container w3-section">
         <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
             {{ addStaffForm.hidden_tag() }}
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Add Staff Member</legend>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(addStaffForm.firstName, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.lastName, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.position, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.email, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.phoneNumber, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.chattStateANumber, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.myersBriggs, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.house, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.houseGrade, "w3-half") }}
-                    {{ macro_display_formfield(addStaffForm.twitterAccount, "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.firstName, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.lastName, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.position, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.email, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.house, "w3-select", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.houseGrade, "w3-select", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.phoneNumber, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.chattStateANumber, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.myersBriggs, "w3-input", "w3-half") }}
+                    {{ macro_display_formfield(addStaffForm.twitterAccount, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
                     {{ addStaffForm.submitAddStaff(class="w3-btn w3-blue w3-large") }}
@@ -154,7 +188,7 @@
             <fieldset class="w3-container w3-padding-large w3-hover-border-green">
                 <legend class="w3-xlarge">Upload Staff List</legend>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(uploadStaffListForm.csvStaffListFile, "w3-half") }}
+                    {{ macro_display_formfield(uploadStaffListForm.csvStaffListFile, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
                     {{ uploadStaffListForm.submitUploadStaffList(class="w3-btn w3-blue w3-large") }}
@@ -167,18 +201,20 @@
         <form class="w3-container w3-padding-large" method="POST"
             action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
             {{ deleteStaffForm.hidden_tag() }}
-            <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <fieldset class="w3-container w3-padding-large w3-hover-border-red">
                 <legend class="w3-xlarge">Delete Staff from P2MT Database</legend>
-                <p> This action will permamently delete the staff member from the P2MT database. This action will NOT
+                <p> This action will permamently delete the staff member from the P2MT database. This action
+                    will NOT
                     affect
                     associated
-                    information such as class schedules, attendance, and interventions. You cannot undo this action.</p>
+                    information such as class schedules, attendance, and interventions. You cannot undo this
+                    action.</p>
                 <div class="w3-row-padding">
-                    {{ macro_display_formfield(deleteStaffForm.staffName, "w3-half") }}
-                    {{ macro_display_formfield(deleteStaffForm.confirmDeleteStaff, "w3-half") }}
+                    {{ macro_display_formfield(deleteStaffForm.staffName, "w3-select", "w3-half") }}
+                    {{ macro_display_formfield(deleteStaffForm.confirmDeleteStaff, "w3-input", "w3-half") }}
                 </div>
                 <div class="w3-row w3-padding-large">
-                    {{ deleteStaffForm.submitDeleteStaff(class="w3-btn w3-blue w3-large") }}
+                    {{ deleteStaffForm.submitDeleteStaff(class="w3-btn w3-red w3-large") }}
                 </div>
             </fieldset>
         </form>

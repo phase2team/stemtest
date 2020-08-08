@@ -3,6 +3,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import SubmitField, StringField, SelectField, HiddenField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired
+from P2MT_App.main.referenceData import getHouseNames
 
 
 class addStudentForm(FlaskForm):
@@ -10,8 +11,10 @@ class addStudentForm(FlaskForm):
     lastName = StringField("Last Name", validators=[DataRequired()])
     email = EmailField("Email", validators=[DataRequired()])
     chattStateANumber = StringField("Chatt State A Number", validators=[DataRequired()])
-    yearOfGraduation = StringField("Year of Graduation", validators=[DataRequired()])
-    house = StringField("House (Use TBD if unknown)", validators=[DataRequired()])
+    yearOfGraduation = StringField(
+        "Year of Graduation (YYYY)", validators=[DataRequired()]
+    )
+    house = SelectField("House", validators=[DataRequired()], choices=getHouseNames())
     googleCalendarId = StringField(
         "Google Calendar ID (Use TBD if unknown)", validators=[DataRequired()]
     )
@@ -29,8 +32,10 @@ class updateStudentForm(FlaskForm):
     lastName = StringField("Last Name", validators=[DataRequired()])
     email = EmailField("Email", validators=[DataRequired()])
     chattStateANumber = StringField("Chatt State A Number", validators=[DataRequired()])
-    yearOfGraduation = StringField("Year of Graduation", validators=[DataRequired()])
-    house = StringField("House (Use TBD if unknown)", validators=[DataRequired()])
+    yearOfGraduation = StringField(
+        "Year of Graduation (YYYY)", validators=[DataRequired()]
+    )
+    house = SelectField("House", validators=[DataRequired()], choices=getHouseNames())
     googleCalendarId = StringField(
         "Google Calendar ID (Use TBD if unknown)", validators=[DataRequired()]
     )
@@ -61,7 +66,7 @@ class addStaffForm(FlaskForm):
     phoneNumber = StringField("Phone Number (Optional)")
     chattStateANumber = StringField("Chatt State A Number (Optional)")
     myersBriggs = StringField("Myers Briggs Personality Type (Optional)")
-    house = StringField("House (Optional)")
+    house = SelectField("House (Optional)", choices=getHouseNames())
     houseGrade = SelectField(
         "House Grade (for House Teachers) (Optional)",
         choices=[("", ""), ("12", "12"), ("11", "11"), ("10", "10"), ("9", "9")],

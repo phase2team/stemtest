@@ -7,7 +7,7 @@ from flask import (
     Blueprint,
 )
 from P2MT_App import db
-from P2MT_App.models import Student
+from P2MT_App.models import Student, FacultyAndStaff
 from P2MT_App.p2mtAdmin.forms import (
     addStudentForm,
     updateStudentForm,
@@ -51,6 +51,8 @@ def displayP2MTAdmin():
     uploadStaffListFormDetails = uploadStaffListForm()
     deleteStaffFormDetails = deleteStaffForm()
     deleteStaffFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
+
+    staffInfo = FacultyAndStaff.query.order_by(FacultyAndStaff.lastName.asc())
 
     if request.method == "POST":
         printLogEntry("form= " + str(request.form))
@@ -175,6 +177,7 @@ def displayP2MTAdmin():
     return render_template(
         "p2mtadmin.html",
         title="P2MT Admin",
+        staffInfo=staffInfo,
         addStudentForm=addStudentFormDetails,
         selectStudentToEditForm=selectStudentToEditFormDetails,
         uploadStudentListForm=uploadStudentListFormDetails,
