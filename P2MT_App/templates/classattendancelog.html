@@ -36,8 +36,8 @@
     {{ macro_display_formfield(classAttendanceForm.classDate) }}
   </div>
   <table class="w3-table-all w3-hoverable">
-    <thead class="w3-light-grey">
-      <tr>
+    <thead>
+      <tr class="w3-blue">
         <th scope="col">Class Name</th>
         <th scope="col">Start Time</th>
         <th scope="col">End Time</th>
@@ -58,7 +58,7 @@
         <td> {{ studentFixedFields.ClassSchedule.Student.lastName }} </td>
         <td>
           {% for subfield in studentAttendanceForm.attendanceCode %}
-          {{ subfield }}
+          {{ subfield(class="w3-radio") }}
           {{ subfield.label }}
           {% endfor %}
         </td>
