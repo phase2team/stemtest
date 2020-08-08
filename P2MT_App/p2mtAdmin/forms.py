@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import SubmitField, StringField, SelectField
+from wtforms import SubmitField, StringField, SelectField, HiddenField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired
 
@@ -16,6 +16,25 @@ class addStudentForm(FlaskForm):
         "Google Calendar ID (Use TBD if unknown)", validators=[DataRequired()]
     )
     submitAddStudent = SubmitField("Add Student")
+
+
+class selectStudentToEditForm(FlaskForm):
+    studentName = SelectField("Student Name", validators=[DataRequired()])
+    submitStudentToEdit = SubmitField("Edit Student")
+
+
+class updateStudentForm(FlaskForm):
+    student_id = HiddenField()
+    firstName = StringField("First Name", validators=[DataRequired()])
+    lastName = StringField("Last Name", validators=[DataRequired()])
+    email = EmailField("Email", validators=[DataRequired()])
+    chattStateANumber = StringField("Chatt State A Number", validators=[DataRequired()])
+    yearOfGraduation = StringField("Year of Graduation", validators=[DataRequired()])
+    house = StringField("House (Use TBD if unknown)", validators=[DataRequired()])
+    googleCalendarId = StringField(
+        "Google Calendar ID (Use TBD if unknown)", validators=[DataRequired()]
+    )
+    submitUpdateStudent = SubmitField("Update Student Info")
 
 
 class uploadStudentListForm(FlaskForm):

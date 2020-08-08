@@ -70,6 +70,19 @@ def getStudents():
     return studentValueLabelTupleList
 
 
+def getStudentsById():
+    studentTupleList = (
+        db.session.query(Student.id, Student.firstName, Student.lastName)
+        .distinct()
+        .order_by(Student.lastName)
+        .all()
+    )
+    studentValueLabelTupleList = [
+        (item[0], item[1] + " " + item[2]) for item in studentTupleList
+    ]
+    return studentValueLabelTupleList
+
+
 def getSchoolYear():
     schoolYearValueLabelTupleList = (
         db.session.query(ClassSchedule.schoolYear, ClassSchedule.schoolYear)
