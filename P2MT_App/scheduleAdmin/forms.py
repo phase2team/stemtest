@@ -41,12 +41,14 @@ class addSingleClassSchedule(FlaskForm):
     className = SelectField("Class Name", validators=[DataRequired()])
     teacherName = SelectField("Teacher", coerce=str, validators=[DataRequired()])
     classDays = MultiCheckboxField("Class Days", validators=[DataRequired()])
-    startTime = TimeField("Start Time", validators=[DataRequired()])
-    endTime = TimeField("End Time", validators=[DataRequired()])
+    startTime = TimeField(
+        "Start Time (HH:MM 24-Hr format)", validators=[DataRequired()]
+    )
+    endTime = TimeField("End Time (HH:MM 24-Hr format)", validators=[DataRequired()])
     online = BooleanField("Online")
     indStudy = BooleanField("Independent Study")
-    comment = StringField("Comment")
-    googleCalendarEventID = StringField("Google Calendar Event ID")
+    comment = StringField("Comment (Optional)")
+    googleCalendarEventID = StringField("Google Calendar Event ID (Optional)")
     submitAddSingleClassSchedule = SubmitField("Add Class Schedule for Single Student")
 
 

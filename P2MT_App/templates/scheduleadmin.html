@@ -52,9 +52,13 @@
       <fieldset class="w3-container w3-padding-large w3-hover-border-green">
         <legend class="w3-xlarge">Download Class Attendance Roster</legend>
         <div class="w3-row-padding">
+          {{ macro_display_formfield(downloadClassAttendanceForm.teacherName, "w3-half") }}
+        </div>
+        <div class="w3-row-padding">
           {{ macro_display_formfield(downloadClassAttendanceForm.schoolYear, "w3-half") }}
           {{ macro_display_formfield(downloadClassAttendanceForm.semester, "w3-half") }}
-          {{ macro_display_formfield(downloadClassAttendanceForm.teacherName, "w3-half") }}
+        </div>
+        <div class="w3-row-padding">
           {{ macro_display_formfield(downloadClassAttendanceForm.startDate, "w3-half") }}
           {{ macro_display_formfield(downloadClassAttendanceForm.endDate, "w3-half") }}
         </div>
