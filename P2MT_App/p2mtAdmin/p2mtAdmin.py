@@ -98,6 +98,22 @@ def addStaffToDatabase(
         )
         == 0
     ):
+        # Set empty strings to None (i.e. Null) for better data type management in database
+        if len(phoneNumber) == 0:
+            phoneNumber = None
+        if len(chattStateANumber) == 0:
+            chattStateANumber = None
+        if len(myersBriggs) == 0:
+            myersBriggs = None
+        if len(house) == 0:
+            house = None
+        if len(twitterAccount) == 0:
+            twitterAccount = None
+        if len(houseGrade) == 0:
+            houseGrade = None
+        # Convert houseGrade from string to integer as required by database typing
+        if isinstance(houseGrade, str):
+            houseGrade = int(houseGrade)
         staff = FacultyAndStaff(
             firstName=firstName,
             lastName=lastName,
@@ -107,7 +123,7 @@ def addStaffToDatabase(
             chattStateANumber=chattStateANumber,
             myersBrigg=myersBriggs,
             house=house,
-            houseGrade=int(houseGrade),
+            houseGrade=houseGrade,
             twitterAccount=twitterAccount,
         )
         print(staff)

@@ -102,7 +102,7 @@ def displayP2MTAdmin():
             chattStateANumber = addStaffFormDetails.chattStateANumber.data
             myersBriggs = addStaffFormDetails.myersBriggs.data
             house = addStaffFormDetails.house.data
-            houseGrade = int(addStaffFormDetails.houseGrade.data)
+            houseGrade = addStaffFormDetails.houseGrade.data
             twitterAccount = addStaffFormDetails.twitterAccount.data
 
             addStaffToDatabase(

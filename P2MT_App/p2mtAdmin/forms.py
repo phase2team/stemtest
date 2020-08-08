@@ -45,10 +45,11 @@ class addStaffForm(FlaskForm):
     house = StringField("House (Optional)")
     houseGrade = SelectField(
         "House Grade (for House Teachers) (Optional)",
-        coerce=int,
-        choices=[(0, ""), (12, "12"), (11, "11"), (10, 10), (9, "9")],
+        choices=[("", ""), ("12", "12"), ("11", "11"), ("10", "10"), ("9", "9")],
     )
-    twitterAccount = StringField("Twitter Account (Optional)", default="@")
+    twitterAccount = StringField(
+        "Twitter Account (Optional)", render_kw={"placeholder": "@"}
+    )
     submitAddStaff = SubmitField("Add Staff")
 
 
