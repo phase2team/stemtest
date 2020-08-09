@@ -48,6 +48,7 @@
 <div class="w3-bar w3-blue">
     <button class="w3-bar-item w3-button tablink w3-black" onclick="openTab(event, 'StudentInfoTab')">Student
         Info</button>
+    <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'ParentsInfoTab')">Parents Info</button>
     <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'StaffInfoTab')">Staff Info</button>
 </div>
 
@@ -125,6 +126,26 @@
             </fieldset>
         </form>
     </div>
+</div>
+
+<div class="infoTab" id="ParentsInfoTab" style="display:none">
+
+    <div class="w3-container">
+        <form class="w3-container w3-padding-large" method="POST"
+            action="{{ url_for('p2mtAdmin_bp.displayP2MTAdmin') }}" enctype="multipart/form-data">
+            {{ uploadParentsListForm.hidden_tag() }}
+            <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+                <legend class="w3-xlarge">Upload Parents List</legend>
+                <div class="w3-row-padding">
+                    {{ macro_display_formfield(uploadParentsListForm.csvParentsListFile, "w3-input", "w3-half") }}
+                </div>
+                <div class="w3-row w3-padding-large">
+                    {{ uploadParentsListForm.submitUploadParentsList(class="w3-btn w3-blue w3-large") }}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
 </div>
 
 <div class="infoTab" id="StaffInfoTab" style="display:none">

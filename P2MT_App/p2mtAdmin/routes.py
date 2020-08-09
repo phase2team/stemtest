@@ -19,6 +19,7 @@ from P2MT_App.p2mtAdmin.forms import (
     updateStaffForm,
     uploadStaffListForm,
     deleteStaffForm,
+    uploadParentsListForm,
 )
 from P2MT_App.main.referenceData import (
     getStudents,
@@ -33,6 +34,7 @@ from P2MT_App.p2mtAdmin.p2mtAdmin import (
     addStaffToDatabase,
     uploadStaffList,
     deleteStaff,
+    uploadParentsList,
 )
 from P2MT_App.main.utilityfunctions import save_File
 from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
@@ -49,6 +51,7 @@ def displayP2MTAdmin():
     uploadStudentListFormDetails = uploadStudentListForm()
     deleteStudentFormDetails = deleteStudentForm()
     deleteStudentFormDetails.studentName.choices = getStudents()
+    uploadParentsListFormDetails = uploadParentsListForm()
     addStaffFormDetails = addStaffForm()
     selectStaffToEditFormDetails = selectStaffToEditForm()
     selectStaffToEditFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
@@ -120,6 +123,18 @@ def displayP2MTAdmin():
                 deleteStudentFormDetails.confirmDeleteStudent.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")
     printFormErrors(deleteStudentFormDetails)
+
+    if "submitUploadParentsList" in request.form:
+        if uploadParentsListFormDetails.validate_on_submit():
+            printLogEntry("Upload Parents List Form Submitted")
+            if uploadParentsListFormDetails.csvParentsListFile.data:
+                uploadedParentsListFile = save_File(
+                    uploadParentsListFormDetails.csvParentsListFile.data,
+                    "Uploaded_ParentsList_File.csv",
+                )
+                uploadParentsList(uploadedParentsListFile)
+                return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
+    printFormErrors(uploadParentsListFormDetails)
 
     if "submitAddStaff" in request.form:
         if addStaffFormDetails.validate_on_submit():
@@ -194,6 +209,7 @@ def displayP2MTAdmin():
         selectStudentToEditForm=selectStudentToEditFormDetails,
         uploadStudentListForm=uploadStudentListFormDetails,
         deleteStudentForm=deleteStudentFormDetails,
+        uploadParentsListForm=uploadParentsListFormDetails,
         addStaffForm=addStaffFormDetails,
         selectStaffToEditForm=selectStaffToEditFormDetails,
         uploadStaffListForm=uploadStaffListFormDetails,

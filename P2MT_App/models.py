@@ -21,11 +21,37 @@ class Student(db.Model):
     interventionLog = db.relationship(
         "InterventionLog", backref="Student", passive_deletes=True, lazy=True,
     )
+    parentInfo = db.relationship(
+        "Parents", backref="Student", passive_deletes=True, lazy=True,
+    )
 
     def __repr__(self):
         return (
             f"Students('{self.chattStateANumber}','{self.firstName}','{self.lastName}')"
         )
+
+
+class Parents(db.Model):
+    __tablename__ = "Parents"
+    id = db.Column(db.Integer, primary_key=True)
+    chattStateANumber = db.Column(
+        db.String(20),
+        db.ForeignKey("Student.chattStateANumber", ondelete="CASCADE"),
+        nullable=False,
+    )
+    guardianship = db.Column(db.String(50), nullable=True)
+    motherName = db.Column(db.String(50), nullable=True)
+    motherEmail = db.Column(db.String(50), nullable=True)
+    motherHomePhone = db.Column(db.String(50), nullable=True)
+    motherDayPhone = db.Column(db.String(50), nullable=True)
+    fatherName = db.Column(db.String(50), nullable=True)
+    fatherEmail = db.Column(db.String(50), nullable=True)
+    fatherHomePhone = db.Column(db.String(50), nullable=True)
+    fatherDayPhone = db.Column(db.String(50), nullable=True)
+    guardianEmail = db.Column(db.String(50), nullable=True)
+
+    def __repr__(self):
+        return f"Parents('{self.chattStateANumber}','{self.guardianship}','{self.motherName}','{self.fatherName}')"
 
 
 class ClassSchedule(db.Model):

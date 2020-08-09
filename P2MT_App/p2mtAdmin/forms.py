@@ -58,6 +58,17 @@ class deleteStudentForm(FlaskForm):
     submitDeleteStudent = SubmitField("Delete Student")
 
 
+# #################
+#   Parents Info  #
+# #################
+class uploadParentsListForm(FlaskForm):
+    csvParentsListFile = FileField(
+        "Parents List (*.csv format)",
+        validators=[FileAllowed(["csv"]), FileRequired()],
+    )
+    submitUploadParentsList = SubmitField("Upload Parents List")
+
+
 class addStaffForm(FlaskForm):
     firstName = StringField("First Name", validators=[DataRequired()])
     lastName = StringField("Last Name", validators=[DataRequired()])
