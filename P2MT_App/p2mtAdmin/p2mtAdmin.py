@@ -220,10 +220,26 @@ def addParentsToDatabase(
             print(parents)
             db.session.add(parents)
             db.session.commit()
+            print("Adding parents for chattStateANumber =", chattStateANumber)
         else:
             print("No student with chattStateANumber =", chattStateANumber, " exists")
     else:
-        print("Parents with chattStateANumber =", chattStateANumber, "already exists")
+        # If parent reccord exists, update the record with the new information
+        print("Updating parents for chattStateANumber =", chattStateANumber)
+        parents = Parents.query.filter_by(chattStateANumber=chattStateANumber).first()
+        parents.chattStateANumber = chattStateANumber
+        parents.guardianship = guardianship
+        parents.motherName = motherName
+        parents.motherEmail = motherEmail
+        parents.motherHomePhone = motherHomePhone
+        parents.motherDayPhone = motherDayPhone
+        parents.fatherName = fatherName
+        parents.fatherEmail = fatherEmail
+        parents.fatherHomePhone = fatherHomePhone
+        parents.fatherDayPhone = fatherDayPhone
+        parents.guardianEmail = guardianEmail
+        parents.comment = None
+        db.session.commit()
     return
 
 
