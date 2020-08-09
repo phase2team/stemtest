@@ -57,6 +57,16 @@ def getCampusChoices():
     return campusValueLabelTupleList
 
 
+def getStudentName(chattStateANumber):
+    studentTupleList = (
+        db.session.query(Student.firstName, Student.lastName)
+        .filter(Student.chattStateANumber == chattStateANumber)
+        .first()
+    )
+    studentName = studentTupleList[0] + " " + studentTupleList[1]
+    return studentName
+
+
 def getStudents():
     studentTupleList = (
         db.session.query(Student.chattStateANumber, Student.firstName, Student.lastName)

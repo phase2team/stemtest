@@ -7,7 +7,7 @@ from flask import (
     Blueprint,
 )
 from P2MT_App import db
-from P2MT_App.models import Student, FacultyAndStaff
+from P2MT_App.models import Student, FacultyAndStaff, Parents
 from P2MT_App.p2mtAdmin.forms import (
     addStudentForm,
     updateStudentForm,
@@ -19,12 +19,15 @@ from P2MT_App.p2mtAdmin.forms import (
     updateStaffForm,
     uploadStaffListForm,
     deleteStaffForm,
+    selectParentsToEditForm,
     uploadParentsListForm,
+    updateParentsForm,
 )
 from P2MT_App.main.referenceData import (
     getStudents,
     getStudentsById,
     getStaffFromFacultyAndStaff,
+    getStudentName,
 )
 
 from P2MT_App.p2mtAdmin.p2mtAdmin import (
@@ -35,6 +38,7 @@ from P2MT_App.p2mtAdmin.p2mtAdmin import (
     uploadStaffList,
     deleteStaff,
     uploadParentsList,
+    addParentsToDatabase,
 )
 from P2MT_App.main.utilityfunctions import save_File
 from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
@@ -51,6 +55,8 @@ def displayP2MTAdmin():
     uploadStudentListFormDetails = uploadStudentListForm()
     deleteStudentFormDetails = deleteStudentForm()
     deleteStudentFormDetails.studentName.choices = getStudents()
+    selectParentsToEditFormDetails = selectParentsToEditForm()
+    selectParentsToEditFormDetails.studentName.choices = getStudents()
     uploadParentsListFormDetails = uploadParentsListForm()
     addStaffFormDetails = addStaffForm()
     selectStaffToEditFormDetails = selectStaffToEditForm()
@@ -123,6 +129,18 @@ def displayP2MTAdmin():
                 deleteStudentFormDetails.confirmDeleteStudent.data = ""
                 printLogEntry("Type DELETE in the text box to confirm delete")
     printFormErrors(deleteStudentFormDetails)
+
+    if "submitParentsToEdit" in request.form:
+        if selectParentsToEditFormDetails.validate_on_submit:
+            printLogEntry("Parents to Edit Form Submitted")
+            chattStateANumber = selectParentsToEditFormDetails.studentName.data
+            print("chattStateANumber = ", chattStateANumber)
+            return redirect(
+                url_for(
+                    "p2mtAdmin_bp.updateParents", chattStateANumber=chattStateANumber
+                )
+            )
+    printFormErrors(selectParentsToEditFormDetails)
 
     if "submitUploadParentsList" in request.form:
         if uploadParentsListFormDetails.validate_on_submit():
@@ -209,6 +227,7 @@ def displayP2MTAdmin():
         selectStudentToEditForm=selectStudentToEditFormDetails,
         uploadStudentListForm=uploadStudentListFormDetails,
         deleteStudentForm=deleteStudentFormDetails,
+        selectParentsToEditForm=selectParentsToEditFormDetails,
         uploadParentsListForm=uploadParentsListFormDetails,
         addStaffForm=addStaffFormDetails,
         selectStaffToEditForm=selectStaffToEditFormDetails,
@@ -257,6 +276,77 @@ def updateStudent(student_id):
         "updatestudent.html",
         title="Update Student",
         updateStudentForm=updateStudentFormDetails,
+    )
+
+
+@p2mtAdmin_bp.route(
+    "/p2mtadmin/<string:chattStateANumber>/parentupdate", methods=["GET", "POST"]
+)
+def updateParents(chattStateANumber):
+    printLogEntry("Running updateParents()")
+    parents = Parents.query.filter(
+        Parents.chattStateANumber == chattStateANumber
+    ).first()
+    # If no parents found, create a blank parents record in the Parents table
+    if parents is None:
+        addParentsToDatabase(
+            chattStateANumber,
+            guardianship=None,
+            motherName=None,
+            motherEmail=None,
+            motherHomePhone=None,
+            motherDayPhone=None,
+            fatherName=None,
+            fatherEmail=None,
+            fatherHomePhone=None,
+            fatherDayPhone=None,
+            guardianEmail=None,
+        )
+        parents = Parents.query.filter(
+            Parents.chattStateANumber == chattStateANumber
+        ).first()
+    studentName = getStudentName(chattStateANumber)
+    updateParentsFormDetails = updateParentsForm()
+    if "submitUpdateParents" in request.form:
+        if updateParentsFormDetails.validate_on_submit():
+            parents.guardianship = updateParentsFormDetails.guardianship.data
+            parents.motherName = updateParentsFormDetails.motherName.data
+            parents.motherEmail = updateParentsFormDetails.motherEmail.data
+            parents.motherHomePhone = updateParentsFormDetails.motherHomePhone.data
+            parents.motherDayPhone = updateParentsFormDetails.motherDayPhone.data
+            parents.fatherName = updateParentsFormDetails.fatherName.data
+            parents.fatherEmail = updateParentsFormDetails.fatherEmail.data
+            parents.fatherHomePhone = updateParentsFormDetails.fatherHomePhone.data
+            parents.fatherDayPhone = updateParentsFormDetails.fatherDayPhone.data
+            parents.guardianEmail = updateParentsFormDetails.guardianEmail.data
+            db.session.commit()
+            parentsUpdateString = (
+                parents.chattStateANumber
+                + " "
+                + parents.motherName
+                + " "
+                + parents.fatherName
+            )
+            printLogEntry("Parents info updated for " + parentsUpdateString)
+            flash("Parents details for " + parentsUpdateString + " updated!", "success")
+            return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
+    elif request.method == "GET":
+        updateParentsFormDetails.chattStateANumber.data = parents.chattStateANumber
+        updateParentsFormDetails.guardianship.data = parents.guardianship
+        updateParentsFormDetails.motherName.data = parents.motherName
+        updateParentsFormDetails.motherEmail.data = parents.motherEmail
+        updateParentsFormDetails.motherHomePhone.data = parents.motherHomePhone
+        updateParentsFormDetails.motherDayPhone.data = parents.motherDayPhone
+        updateParentsFormDetails.fatherName.data = parents.fatherName
+        updateParentsFormDetails.fatherEmail.data = parents.fatherEmail
+        updateParentsFormDetails.fatherHomePhone.data = parents.fatherHomePhone
+        updateParentsFormDetails.fatherDayPhone.data = parents.fatherDayPhone
+        updateParentsFormDetails.guardianEmail.data = parents.guardianEmail
+    return render_template(
+        "updateparents.html",
+        title="Update Parents",
+        updateParentsForm=updateParentsFormDetails,
+        studentName=studentName,
     )
 
 

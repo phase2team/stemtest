@@ -69,6 +69,28 @@ class uploadParentsListForm(FlaskForm):
     submitUploadParentsList = SubmitField("Upload Parents List")
 
 
+class selectParentsToEditForm(FlaskForm):
+    studentName = SelectField("Student Name", validators=[DataRequired()])
+    submitParentsToEdit = SubmitField("Edit Parents")
+
+
+class updateParentsForm(FlaskForm):
+    chattStateANumber = HiddenField()
+    guardianship = StringField(
+        "Guardianship (e.g., Both Parents, Mother, Father, Grandmother)"
+    )
+    motherName = StringField("Mother's Name (last, first)")
+    motherEmail = StringField("Mother's Email (separate by commas if more than one)")
+    motherHomePhone = StringField("Mother's Home Phone")
+    motherDayPhone = StringField("Mother's Day Phone")
+    fatherName = StringField("Father's Name (last, first")
+    fatherEmail = StringField("Father's Email (separate by commas if more than one)")
+    fatherHomePhone = StringField("Father's Home Phone")
+    fatherDayPhone = StringField("Father's Day Phone")
+    guardianEmail = StringField("Guardian Email (separate by commas if more than one)")
+    submitUpdateParents = SubmitField("Update Parents Info")
+
+
 class addStaffForm(FlaskForm):
     firstName = StringField("First Name", validators=[DataRequired()])
     lastName = StringField("Last Name", validators=[DataRequired()])
