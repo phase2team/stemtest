@@ -1,0 +1,95 @@
+{% extends 'layout.html'%}
+{% block content %}
+
+{% macro macro_display_formfield(formfield, w3ResponsiveGridClass, uniqueId) %}
+<div class="{{w3ResponsiveGridClass}}">
+  {{ formfield.label(class="w3-text-green w3-large") }}
+  {% if formfield.errors %}
+  {{ formfield(class="w3-select is-invalid") }}
+  <div class="invalid-feedback">
+    {% for error in formfield.errors %}
+    <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% else %}
+  {{ formfield(id=uniqueId, class="w3-select w3-section") }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+<div class="w3-container w3-green w3-row">
+  <div class="w3-third">
+    <h2>{{title}}</h2>
+  </div>
+  <div>
+    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
+      placeholder="Search by student name...">
+  </div>
+</div>
+
+<div style="overflow-x:auto;">
+  <table class="w3-table w3-striped w3-hoverable">
+    <thead>
+      <tr class="w3-blue">
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th colspan="4" class="w3-center">Mother</th>
+        <th colspan="4" class="w3-center">Father</th>
+        <th></th>
+        <th></th>
+      </tr>
+      <tr class="w3-blue">
+        <th>A#</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Guardianship</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Home</th>
+        <th>Day</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Home</th>
+        <th>Day</th>
+        <th>Guardian Email</th>
+        <th>Comment</th>
+      </tr>
+    </thead>
+    <tbody id="filteredTable" class="w3-main">
+      {% for parent in parents %}
+      <tr>
+        <td>{{ parent.Student.chattStateANumber }}</td>
+        <td>{{ parent.Student.firstName }}</td>
+        <td>{{ parent.Student.lastName }}</td>
+        <td>{{ parent.guardianship }}</td>
+        <td>{{ parent.motherName }}</td>
+        <td>{{ parent.motherEmail }}</td>
+        <td>{{ parent.motherHomePhone }}</td>
+        <td>{{ parent.motherDayPhone }}</td>
+        <td>{{ parent.fatherName }}</td>
+        <td>{{ parent.fatherEmail }}</td>
+        <td>{{ parent.fatherHomePhone }}</td>
+        <td>{{ parent.fatherDayPhone }}</td>
+        <td>{{ parent.guardianEmail }}</td>
+        <td>{{ parent.comment }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Search Filter -->
+<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
+<script>
+  // Note: the table does not include the header rows
+  var tableBody = document.getElementById('filteredTable');
+  var searchFilter = document.getElementById('searchFilter');
+  searchFilter.firstNameCellPosition = 1;
+  searchFilter.lastNameCellPosition = 2;
+  searchFilter.addEventListener('keyup', filterFirstLastNames);
+</script>
+
+
+{% endblock content %}
