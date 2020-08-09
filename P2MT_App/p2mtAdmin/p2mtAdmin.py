@@ -197,6 +197,7 @@ def addParentsToDatabase(
     fatherHomePhone,
     fatherDayPhone,
     guardianEmail,
+    comment,
 ):
     printLogEntry("addParentToDatabase() function called")
     # Only add the parent info if chattStateANumber is not already in the database
@@ -214,6 +215,7 @@ def addParentsToDatabase(
                 fatherHomePhone=fatherHomePhone,
                 fatherDayPhone=fatherDayPhone,
                 guardianEmail=guardianEmail,
+                comment=comment,
             )
             print(parents)
             db.session.add(parents)
@@ -245,6 +247,7 @@ def uploadParentsList(fname):
         fatherHomePhone = row[8].strip()
         fatherDayPhone = row[9].strip()
         guardianEmail = row[10].strip()
+        comment = None
         addParentsToDatabase(
             chattStateANumber,
             guardianship,
@@ -257,6 +260,7 @@ def uploadParentsList(fname):
             fatherHomePhone,
             fatherDayPhone,
             guardianEmail,
+            comment,
         )
     return
 

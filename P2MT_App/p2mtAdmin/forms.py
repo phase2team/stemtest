@@ -88,7 +88,13 @@ class updateParentsForm(FlaskForm):
     fatherHomePhone = StringField("Father's Home Phone")
     fatherDayPhone = StringField("Father's Day Phone")
     guardianEmail = StringField("Guardian Email (separate by commas if more than one)")
+    comment = StringField("Comments (Optional)")
     submitUpdateParents = SubmitField("Update Parents Info")
+
+
+# #################
+#   Staff Info    #
+# #################
 
 
 class addStaffForm(FlaskForm):

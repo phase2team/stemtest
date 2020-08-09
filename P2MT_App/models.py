@@ -49,6 +49,7 @@ class Parents(db.Model):
     fatherHomePhone = db.Column(db.String(50), nullable=True)
     fatherDayPhone = db.Column(db.String(50), nullable=True)
     guardianEmail = db.Column(db.String(50), nullable=True)
+    comment = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f"Parents('{self.chattStateANumber}','{self.guardianship}','{self.motherName}','{self.fatherName}')"

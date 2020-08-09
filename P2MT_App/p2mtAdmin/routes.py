@@ -301,6 +301,7 @@ def updateParents(chattStateANumber):
             fatherHomePhone=None,
             fatherDayPhone=None,
             guardianEmail=None,
+            comment=None
         )
         parents = Parents.query.filter(
             Parents.chattStateANumber == chattStateANumber
@@ -319,6 +320,7 @@ def updateParents(chattStateANumber):
             parents.fatherHomePhone = updateParentsFormDetails.fatherHomePhone.data
             parents.fatherDayPhone = updateParentsFormDetails.fatherDayPhone.data
             parents.guardianEmail = updateParentsFormDetails.guardianEmail.data
+            parents.comment = updateParentsFormDetails.comment.data
             db.session.commit()
             parentsUpdateString = (
                 parents.chattStateANumber
@@ -342,6 +344,7 @@ def updateParents(chattStateANumber):
         updateParentsFormDetails.fatherHomePhone.data = parents.fatherHomePhone
         updateParentsFormDetails.fatherDayPhone.data = parents.fatherDayPhone
         updateParentsFormDetails.guardianEmail.data = parents.guardianEmail
+        updateParentsFormDetails.comment.data = parents.comment
     return render_template(
         "updateparents.html",
         title="Update Parents",
