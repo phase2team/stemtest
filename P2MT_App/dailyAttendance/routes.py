@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, flash, Blueprint
 from P2MT_App import db
 from P2MT_App.models import DailyAttendanceLog
 from P2MT_App.main.utilityfunctions import printLogEntry
+from P2MT_App.dailyAttendance.dailyAttendance import downloadDailyAttendanceLog
 
 dailyAttendance_bp = Blueprint("dailyAttendance_bp", __name__)
 
@@ -28,3 +29,9 @@ def delete_DailyAttendanceLog(log_id):
     db.session.commit()
     flash("Daily attendance log has been deleted!", "success")
     return redirect(url_for("dailyAttendance_bp.displayDailyAttendanceLogs"))
+
+
+@dailyAttendance_bp.route("/dailyattendancelog/download")
+def download_DailyAttendanceLog():
+    printLogEntry("download_DailyAttendanceLog() function called")
+    return downloadDailyAttendanceLog()
