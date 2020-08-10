@@ -250,10 +250,26 @@ def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, end
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_attendance_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
+    csvOutputWriter = csv.writer(
+        csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+    )
     # Write header row for CSV file
-    csvHeaderRow = "teacher, className, day, classDate, startTime, endTime, firstName,lastName,attendanceCode,comment\n"
-    csvOutputFile.write(csvHeaderRow)
+    csvOutputWriter.writerow(
+        [
+            "teacher",
+            "className",
+            "day",
+            "classDate",
+            "startTime",
+            "endTime",
+            "firstName",
+            "lastName",
+            "attendanceCode",
+            "comment",
+        ]
+    )
     csvOutputFileRowCount = 0
+    # Query for class attendance records
     ClassAttendanceLogs = (
         ClassAttendanceLog.query.join(ClassSchedule)
         .join(ClassSchedule.Student)
@@ -269,43 +285,24 @@ def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, end
         .order_by(ClassSchedule.className)
         .order_by(Student.lastName)
     )
-    # for classAttendanceLog in ClassAttendanceLogs:
-    #     print(
-    #         classAttendanceLog.ClassSchedule.teacherLastName,
-    #         classAttendanceLog.ClassSchedule.className,
-    #         classAttendanceLog.classDate.strftime("%a"),
-    #         classAttendanceLog.classDate.strftime("%Y/%m/%d"),
-    #         classAttendanceLog.ClassSchedule.startTime.strftime("%-I:%M %p"),
-    #         classAttendanceLog.ClassSchedule.endTime.strftime("%-I:%M %p"),
-    #         classAttendanceLog.ClassSchedule.Student.firstName,
-    #         classAttendanceLog.ClassSchedule.Student.lastName,
-    #         classAttendanceLog.attendanceCode,
-    #         classAttendanceLog.comment,
-    #     )
     # Process each record in the query and write to the output file
     for classAttendanceLog in ClassAttendanceLogs:
-        csvRow = [
-            classAttendanceLog.ClassSchedule.teacherLastName,
-            classAttendanceLog.ClassSchedule.className,
-            classAttendanceLog.classDate.strftime("%a"),
-            classAttendanceLog.classDate.strftime("%Y/%m/%d"),
-            classAttendanceLog.ClassSchedule.startTime.strftime("%-I:%M %p"),
-            classAttendanceLog.ClassSchedule.endTime.strftime("%-I:%M %p"),
-            classAttendanceLog.ClassSchedule.Student.firstName,
-            classAttendanceLog.ClassSchedule.Student.lastName,
-            classAttendanceLog.attendanceCode,
-            classAttendanceLog.comment,
-        ]
+        csvOutputWriter.writerow(
+            [
+                classAttendanceLog.ClassSchedule.teacherLastName,
+                classAttendanceLog.ClassSchedule.className,
+                classAttendanceLog.classDate.strftime("%a"),
+                classAttendanceLog.classDate.strftime("%Y-%m-%d"),
+                classAttendanceLog.ClassSchedule.startTime.strftime("%-I:%M %p"),
+                classAttendanceLog.ClassSchedule.endTime.strftime("%-I:%M %p"),
+                classAttendanceLog.ClassSchedule.Student.firstName,
+                classAttendanceLog.ClassSchedule.Student.lastName,
+                classAttendanceLog.attendanceCode,
+                classAttendanceLog.comment,
+            ]
+        )
 
         csvElementCounter = 1
-        for element in csvRow:
-            if element is None:
-                element = ""
-            if csvElementCounter < len(csvRow):
-                csvOutputFile.write(element + ",")
-                csvElementCounter += 1
-            else:
-                csvOutputFile.write(element + "\n")
         csvOutputFileRowCount = csvOutputFileRowCount + 1
     csvOutputFile.close()
     return send_file(csvFilename, as_attachment=True, cache_timeout=0)
