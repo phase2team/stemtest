@@ -364,7 +364,7 @@ def addParentsToDatabase(
         parents.fatherHomePhone = fatherHomePhone
         parents.fatherDayPhone = fatherDayPhone
         parents.guardianEmail = guardianEmail
-        parents.comment = None
+        parents.comment = comment
         db.session.commit()
     return
 
