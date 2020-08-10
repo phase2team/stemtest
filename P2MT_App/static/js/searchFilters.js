@@ -26,7 +26,6 @@ function filterFirstLastNames(e) {
     for (var j = 0; j < tableRows.length; j++) {
         var tableCellsCollection = tableRows[j].getElementsByTagName('td');
         var tableCells = Array.from(tableCellsCollection);
-        // Prevent a case of a null value (which shouldn't be possible with name cells anyway)
         var firstName = tableCells[firstNameCellPosition].firstChild.textContent;
         var lastName = tableCells[lastNameCellPosition].firstChild.textContent;
         // Check if the search text is found in the table data text

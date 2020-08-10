@@ -31,47 +31,43 @@
   <table class="w3-table w3-striped w3-hoverable">
     <thead>
       <tr class="w3-blue">
+        <th colspan="2" class="w3-border-left w3-border-right">Student</th>
         <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th colspan="4" class="w3-center">Mother</th>
-        <th colspan="4" class="w3-center">Father</th>
+        <th colspan="4" class="w3-center w3-border-left w3-border-right">Mother</th>
+        <th colspan="4" class="w3-center w3-border-right">Father</th>
         <th></th>
         <th></th>
       </tr>
       <tr class="w3-blue">
-        <th>A#</th>
         <th>First</th>
-        <th>Last</th>
+        <th class="w3-border-right">Last</th>
         <th>Guardianship</th>
-        <th>Name</th>
+        <th class="w3-border-left">Name</th>
         <th>Email</th>
         <th>Home</th>
         <th>Day</th>
-        <th>Name</th>
+        <th class="w3-border-left">Name</th>
         <th>Email</th>
         <th>Home</th>
-        <th>Day</th>
+        <th class="w3-border-right">Day</th>
         <th>Guardian Email</th>
         <th>Comment</th>
       </tr>
     </thead>
     <tbody id="filteredTable" class="w3-main">
       {% for parent in parents %}
-      <tr>
-        <td>{{ parent.Student.chattStateANumber }}</td>
+      <tr style="white-space: nowrap;">
         <td>{{ parent.Student.firstName }}</td>
-        <td>{{ parent.Student.lastName }}</td>
-        <td>{{ parent.guardianship }}</td>
+        <td class="w3-border-right">{{ parent.Student.lastName }}</td>
+        <td class="w3-border-right">{{ parent.guardianship }}</td>
         <td>{{ parent.motherName }}</td>
         <td>{{ parent.motherEmail }}</td>
         <td>{{ parent.motherHomePhone }}</td>
-        <td>{{ parent.motherDayPhone }}</td>
+        <td class="w3-border-right">{{ parent.motherDayPhone }}</td>
         <td>{{ parent.fatherName }}</td>
         <td>{{ parent.fatherEmail }}</td>
         <td>{{ parent.fatherHomePhone }}</td>
-        <td>{{ parent.fatherDayPhone }}</td>
+        <td class="w3-border-right">{{ parent.fatherDayPhone }}</td>
         <td>{{ parent.guardianEmail }}</td>
         <td>{{ parent.comment }}</td>
       </tr>
@@ -86,8 +82,8 @@
   // Note: the table does not include the header rows
   var tableBody = document.getElementById('filteredTable');
   var searchFilter = document.getElementById('searchFilter');
-  searchFilter.firstNameCellPosition = 1;
-  searchFilter.lastNameCellPosition = 2;
+  searchFilter.firstNameCellPosition = 0;
+  searchFilter.lastNameCellPosition = 1;
   searchFilter.addEventListener('keyup', filterFirstLastNames);
 </script>
 
