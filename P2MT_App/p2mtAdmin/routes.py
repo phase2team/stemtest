@@ -38,12 +38,14 @@ from P2MT_App.p2mtAdmin.p2mtAdmin import (
     addStudentToDatabase,
     uploadStudentList,
     deleteStudent,
+    downloadStudentList,
     addStaffToDatabase,
+    downloadStaffList,
     uploadStaffList,
     deleteStaff,
+    downloadParentsList,
     uploadParentsList,
     addParentsToDatabase,
-    downloadStudentListTemplate,
 )
 from P2MT_App.main.utilityfunctions import save_File
 from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
@@ -96,15 +98,18 @@ def displayP2MTAdmin():
     addStudentFormDetails = addStudentForm()
     selectStudentToEditFormDetails = selectStudentToEditForm()
     selectStudentToEditFormDetails.studentName.choices = getStudentsById()
+    downloadStudentListFormDetails = downloadStudentListForm()
     uploadStudentListFormDetails = uploadStudentListForm()
     deleteStudentFormDetails = deleteStudentForm()
     deleteStudentFormDetails.studentName.choices = getStudents()
     selectParentsToEditFormDetails = selectParentsToEditForm()
     selectParentsToEditFormDetails.studentName.choices = getStudents()
+    downloadParentsListFormDetails = downloadParentsListForm()
     uploadParentsListFormDetails = uploadParentsListForm()
     addStaffFormDetails = addStaffForm()
     selectStaffToEditFormDetails = selectStaffToEditForm()
     selectStaffToEditFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
+    downloadStaffListFormDetails = downloadStaffListForm()
     uploadStaffListFormDetails = uploadStaffListForm()
     deleteStaffFormDetails = deleteStaffForm()
     deleteStaffFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
@@ -146,6 +151,11 @@ def displayP2MTAdmin():
             )
     printFormErrors(selectStudentToEditFormDetails)
 
+    if "submitDownloadStudentListForm" in request.form:
+        if downloadStudentListFormDetails.validate_on_submit():
+            printLogEntry("Download Student List Form Submitted")
+            return downloadStudentList()
+
     if "submitUploadStudentList" in request.form:
         if uploadStudentListFormDetails.validate_on_submit():
             printLogEntry("Upload Student List Form Submitted")
@@ -185,6 +195,11 @@ def displayP2MTAdmin():
                 )
             )
     printFormErrors(selectParentsToEditFormDetails)
+
+    if "submitDownloadParentsListForm" in request.form:
+        if downloadParentsListFormDetails.validate_on_submit():
+            printLogEntry("Download Parent List Form Submitted")
+            return downloadParentsList()
 
     if "submitUploadParentsList" in request.form:
         if uploadParentsListFormDetails.validate_on_submit():
@@ -226,6 +241,11 @@ def displayP2MTAdmin():
             )
             return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     printFormErrors(addStaffFormDetails)
+
+    if "submitDownloadStaffListForm" in request.form:
+        if downloadStaffListFormDetails.validate_on_submit():
+            printLogEntry("Download Staff List Form Submitted")
+            return downloadStaffList()
 
     if "submitStaffToEdit" in request.form:
         if selectStaffToEditFormDetails.validate_on_submit:
@@ -269,12 +289,15 @@ def displayP2MTAdmin():
         staffInfo=staffInfo,
         addStudentForm=addStudentFormDetails,
         selectStudentToEditForm=selectStudentToEditFormDetails,
+        downloadStudentListForm=downloadStudentListFormDetails,
         uploadStudentListForm=uploadStudentListFormDetails,
         deleteStudentForm=deleteStudentFormDetails,
         selectParentsToEditForm=selectParentsToEditFormDetails,
+        downloadParentsListForm=downloadParentsListFormDetails,
         uploadParentsListForm=uploadParentsListFormDetails,
         addStaffForm=addStaffFormDetails,
         selectStaffToEditForm=selectStaffToEditFormDetails,
+        downloadStaffListForm=downloadStaffListFormDetails,
         uploadStaffListForm=uploadStaffListFormDetails,
         deleteStaffForm=deleteStaffFormDetails,
     )

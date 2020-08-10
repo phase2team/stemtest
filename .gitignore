@@ -23,3 +23,7 @@ P2MT_App/static/upload/Uploaded_StaffList_File.csv
 P2MT_App/static/upload/Uploaded_Schedule_File.csv
 P2MT_App/static/upload/Uploaded_ParentsList_File.csv
 P2MT_App/static/upload/Uploaded_Schedule_File.csv
+P2MT_App/static/download/student_list_*
+P2MT_App/static/download/parent_list_*
+P2MT_App/static/download/staff_list_*
+P2MT_App/static/upload/Uploaded_Schedule_File.csv

@@ -1,9 +1,10 @@
-from flask import flash
+from flask import flash, current_app, send_file
 from P2MT_App import db
 from P2MT_App.models import Student, FacultyAndStaff, Parents
 from datetime import datetime, date, time
 from P2MT_App.main.utilityfunctions import printLogEntry
 import csv
+import os
 
 
 # ###################
@@ -80,16 +81,17 @@ def deleteStudent(chattStateANumber):
     return
 
 
-def downloadStudentListTemplate():
-    printLogEntry("downloadStudentListTemplate() function called")
-    # Create a CSV output file
+def downloadStudentList():
+    printLogEntry("downloadStudentList() function called")
+    # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
-    csvFilename = output_file_path + "/" + "student_list_template.csv"
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "student_list_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
-    # Write header row for CSV file
     csvOutputWriter = csv.writer(
         csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
     )
+    # Write header row for CSV file
     csvOutputWriter.writerow(
         [
             "Chatt_State_A_Number",
@@ -101,86 +103,30 @@ def downloadStudentListTemplate():
             "googleCalendarID",
         ]
     )
-    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
-
-
-def downloadStudentList():
-    printLogEntry("downloadStudentList() function called")
-    # Create a CSV output file and append with a timestamp
-    output_file_path = os.path.join(current_app.root_path, "static/download")
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
-    csvOutputFile = open(csvFilename, "w")
-    # Write header row for CSV file
-    csvHeaderRow = "year,semester,Chatt_State_A_Number,CSname,firstName,lastName,HSclass,campus,courseNumber,courseName,sectionID,teacher,online,indStudy,days,times,startTime,endTime,comment,googleCalendarEventID\n"
-    csvOutputFile.write(csvHeaderRow)
     csvOutputFileRowCount = 0
-    # Query the ClassSchedule with a join to include student information
-    ClassSchedules = ClassSchedule.query.filter(
-        ClassSchedule.schoolYear == schoolYear, ClassSchedule.semester == semester
-    ).order_by(ClassSchedule.chattStateANumber.desc())
+    # Query Student for student information
+    students = Student.query.order_by(Student.yearOfGraduation, Student.lastName)
     # Process each record in the query and write to the output file
-    for classSchedule in ClassSchedules:
-        chattStateANumber = classSchedule.chattStateANumber
-        lastName = classSchedule.Student.lastName
-        firstName = classSchedule.Student.firstName
-        CSname = lastName + " " + firstName
-        HSclass = classSchedule.Student.yearOfGraduation
-        campus = classSchedule.campus
-        courseNumber = ""
-        courseName = classSchedule.className
-        sectionID = ""
-        teacher = classSchedule.teacherLastName
-        online = classSchedule.online
-        if online:
-            online = "1"
-        else:
-            online = "0"
-        indStudy = classSchedule.indStudy
-        if indStudy:
-            indStudy = "1"
-        else:
-            indStudy = "0"
-        days = classSchedule.classDays
-        startTime = classSchedule.startTime
-        endTime = classSchedule.endTime
-        comment = classSchedule.comment
-        googleCalendarEventID = classSchedule.googleCalendarEventID
+    for student in students:
+        chattStateANumber = student.chattStateANumber
+        firstName = student.firstName
+        lastName = student.lastName
+        email = student.email
+        yearOfGraduation = student.yearOfGraduation
+        house = student.house
+        googleCalendarId = student.googleCalendarId
 
-        csvRowPrefix = [
-            str(schoolYear),
-            semester,
-            chattStateANumber,
-            CSname,
-            firstName,
-            lastName,
-            str(HSclass),
-        ]
-
-        csvRow = csvRowPrefix + [
-            campus,
-            courseNumber,
-            courseName,
-            str(sectionID),
-            teacher,
-            online,
-            indStudy,
-            days,
-            startTime.strftime("%-I:%M") + " - " + endTime.strftime("%-I:%M"),
-            startTime.strftime("%-I:%M %p"),
-            endTime.strftime("%-I:%M %p"),
-            comment,
-            googleCalendarEventID,
-        ]
-        csvElementCounter = 1
-        for element in csvRow:
-            if element is None:
-                element = ""
-            if csvElementCounter < len(csvRow):
-                csvOutputFile.write(element + ",")
-                csvElementCounter += 1
-            else:
-                csvOutputFile.write(element + "\n")
+        csvOutputWriter.writerow(
+            [
+                chattStateANumber,
+                firstName,
+                lastName,
+                email,
+                yearOfGraduation,
+                house,
+                googleCalendarId,
+            ]
+        )
         csvOutputFileRowCount = csvOutputFileRowCount + 1
     csvOutputFile.close()
     return send_file(csvFilename, as_attachment=True, cache_timeout=0)
@@ -247,6 +193,66 @@ def addStaffToDatabase(
     else:
         print("Staff member", firstName, lastName, "already exists")
     return
+
+
+def downloadStaffList():
+    printLogEntry("downloadStaffList() function called")
+    # Create a CSV output file and append with a timestamp
+    output_file_path = os.path.join(current_app.root_path, "static/download")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "staff_list_" + timestamp + ".csv"
+    csvOutputFile = open(csvFilename, "w")
+    csvOutputWriter = csv.writer(
+        csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+    )
+    # Write header row for CSV file
+    csvOutputWriter.writerow(
+        [
+            "firstName",
+            "lastName",
+            "position",
+            "email",
+            "phoneNumber",
+            "chattStateANumber",
+            "house",
+            "houseGrade",
+            "myersBriggs",
+            "twitterAccount",
+        ]
+    )
+    csvOutputFileRowCount = 0
+    # Query Student for student information
+    staffMembers = FacultyAndStaff.query.order_by(FacultyAndStaff.lastName)
+    # Process each record in the query and write to the output file
+    for staff in staffMembers:
+        firstName = staff.firstName
+        lastName = staff.lastName
+        position = staff.position
+        email = staff.email
+        phoneNumber = staff.phoneNumber
+        chattStateANumber = staff.chattStateANumber
+        house = staff.house
+        houseGrade = staff.houseGrade
+        myersBriggs = staff.myersBrigg
+        twitterAccount = staff.twitterAccount
+
+        csvOutputWriter.writerow(
+            [
+                firstName,
+                lastName,
+                position,
+                email,
+                phoneNumber,
+                chattStateANumber,
+                house,
+                houseGrade,
+                myersBriggs,
+                twitterAccount,
+            ]
+        )
+        csvOutputFileRowCount = csvOutputFileRowCount + 1
+    csvOutputFile.close()
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
 
 
 def uploadStaffList(fname):
@@ -373,16 +379,17 @@ def uploadParentsList(fname):
             continue
         print("row=", row)
         chattStateANumber = row[0].strip()
-        guardianship = row[1].strip()
-        motherName = row[2].strip()
-        motherEmail = row[3].strip()
-        motherHomePhone = row[4].strip()
-        motherDayPhone = row[5].strip()
-        fatherName = row[6].strip()
-        fatherEmail = row[7].strip()
-        fatherHomePhone = row[8].strip()
-        fatherDayPhone = row[9].strip()
-        guardianEmail = row[10].strip()
+        # Ignore columns for student info (row[1], row[2], row[3]): student first name, last name, year of graduation
+        guardianship = row[4].strip()
+        motherName = row[5].strip()
+        motherEmail = row[6].strip()
+        motherHomePhone = row[7].strip()
+        motherDayPhone = row[8].strip()
+        fatherName = row[9].strip()
+        fatherEmail = row[10].strip()
+        fatherHomePhone = row[11].strip()
+        fatherDayPhone = row[12].strip()
+        guardianEmail = row[13].strip()
         comment = None
         addParentsToDatabase(
             chattStateANumber,
@@ -400,3 +407,76 @@ def uploadParentsList(fname):
         )
     return
 
+
+def downloadParentsList():
+    printLogEntry("downloadParentsList() function called")
+    # Create a CSV output file and append with a timestamp
+    output_file_path = os.path.join(current_app.root_path, "static/download")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "parent_list_" + timestamp + ".csv"
+    csvOutputFile = open(csvFilename, "w")
+    csvOutputWriter = csv.writer(
+        csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+    )
+    # Write header row for CSV file
+    csvOutputWriter.writerow(
+        [
+            "Chatt_State_A_Number",
+            "student_FirstName",
+            "student_LastName",
+            "student_Year_of_Graduation",
+            "Guardianship",
+            "Mother",
+            "Mothers_Email_Address",
+            "Mothers_Home_Phone",
+            "Mothers_Day_Phone",
+            "Father",
+            "Fathers_Email_Address",
+            "Fathers_Home_Phone",
+            "Fathers_Day_Phone",
+            "Guardian_Email",
+        ]
+    )
+    csvOutputFileRowCount = 0
+    # Query Student for student information
+    parentInfo = (
+        Parents.query.join(Student)
+        .order_by(Student.yearOfGraduation, Student.lastName)
+        .all()
+    )
+    # Process each record in the query and write to the output file
+    for parent in parentInfo:
+        chattStateANumber = parent.Student.chattStateANumber
+        firstName = parent.Student.firstName
+        lastName = parent.Student.lastName
+        yearOfGraduation = parent.Student.yearOfGraduation
+        motherName = parent.motherName
+        motherEmail = parent.motherEmail
+        motherHomePhone = parent.motherHomePhone
+        motherDayPhone = parent.motherDayPhone
+        fatherName = parent.fatherName
+        fatherEmail = parent.fatherEmail
+        fatherHomePhone = parent.fatherHomePhone
+        fatherDayPhone = parent.fatherDayPhone
+        guardianEmail = parent.guardianEmail
+
+        csvOutputWriter.writerow(
+            [
+                chattStateANumber,
+                firstName,
+                lastName,
+                yearOfGraduation,
+                motherName,
+                motherEmail,
+                motherHomePhone,
+                motherDayPhone,
+                fatherName,
+                fatherEmail,
+                fatherHomePhone,
+                fatherDayPhone,
+                guardianEmail,
+            ]
+        )
+        csvOutputFileRowCount = csvOutputFileRowCount + 1
+    csvOutputFile.close()
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
