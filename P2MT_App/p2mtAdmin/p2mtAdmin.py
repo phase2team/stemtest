@@ -5,6 +5,11 @@ from datetime import datetime, date, time
 from P2MT_App.main.utilityfunctions import printLogEntry
 import csv
 
+
+# ###################
+#    Student Info   #
+# ###################
+
 #  Add student info to database
 def addStudentToDatabase(
     chattStateANumber,
@@ -74,6 +79,116 @@ def deleteStudent(chattStateANumber):
     flash("Student has been deleted!", "success")
     return
 
+
+def downloadStudentListTemplate():
+    printLogEntry("downloadStudentListTemplate() function called")
+    # Create a CSV output file
+    output_file_path = os.path.join(current_app.root_path, "static/download")
+    csvFilename = output_file_path + "/" + "student_list_template.csv"
+    csvOutputFile = open(csvFilename, "w")
+    # Write header row for CSV file
+    csvOutputWriter = csv.writer(
+        csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+    )
+    csvOutputWriter.writerow(
+        [
+            "Chatt_State_A_Number",
+            "First_Name",
+            "Last_Name",
+            "Student_Email",
+            "Year_of_Graduation",
+            "House",
+            "googleCalendarID",
+        ]
+    )
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
+
+
+def downloadStudentList():
+    printLogEntry("downloadStudentList() function called")
+    # Create a CSV output file and append with a timestamp
+    output_file_path = os.path.join(current_app.root_path, "static/download")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
+    csvOutputFile = open(csvFilename, "w")
+    # Write header row for CSV file
+    csvHeaderRow = "year,semester,Chatt_State_A_Number,CSname,firstName,lastName,HSclass,campus,courseNumber,courseName,sectionID,teacher,online,indStudy,days,times,startTime,endTime,comment,googleCalendarEventID\n"
+    csvOutputFile.write(csvHeaderRow)
+    csvOutputFileRowCount = 0
+    # Query the ClassSchedule with a join to include student information
+    ClassSchedules = ClassSchedule.query.filter(
+        ClassSchedule.schoolYear == schoolYear, ClassSchedule.semester == semester
+    ).order_by(ClassSchedule.chattStateANumber.desc())
+    # Process each record in the query and write to the output file
+    for classSchedule in ClassSchedules:
+        chattStateANumber = classSchedule.chattStateANumber
+        lastName = classSchedule.Student.lastName
+        firstName = classSchedule.Student.firstName
+        CSname = lastName + " " + firstName
+        HSclass = classSchedule.Student.yearOfGraduation
+        campus = classSchedule.campus
+        courseNumber = ""
+        courseName = classSchedule.className
+        sectionID = ""
+        teacher = classSchedule.teacherLastName
+        online = classSchedule.online
+        if online:
+            online = "1"
+        else:
+            online = "0"
+        indStudy = classSchedule.indStudy
+        if indStudy:
+            indStudy = "1"
+        else:
+            indStudy = "0"
+        days = classSchedule.classDays
+        startTime = classSchedule.startTime
+        endTime = classSchedule.endTime
+        comment = classSchedule.comment
+        googleCalendarEventID = classSchedule.googleCalendarEventID
+
+        csvRowPrefix = [
+            str(schoolYear),
+            semester,
+            chattStateANumber,
+            CSname,
+            firstName,
+            lastName,
+            str(HSclass),
+        ]
+
+        csvRow = csvRowPrefix + [
+            campus,
+            courseNumber,
+            courseName,
+            str(sectionID),
+            teacher,
+            online,
+            indStudy,
+            days,
+            startTime.strftime("%-I:%M") + " - " + endTime.strftime("%-I:%M"),
+            startTime.strftime("%-I:%M %p"),
+            endTime.strftime("%-I:%M %p"),
+            comment,
+            googleCalendarEventID,
+        ]
+        csvElementCounter = 1
+        for element in csvRow:
+            if element is None:
+                element = ""
+            if csvElementCounter < len(csvRow):
+                csvOutputFile.write(element + ",")
+                csvElementCounter += 1
+            else:
+                csvOutputFile.write(element + "\n")
+        csvOutputFileRowCount = csvOutputFileRowCount + 1
+    csvOutputFile.close()
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
+
+
+# ###################
+#    Staff Info     #
+# ###################
 
 # Add staff to database
 def addStaffToDatabase(
@@ -183,6 +298,11 @@ def deleteStaff(log_id):
     print("Staff deleted from P2MT database:", firstName, lastName)
     flash("Staff member has been deleted!", "success")
     return
+
+
+# ###################
+#    Parent Info    #
+# ###################
 
 
 def addParentsToDatabase(

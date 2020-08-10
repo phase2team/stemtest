@@ -6,6 +6,11 @@ from wtforms.validators import DataRequired
 from P2MT_App.main.referenceData import getHouseNames, getGradeLevels
 
 
+# ###################
+#    Student Info   #
+# ###################
+
+
 class addStudentForm(FlaskForm):
     firstName = StringField("First Name", validators=[DataRequired()])
     lastName = StringField("Last Name", validators=[DataRequired()])
@@ -40,6 +45,10 @@ class updateStudentForm(FlaskForm):
         "Google Calendar ID (Use TBD if unknown)", validators=[DataRequired()]
     )
     submitUpdateStudent = SubmitField("Update Student Info")
+
+
+class downloadStudentListForm(FlaskForm):
+    submitDownloadStudentListForm = SubmitField("Download Student List")
 
 
 class uploadStudentListForm(FlaskForm):
@@ -92,6 +101,10 @@ class updateParentsForm(FlaskForm):
     submitUpdateParents = SubmitField("Update Parents Info")
 
 
+class downloadParentsListForm(FlaskForm):
+    submitDownloadParentsListForm = SubmitField("Download Parents List")
+
+
 # #################
 #   Staff Info    #
 # #################
@@ -137,6 +150,10 @@ class updateStaffForm(FlaskForm):
         "Twitter Account (Optional)", render_kw={"placeholder": "@"}
     )
     submitUpdateStaff = SubmitField("Update Staff Member Info")
+
+
+class downloadStaffListForm(FlaskForm):
+    submitDownloadStaffListForm = SubmitField("Download Staff List")
 
 
 class uploadStaffListForm(FlaskForm):

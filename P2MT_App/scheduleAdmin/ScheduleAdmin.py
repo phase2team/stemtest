@@ -6,6 +6,7 @@ from datetime import datetime, date, time
 import re
 import os
 import pandas as pd
+import csv
 
 print("\n=========", __file__, "=========\n")
 
@@ -152,9 +153,34 @@ def downloadClassSchedule(schoolYear, semester):
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
+    csvOutputWriter = csv.writer(
+        csvOutputFile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+    )
     # Write header row for CSV file
-    csvHeaderRow = "year,semester,Chatt_State_A_Number,CSname,firstName,lastName,HSclass,campus,courseNumber,courseName,sectionID,teacher,online,indStudy,days,times,startTime,endTime,comment,googleCalendarEventID\n"
-    csvOutputFile.write(csvHeaderRow)
+    csvOutputWriter.writerow(
+        [
+            "year",
+            "semester",
+            "Chatt_State_A_Number",
+            "CSname",
+            "firstName",
+            "lastName",
+            "HSclass",
+            "campus",
+            "courseNumber",
+            "courseName",
+            "sectionID",
+            "teacher",
+            "online",
+            "indStudy",
+            "days",
+            "times",
+            "startTime",
+            "endTime",
+            "comment",
+            "googleCalendarEventID",
+        ]
+    )
     csvOutputFileRowCount = 0
     # Query the ClassSchedule with a join to include student information
     ClassSchedules = ClassSchedule.query.filter(
@@ -188,40 +214,30 @@ def downloadClassSchedule(schoolYear, semester):
         comment = classSchedule.comment
         googleCalendarEventID = classSchedule.googleCalendarEventID
 
-        csvRowPrefix = [
-            str(schoolYear),
-            semester,
-            chattStateANumber,
-            CSname,
-            firstName,
-            lastName,
-            str(HSclass),
-        ]
-
-        csvRow = csvRowPrefix + [
-            campus,
-            courseNumber,
-            courseName,
-            str(sectionID),
-            teacher,
-            online,
-            indStudy,
-            days,
-            startTime.strftime("%-I:%M") + " - " + endTime.strftime("%-I:%M"),
-            startTime.strftime("%-I:%M %p"),
-            endTime.strftime("%-I:%M %p"),
-            comment,
-            googleCalendarEventID,
-        ]
-        csvElementCounter = 1
-        for element in csvRow:
-            if element is None:
-                element = ""
-            if csvElementCounter < len(csvRow):
-                csvOutputFile.write(element + ",")
-                csvElementCounter += 1
-            else:
-                csvOutputFile.write(element + "\n")
+        csvOutputWriter.writerow(
+            [
+                str(schoolYear),
+                semester,
+                chattStateANumber,
+                CSname,
+                firstName,
+                lastName,
+                str(HSclass),
+                campus,
+                courseNumber,
+                courseName,
+                str(sectionID),
+                teacher,
+                online,
+                indStudy,
+                days,
+                startTime.strftime("%-I:%M") + " - " + endTime.strftime("%-I:%M"),
+                startTime.strftime("%-I:%M %p"),
+                endTime.strftime("%-I:%M %p"),
+                comment,
+                googleCalendarEventID,
+            ]
+        )
         csvOutputFileRowCount = csvOutputFileRowCount + 1
     csvOutputFile.close()
     return send_file(csvFilename, as_attachment=True, cache_timeout=0)

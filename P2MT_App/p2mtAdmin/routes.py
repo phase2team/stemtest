@@ -5,6 +5,7 @@ from flask import (
     flash,
     request,
     Blueprint,
+    send_file,
 )
 from P2MT_App import db
 from P2MT_App.models import Student, FacultyAndStaff, Parents
@@ -13,15 +14,18 @@ from P2MT_App.p2mtAdmin.forms import (
     updateStudentForm,
     selectStudentToEditForm,
     uploadStudentListForm,
+    downloadStudentListForm,
     deleteStudentForm,
     addStaffForm,
     selectStaffToEditForm,
+    downloadStaffListForm,
     updateStaffForm,
     uploadStaffListForm,
     deleteStaffForm,
     selectParentsToEditForm,
     uploadParentsListForm,
     updateParentsForm,
+    downloadParentsListForm,
 )
 from P2MT_App.main.referenceData import (
     getStudents,
@@ -39,11 +43,51 @@ from P2MT_App.p2mtAdmin.p2mtAdmin import (
     deleteStaff,
     uploadParentsList,
     addParentsToDatabase,
+    downloadStudentListTemplate,
 )
 from P2MT_App.main.utilityfunctions import save_File
 from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
 
 p2mtAdmin_bp = Blueprint("p2mtAdmin_bp", __name__)
+
+# Route for direct download from templates folder
+@p2mtAdmin_bp.route("/templates/student_list_template")
+def downloadStudentListTemplate():
+    try:
+        return send_file(
+            "static/templates/student_list_template.csv",
+            attachment_filename="student_list_template.csv",
+            as_attachment=True,
+            cache_timeout=0,
+        )
+    except Exception as e:
+        return str(e)
+
+
+@p2mtAdmin_bp.route("/templates/parent_list_template")
+def downloadParentListTemplate():
+    try:
+        return send_file(
+            "static/templates/parent_list_template.csv",
+            attachment_filename="parent_list_template.csv",
+            as_attachment=True,
+            cache_timeout=0,
+        )
+    except Exception as e:
+        return str(e)
+
+
+@p2mtAdmin_bp.route("/templates/staff_list_template")
+def downloadStaffListTemplate():
+    try:
+        return send_file(
+            "static/templates/staff_list_template.csv",
+            attachment_filename="staff_list_template.csv",
+            as_attachment=True,
+            cache_timeout=0,
+        )
+    except Exception as e:
+        return str(e)
 
 
 @p2mtAdmin_bp.route("/p2mtadmin", methods=["GET", "POST"])

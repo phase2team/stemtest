@@ -5,6 +5,7 @@ from flask import (
     flash,
     request,
     Blueprint,
+    send_file,
 )
 from P2MT_App.scheduleAdmin.forms import (
     uploadClassScheduleForm,
@@ -35,6 +36,19 @@ from P2MT_App.main.utilityfunctions import save_File
 from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
 
 scheduleAdmin_bp = Blueprint("scheduleAdmin_bp", __name__)
+
+# Route for direct download from templates folder
+@scheduleAdmin_bp.route("/templates/class_schedule_template")
+def downloadClassScheduleTemplate():
+    try:
+        return send_file(
+            "static/templates/class_schedule_template.csv",
+            attachment_filename="class_schedule_template.csv",
+            as_attachment=True,
+            cache_timeout=0,
+        )
+    except Exception as e:
+        return str(e)
 
 
 @scheduleAdmin_bp.route("/scheduleadmin", methods=["GET", "POST"])
@@ -71,6 +85,7 @@ def displayScheduleAdmin():
     ]
     if request.method == "POST":
         printLogEntry("form= " + str(request.form))
+
     if "submitUploadClassSchedule" in request.form:
         if uploadClassScheduleFormDetails.validate_on_submit():
             printLogEntry("Upload Form Submitted")
@@ -176,6 +191,7 @@ def displayScheduleAdmin():
                 googleCalendarEventID,
             )
             return redirect(url_for("scheduleAdmin_bp.displayScheduleAdmin"))
+
     if "submitDownloadClassScheduleForm" in request.form:
         if downloadClassScheduleFormDetails.validate_on_submit():
             schoolYear = downloadClassScheduleFormDetails.schoolYear.data
