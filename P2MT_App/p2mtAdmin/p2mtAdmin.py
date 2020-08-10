@@ -390,7 +390,7 @@ def uploadParentsList(fname):
         fatherHomePhone = row[11].strip()
         fatherDayPhone = row[12].strip()
         guardianEmail = row[13].strip()
-        comment = None
+        comment = row[14].strip()
         addParentsToDatabase(
             chattStateANumber,
             guardianship,
