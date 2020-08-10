@@ -435,6 +435,7 @@ def downloadParentsList():
             "Fathers_Home_Phone",
             "Fathers_Day_Phone",
             "Guardian_Email",
+            "Comment",
         ]
     )
     csvOutputFileRowCount = 0
@@ -450,6 +451,7 @@ def downloadParentsList():
         firstName = parent.Student.firstName
         lastName = parent.Student.lastName
         yearOfGraduation = parent.Student.yearOfGraduation
+        guardianship = parent.guardianship
         motherName = parent.motherName
         motherEmail = parent.motherEmail
         motherHomePhone = parent.motherHomePhone
@@ -459,6 +461,7 @@ def downloadParentsList():
         fatherHomePhone = parent.fatherHomePhone
         fatherDayPhone = parent.fatherDayPhone
         guardianEmail = parent.guardianEmail
+        comment = parent.comment
 
         csvOutputWriter.writerow(
             [
@@ -466,6 +469,7 @@ def downloadParentsList():
                 firstName,
                 lastName,
                 yearOfGraduation,
+                guardianship,
                 motherName,
                 motherEmail,
                 motherHomePhone,
@@ -475,6 +479,7 @@ def downloadParentsList():
                 fatherHomePhone,
                 fatherDayPhone,
                 guardianEmail,
+                comment,
             ]
         )
         csvOutputFileRowCount = csvOutputFileRowCount + 1
