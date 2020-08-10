@@ -301,7 +301,7 @@ def updateParents(chattStateANumber):
             fatherHomePhone=None,
             fatherDayPhone=None,
             guardianEmail=None,
-            comment=None
+            comment=None,
         )
         parents = Parents.query.filter(
             Parents.chattStateANumber == chattStateANumber
@@ -329,7 +329,7 @@ def updateParents(chattStateANumber):
                 + " "
                 + parents.fatherName
             )
-            printLogEntry("Parents info updated for " + parentsUpdateString)
+            printLogEntry("Parent info updated for " + parentsUpdateString)
             flash("Parents details for " + parentsUpdateString + " updated!", "success")
             return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
     elif request.method == "GET":
