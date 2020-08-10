@@ -2,8 +2,16 @@ from flask import render_template, redirect, url_for, flash, Blueprint
 from P2MT_App import db
 from P2MT_App.main.utilityfunctions import printLogEntry
 from P2MT_App.models import ClassSchedule
+from P2MT_App.scheduleAdmin.ScheduleAdmin import downloadClassSchedule
+from P2MT_App.main.referenceData import getCurrentSchoolYear, getCurrentSemester
 
 masterSchedule_bp = Blueprint("masterSchedule_bp", __name__)
+
+
+@masterSchedule_bp.route("/masterschedule/download")
+def download_MasterSchedule():
+    printLogEntry("download_MasterSchedule() function called")
+    return downloadClassSchedule(getCurrentSchoolYear(), getCurrentSemester())
 
 
 @masterSchedule_bp.route("/masterschedule")

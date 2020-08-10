@@ -7,9 +7,16 @@ from P2MT_App.interventionInfo.forms import addInterventionLogForm
 from P2MT_App.dailyAttendance.forms import addDailyAttendanceForm
 from P2MT_App.main.referenceData import getInterventionTypes
 from P2MT_App.main.utilityfunctions import printLogEntry
+from P2MT_App.p2mtAdmin.p2mtAdmin import downloadStudentList
 from datetime import datetime
 
 studentInfo_bp = Blueprint("studentInfo_bp", __name__)
+
+
+@studentInfo_bp.route("/students/download")
+def download_StudentList():
+    printLogEntry("download_StudentList() function called")
+    return downloadStudentList()
 
 
 @studentInfo_bp.route("/students", methods=["GET", "POST"])

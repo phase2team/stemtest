@@ -1,6 +1,8 @@
 from P2MT_App.models import InterventionType, FacultyAndStaff, ClassSchedule, Student
 from P2MT_App import db
 from sqlalchemy import distinct
+from datetime import date
+from P2MT_App.main.utilityfunctions import printLogEntry
 
 
 def getInterventionTypes():
@@ -144,3 +146,20 @@ def getGradeLevels():
         ("12", "12"),
     ]
     return gradeLevelTupleList
+
+
+def getCurrentSchoolYear():
+    printLogEntry("getCurrentSchoolYear() function called")
+    schoolYear = date.today().year
+    print("Current schoolYear =", schoolYear)
+    return schoolYear
+
+
+def getCurrentSemester():
+    printLogEntry("getCurrentSemester() function called")
+    if date.today().month < 6:
+        semester = "Spring"
+    else:
+        semester = "Fall"
+    print("Current month =", date.today().month, "and semester =", semester)
+    return semester
