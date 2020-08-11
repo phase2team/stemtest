@@ -7,7 +7,11 @@ from P2MT_App.classAttendance.forms import (
     updateStudentAttendanceForm,
 )
 from P2MT_App.tmiTeacherReview.forms import updateTmiTeacherReviewForm
-from P2MT_App.main.referenceData import getTeachers, getClassNames
+from P2MT_App.main.referenceData import (
+    getTeachers,
+    getClassNames,
+    getCurrent_Start_End_Tmi_Dates,
+)
 from datetime import date
 from P2MT_App.tmiTeacherReview.tmiTeacherReview import test_setAttendanceForTmiTesting
 
@@ -17,6 +21,7 @@ tmiTeacherReview_bp = Blueprint("tmiTeacherReview_bp", __name__)
 @tmiTeacherReview_bp.route("/tmiteacherreview", methods=["GET", "POST"])
 def displayTmiTeacherReview():
     printLogEntry("Running displayTmiTeacherReview()")
+    startTmiPeriod, endTmiPeriod, tmiDay = getCurrent_Start_End_Tmi_Dates()
     test_setAttendanceForTmiTesting(date(2020, 8, 5), date(2020, 8, 11))
     tmiTeacherReviewForm = updateTmiTeacherReviewForm()
     tmiTeacherReviewForm.teacherName.choices = getTeachers()
@@ -81,12 +86,10 @@ def displayTmiTeacherReview():
         tmiTeacherReviewForm.process()
 
     # Retrive updated fixed-value attendance fields from database
-    tmiStartDate = date(2020, 8, 5)
-    tmiEndDate = date(2020, 8, 11)
     classAttendanceFixedFields = (
         ClassAttendanceLog.query.filter(
-            ClassAttendanceLog.classDate >= tmiStartDate,
-            ClassAttendanceLog.classDate <= tmiEndDate,
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
         )
         .filter(
             (ClassAttendanceLog.attendanceCode == None)
@@ -132,4 +135,7 @@ def displayTmiTeacherReview():
         title="TMI Teacher Review",
         classAttendanceForm=tmiTeacherReviewForm,
         classAttendanceFixedFields=classAttendanceFixedFields,
+        startTmiPeriod=startTmiPeriod,
+        endTmiPeriod=endTmiPeriod,
+        tmiDay=tmiDay,
     )

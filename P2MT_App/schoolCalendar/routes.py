@@ -41,6 +41,8 @@ def displaySchoolCalendar():
                     schoolCalendar.juniorErDay = schoolCalendarDay["juniorErDay"]
                     schoolCalendar.seniorUpDay = schoolCalendarDay["seniorUpDay"]
                     schoolCalendar.juniorUpDay = schoolCalendarDay["juniorUpDay"]
+                    schoolCalendar.startTmiPeriod = schoolCalendarDay["startTmiPeriod"]
+                    schoolCalendar.tmiDay = schoolCalendarDay["tmiDay"]
                     db.session.commit()
 
     print(updateSchoolCalendarContainerFormDetails.errors)
@@ -79,6 +81,10 @@ def displaySchoolCalendar():
         updateSchoolCalendarFieldListFormDetails.juniorUpDay = (
             schoolCalendarDay.juniorUpDay
         )
+        updateSchoolCalendarFieldListFormDetails.startTmiPeriod = (
+            schoolCalendarDay.startTmiPeriod
+        )
+        updateSchoolCalendarFieldListFormDetails.tmiDay = schoolCalendarDay.tmiDay
         updateSchoolCalendarFieldListFormDetails.updateFlag = ""
         # Append school day details to top level form
         updateSchoolCalendarContainerFormDetails.schoolCalendarDays.append_entry(

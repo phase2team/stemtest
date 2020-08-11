@@ -26,3 +26,9 @@ def printFormErrors(form):
         printLogEntry("Form errors:" + str(form.errors))
     return
 
+
+def createListOfDates(SchoolCalendarTableExtract):
+    dateList = []
+    for day in SchoolCalendarTableExtract:
+        dateList.append(day.classDate)
+    return dateList

@@ -25,10 +25,13 @@
 
 <div class="w3-panel">
     <h3>Important: Set these day correctly</h3>
-    <p>STEM School Day - reserved for future use </p>
+    <p>STEM School Day - Reserved for future use </p>
     <p>Phase II Day - Used in calculating attendance rosters for normal class days</p>
     <p>ER Days - Used in calculating attendance rosters for ER </p>
     <p>UP Days - Used in calculating attendance rosters for UP Days </p>
+    <p> Start TMI Period - Used to detemine the start date for calculating TMI (normally Wednesday) </p>
+    <p> TMI Day - The day when TMI is served (normally Friday)</p>
+    <p> Note: The end date for calculating TMI is automatically set to the day before the next Start TMI Period date</p>
 </div>
 
 <div class="w3-container w3-row w3-center" , id="myStickyHeader">
@@ -70,6 +73,8 @@
                 <p> {{ macro_display_checkbox(schoolCalendarDaysFieldList.juniorErDay, "w3-padding-small" ) }} </p>
                 <p> {{ macro_display_checkbox(schoolCalendarDaysFieldList.seniorUpDay, "w3-padding-small" ) }} </p>
                 <p> {{ macro_display_checkbox(schoolCalendarDaysFieldList.juniorUpDay, "w3-padding-small" ) }}</p>
+                <p> {{ macro_display_checkbox(schoolCalendarDaysFieldList.startTmiPeriod, "w3-padding-small" ) }}</p>
+                <p> {{ macro_display_checkbox(schoolCalendarDaysFieldList.tmiDay, "w3-padding-small" ) }}</p>
             </div>
             <!-- End div and start new div after week of five days  -->
             {% if loop.index is divisibleby(5) %}

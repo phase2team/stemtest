@@ -213,3 +213,5 @@ class SchoolCalendar(db.Model):
     seniorUpDay = db.Column(db.Boolean, nullable=True)
     juniorErDay = db.Column(db.Boolean, nullable=True)
     juniorUpDay = db.Column(db.Boolean, nullable=True)
+    startTmiPeriod = db.Column(db.Boolean, nullable=True)
+    tmiDay = db.Column(db.Boolean, nullable=True)

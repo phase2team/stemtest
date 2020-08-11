@@ -14,6 +14,8 @@ class updateSchoolCalendarFieldListForm(FlaskForm):
     juniorErDay = BooleanField("Junior ER Day")
     seniorUpDay = BooleanField("Senior UP Day")
     juniorUpDay = BooleanField("Junior UP Day")
+    startTmiPeriod = BooleanField("Start TMI Period")
+    tmiDay = BooleanField("TMI Day")
     updateFlag = HiddenField()
 
 
