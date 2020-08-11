@@ -116,7 +116,7 @@ def displayClassAttendanceLog():
             ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
         )
         .filter(ClassSchedule.className == classAttendanceForm.className.default)
-        .order_by(ClassSchedule.className, Student.lastName)
+        .order_by(ClassSchedule.startTime, ClassSchedule.className, Student.lastName)
         .all()
     )
 
