@@ -1,0 +1,225 @@
+{% extends 'layout.html'%}
+{% block content %}
+
+{% macro macro_display_formfield(formfield) %}
+<div class="w3-third">
+  {{ formfield.label(class="w3-text-green w3-large") }}
+  {% if formfield.errors %}
+  {{ formfield(class="w3-select is-invalid") }}
+  <div class="invalid-feedback">
+    {% for error in formfield.errors %}
+    <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% else %}
+  {{ formfield(class="w3-select w3-border") }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro macro_display_checkbox(formfield, w3ResponsiveGridClass) %}
+<div class="{{w3ResponsiveGridClass}}">
+  <!-- {{ formfield.label(class="w3-text-green w3-large") }} -->
+  {% if formfield.errors %}
+  {{ formfield(class="w3-select is-invalid") }}
+  <div class="invalid-feedback">
+    {% for error in formfield.errors %}
+    <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% else %}
+  {{ formfield(class="w3-check") }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+<div class="w3-container w3-green w3-row">
+  <div class="w3-third">
+    <h2>{{title}}</h2>
+  </div>
+  <div>
+    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
+      placeholder="Search by student name...">
+  </div>
+</div>
+
+
+
+<form class="w3-container w3-padding-large" method="POST"
+  action="{{ url_for('tmiTeacherReview_bp.displayTmiTeacherReview') }}" enctype="multipart/form-data">
+  {{ classAttendanceForm.hidden_tag() }}
+  <div class="w3-row-padding">
+    <div class="w3-third">
+      {{ macro_display_formfield(classAttendanceForm.teacherName) }}
+    </div>
+    <div class="w3-third">
+      <p>Start Date for TMI Period: Aug 5, 2020</p>
+      <p>End Date for TMI Period: Aug 11, 2020</p>
+      <p>TMI Date: Aug 14, 2020</p>
+    </div>
+  </div>
+  <table class="w3-table-all w3-hoverable">
+    <thead>
+      <tr class="w3-blue">
+        <th>Class Date</th>
+        <th>Class Name</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Attendance Code</th>
+        <th>Comment</th>
+        <th>Assign TMI</th>
+      </tr>
+    </thead>
+    <tbody id="filteredTable">
+      {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
+      {{ studentAttendanceForm.hidden_tag() }}
+      <tr>
+        <td> {{ studentFixedFields.classDate.strftime('%a %b %-d') }}</td>
+        <td> {{ studentFixedFields.ClassSchedule.className }}</td>
+        <td> {{ studentFixedFields.ClassSchedule.Student.firstName }}</td>
+        <td> {{ studentFixedFields.ClassSchedule.Student.lastName }} </td>
+        <td>
+          {% for subfield in studentAttendanceForm.attendanceCode %}
+          {{ subfield(class="w3-radio") }}
+          {{ subfield.label }}
+          {% endfor %}
+        </td>
+        <td>
+          {{ studentAttendanceForm.comment(class="w3-input", size="30") }}
+        </td>
+        <td>
+          {{ macro_display_checkbox(studentAttendanceForm.assignTmi, "w3-container") }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+
+<!-- Search Filter -->
+<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
+<script>
+  var tableBody = document.getElementById('filteredTable');
+  var searchFilter = document.getElementById('searchFilter');
+  searchFilter.firstNameCellPosition = 3;
+  searchFilter.lastNameCellPosition = 4;
+  searchFilter.addEventListener('keyup', filterFirstLastNames);
+</script>
+
+<script>
+  // Keep track of the scroll position so the page reloads to the same position 
+  // after submitting attendance (prevents page from reloading to top of page 
+  // when updating attendance records further down the page)
+  document.addEventListener("DOMContentLoaded", function (event) {
+    var scrollpos = localStorage.getItem('scrollpos');
+    if (scrollpos) window.scrollTo(0, scrollpos);
+  });
+
+  window.onbeforeunload = function (e) {
+    localStorage.setItem('scrollpos', window.scrollY);
+  };
+
+  // Set event listerners for updates to radio buttons
+  var radioButtons = document.querySelectorAll("input[type=radio]");
+  for (i = 0; i < radioButtons.length; i++) {
+    radioButtons[i].addEventListener("click", function () { submitUpdate(event); });
+  }
+  // Set event listerners for updates to comment fields
+  var commentFields = document.querySelectorAll("input[type=text]");
+  for (i = 0; i < commentFields.length; i++) {
+    commentFields[i].addEventListener("blur", function () { submitUpdate(event); });
+  }
+
+  var checkBoxes = document.querySelectorAll("input[type=checkbox]");
+  for (i = 0; i < checkBoxes.length; i++) {
+    checkBoxes[i].addEventListener("click", function () { submitUpdate(event); });
+  }
+
+  // Set event listeners for updates to teacher, class, and class date filter selections
+  var teacherNameElement = document.getElementById("teacherName")
+  teacherNameElement.addEventListener("change", function () { filterUpdateAndSubmit(event); });
+
+  // Update filterUpdateFlag to indicate change to filter settings and submit form
+  function filterUpdateAndSubmit(event) {
+    console.log('Filter change detected!')
+    console.log(document.getElementById("updateFiltersFlag").value)
+    document.getElementById("updateFiltersFlag").value = 'updated';
+    console.log(document.getElementById("updateFiltersFlag").value)
+    trigger_field = document.getElementById(event.target.id);
+    console.log('trigger_field = ' + trigger_field);
+    form = trigger_field.form;
+    console.log('trigger_form = ' + form)
+    form.submit();
+  }
+
+  // Submit update to attendance on changes to attendanceCode or comment
+  function submitUpdate(event) {
+    // Identify the form which was updated
+    trigger_field = document.getElementById(event.target.id);
+    console.log('trigger_field = ' + trigger_field);
+    form = trigger_field.form;
+    console.log('trigger_form = ' + form)
+
+    // Update the hidden fields to capture the teacher name, class name, and class date
+    event_id = event.target.id;
+    event_split_id = event_id.split('-');
+    classNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-updateFlag';
+    console.log(classNameHiddenInput_id)
+    document.getElementById(classNameHiddenInput_id).value = 'updated';
+    form.submit();
+  }
+
+  // Check attendanceType before making change to assignTmi 
+  function reviewBeforeUpdate(event) {
+    event.preventDefault()
+    console.log('Running reviewBeforeUpdate()')
+    // Identify the form which was updated
+    trigger_field = document.getElementById(event.target.id);
+    console.log('trigger_field = ' + trigger_field);
+    form = trigger_field.form;
+    console.log('trigger_form = ' + form)
+
+    // Update the hidden fields to capture the teacher name, class name, and class date
+    event_id = event.target.id;
+    console.log("checkbox id = " + event_id);
+    event_split_id = event_id.split('-');
+    attendanceType_id_prefix = event_split_id[0] + '-' + event_split_id[1] + '-attendanceCode-';
+    present_id = attendanceType_id_prefix + '0';
+    tardy_id = attendanceType_id_prefix + '1';
+    excused_id = attendanceType_id_prefix + '2';
+    unexcused_id = attendanceType_id_prefix + '3';
+    question_id = attendanceType_id_prefix + '4';
+    if (document.getElementById(tardy_id).checked) {
+      console.log('Attendance Code = T');
+      console.log(document.getElementById(event.target.id).checked);
+    }
+    if (document.getElementById(excused_id).checked) {
+      console.log('Attendance Code = E');
+      targetCheckbox = document.getElementById(event.target.id);
+      console.log(document.getElementById(event.target.id).checked);
+      console.log(targetCheckbox)
+      if (document.getElementById(event.target.id).checked == true) {
+        console.log('assignTMI checked');
+        document.getElementById(event.target.id).checked = null;
+      } else {
+        console.log('assignTMI NOT checked');
+        document.getElementById(event.target.id).checked = null;
+      }
+    }
+    if (document.getElementById(unexcused_id).checked) {
+      console.log('Attendance Code = U');
+    }
+    if (document.getElementById(question_id).checked) {
+      console.log('Attendance Code = ?');
+    }
+
+
+    classNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-updateFlag';
+    console.log(classNameHiddenInput_id)
+    document.getElementById(classNameHiddenInput_id).value = 'updated';
+    // form.submit();
+  }
+
+</script>
+
+{% endblock content %}

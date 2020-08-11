@@ -91,6 +91,16 @@ def displayClassAttendanceLog():
                     classAttendanceLog = ClassAttendanceLog.query.get_or_404(log_id)
                     classAttendanceLog.attendanceCode = studentForm["attendanceCode"]
                     classAttendanceLog.comment = studentForm["comment"]
+                    if classAttendanceLog.attendanceCode == "P":
+                        classAttendanceLog.assignTmi = False
+                    if classAttendanceLog.attendanceCode == "E":
+                        classAttendanceLog.assignTmi = False
+                    if classAttendanceLog.attendanceCode == "T":
+                        classAttendanceLog.assignTmi = True
+                    if classAttendanceLog.attendanceCode == "U":
+                        classAttendanceLog.assignTmi = True
+                    if classAttendanceLog.attendanceCode == "Q":
+                        classAttendanceLog.assignTmi = True
                     db.session.commit()
 
         # Need to run the next statement [classAttendanceForm.process()]
@@ -106,9 +116,7 @@ def displayClassAttendanceLog():
             ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
         )
         .filter(ClassSchedule.className == classAttendanceForm.className.default)
-        .order_by(ClassSchedule.startTime)
-        .order_by(ClassSchedule.className)
-        .order_by(Student.lastName)
+        .order_by(ClassSchedule.className, Student.lastName)
         .all()
     )
 

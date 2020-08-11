@@ -6,6 +6,7 @@ from wtforms import (
     FormField,
     FieldList,
     HiddenField,
+    BooleanField,
 )
 from wtforms.fields.html5 import DateField
 from wtforms.validators import Optional
@@ -20,6 +21,7 @@ class updateStudentAttendanceForm(FlaskForm):
         validators=[Optional()],
     )
     comment = StringField("Comment")
+    assignTmi = BooleanField()
     # className = HiddenField()
     # teacherName = HiddenField()
     # classDate = HiddenField()

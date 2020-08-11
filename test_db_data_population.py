@@ -1,3 +1,11 @@
+# from P2MT_App import create_app
+
+# app = create_app()
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
+
+
 from P2MT_App import db
 from P2MT_App.models import (
     Student,
@@ -380,7 +388,21 @@ def test_propagateClassSchedule(startDate, endDate, schoolYear, semester):
             test_addClassAttendanceLog(classSchedule_id, list_of_fridays)
 
 
-db.create_all()
+def test_setAttendanceForTmiTesting(startDate, endDate):
+    logs = ClassAttendanceLog.query.filter(
+        ClassAttendanceLog.classDate >= startDate,
+        ClassAttendanceLog.classDate <= endDate,
+    )
+    for log in logs:
+        log.attendanceCode = "P"
+        db.session.commit()
+        print(log)
+    return
+
+
+# test_setAttendanceForTmiTesting(date(2020, 8, 10), date(2020, 8, 10))
+
+# db.create_all()
 
 # test_addDailyAttendanceLog()
 
