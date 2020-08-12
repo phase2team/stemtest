@@ -102,7 +102,7 @@ class ClassAttendanceLog(db.Model):
     )
 
     def __repr__(self):
-        return f"ClassAttendanceLog('{self.id}','{self.classSchedule_id}','{self.classDate}','{self.attendanceCode}')"
+        return f"ClassAttendanceLog('{self.id}','{self.classSchedule_id}','{self.classDate}','{self.attendanceCode}','{self.assignTmi}')"
 
 
 class DailyAttendanceLog(db.Model):

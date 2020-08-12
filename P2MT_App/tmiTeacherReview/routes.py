@@ -14,6 +14,8 @@ from P2MT_App.main.referenceData import (
 )
 from datetime import date
 from P2MT_App.tmiTeacherReview.tmiTeacherReview import test_setAttendanceForTmiTesting
+from P2MT_App.tmiFinalApproval.tmiFinalApproval import assignTmiForTardy
+
 
 tmiTeacherReview_bp = Blueprint("tmiTeacherReview_bp", __name__)
 
@@ -73,8 +75,8 @@ def displayTmiTeacherReview():
                         classAttendanceLog.assignTmi = False
                     if classAttendanceLog.attendanceCode == "E":
                         classAttendanceLog.assignTmi = studentForm["assignTmi"]
-                    if classAttendanceLog.attendanceCode == "T":
-                        classAttendanceLog.assignTmi = True
+                    # if classAttendanceLog.attendanceCode == "T":
+                    #     classAttendanceLog.assignTmi = False
                     if classAttendanceLog.attendanceCode == "U":
                         classAttendanceLog.assignTmi = True
                     if classAttendanceLog.attendanceCode == "Q":
@@ -84,6 +86,11 @@ def displayTmiTeacherReview():
         # Need to run the next statement [classAttendanceForm.process()]
         # or the updated values for the studentAttendanceForm won't display
         tmiTeacherReviewForm.process()
+
+    # Update TMI status for tardy students which is based on tardies
+    # for other classes
+    assignTmiForTardy(startTmiPeriod, endTmiPeriod)
+    db.session.commit()
 
     # Retrive updated fixed-value attendance fields from database
     classAttendanceFixedFields = (

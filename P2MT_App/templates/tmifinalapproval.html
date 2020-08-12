@@ -46,12 +46,8 @@
 
 
 <form class="w3-container w3-padding-large" method="POST"
-  action="{{ url_for('tmiTeacherReview_bp.displayTmiTeacherReview') }}" enctype="multipart/form-data">
-  {{ classAttendanceForm.hidden_tag() }}
+  action="{{ url_for('tmiFinalApproval_bp.displayTmiFinalApproval') }}" enctype="multipart/form-data">
   <div class="w3-row-padding">
-    <div class="w3-third">
-      {{ macro_display_formfield(classAttendanceForm.teacherName) }}
-    </div>
     <div class="w3-third">
       <p>Start Date for TMI Period: {{ startTmiPeriod.strftime('%a %b %-d') }}</p>
       <p>End Date for TMI Period: {{ endTmiPeriod.strftime('%a %b %-d') }}</p>
@@ -61,34 +57,24 @@
   <table class="w3-table-all w3-hoverable">
     <thead>
       <tr class="w3-blue">
-        <th>Class Date</th>
-        <th>Class Name</th>
         <th>First Name</th>
         <th>Last Name</th>
+        <th>Class Date</th>
+        <th>Class Name</th>
         <th>Attendance Code</th>
-        <th>Comment</th>
-        <th>Assign TMI</th>
+        <th>Teacher</th>
       </tr>
     </thead>
     <tbody id="filteredTable">
-      {% for studentAttendanceForm, studentFixedFields in zip(classAttendanceForm.classMembers, classAttendanceFixedFields) %}
-      {{ studentAttendanceForm.hidden_tag() }}
+      {% for studentFixedFields in classAttendanceFixedFields %}
       <tr>
-        <td> {{ studentFixedFields.classDate.strftime('%a %b %-d') }}</td>
-        <td> {{ studentFixedFields.ClassSchedule.className }}</td>
         <td> {{ studentFixedFields.ClassSchedule.Student.firstName }}</td>
         <td> {{ studentFixedFields.ClassSchedule.Student.lastName }} </td>
+        <td> {{ studentFixedFields.classDate.strftime('%a %b %-d') }}</td>
+        <td> {{ studentFixedFields.ClassSchedule.className }}</td>
+        <td> {{ studentFixedFields.attendanceCode }}</td>
         <td>
-          {% for subfield in studentAttendanceForm.attendanceCode %}
-          {{ subfield(class="w3-radio") }}
-          {{ subfield.label }}
-          {% endfor %}
-        </td>
-        <td>
-          {{ studentAttendanceForm.comment(class="w3-input", size="30") }}
-        </td>
-        <td>
-          {{ macro_display_checkbox(studentAttendanceForm.assignTmi, "w3-container") }}
+          {{ studentFixedFields.ClassSchedule.teacherLastName }}
         </td>
       </tr>
       {% endfor %}
@@ -101,8 +87,8 @@
 <script>
   var tableBody = document.getElementById('filteredTable');
   var searchFilter = document.getElementById('searchFilter');
-  searchFilter.firstNameCellPosition = 3;
-  searchFilter.lastNameCellPosition = 4;
+  searchFilter.firstNameCellPosition = 0;
+  searchFilter.lastNameCellPosition = 1;
   searchFilter.addEventListener('keyup', filterFirstLastNames);
 </script>
 
@@ -123,7 +109,6 @@
   var radioButtons = document.querySelectorAll("input[type=radio]");
   for (i = 0; i < radioButtons.length; i++) {
     radioButtons[i].addEventListener("click", function () { submitUpdate(event); });
-    radioButtons[i].addEventListener("click", function () { setAssignTmiAvailability(event); });
   }
   // Set event listerners for updates to comment fields
   var commentFields = document.querySelectorAll("input[type=text]");
@@ -169,29 +154,6 @@
     document.getElementById(classNameHiddenInput_id).value = 'updated';
     form.submit();
   }
-
-  // Set availability of Assign TMI checkbox depending on attendance code
-  function setAssignTmiAvailability(event) {
-    // Identify which radio button triggered the event
-    event_id = event.target.id;
-    console.log("radio id = " + event_id);
-    event_split_id = event_id.split('-');
-    attendanceType_id_prefix = event_split_id[0] + '-' + event_split_id[1] + '-attendanceCode-';
-    assignTmi_id = event_split_id[0] + '-' + event_split_id[1] + '-assignTmi';
-    // present_id = attendanceType_id_prefix + '0';
-    tardy_id = attendanceType_id_prefix + '1';
-    // excused_id = attendanceType_id_prefix + '2';
-    // unexcused_id = attendanceType_id_prefix + '3';
-    // question_id = attendanceType_id_prefix + '4';
-    if (document.getElementById(tardy_id).checked) {
-      console.log('Attendance Code = T');
-      console.log(document.getElementById(event.target.id).checked);
-      document.getElementById(assignTmi_id).disabled = false;
-    } else {
-      document.getElementById(assignTmi_id).disabled = true;
-    }
-  }
-
 
   // Check attendanceType before making change to assignTmi 
   function reviewBeforeUpdate(event) {

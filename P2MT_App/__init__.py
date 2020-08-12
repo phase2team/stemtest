@@ -41,6 +41,7 @@ def create_app(config_class=Config):
     from P2MT_App.p2mtAdmin.routes import p2mtAdmin_bp
     from P2MT_App.parentInfo.routes import parentsInfo_bp
     from P2MT_App.tmiTeacherReview.routes import tmiTeacherReview_bp
+    from P2MT_App.tmiFinalApproval.routes import tmiFinalApproval_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(classAttendance_bp)
@@ -54,5 +55,6 @@ def create_app(config_class=Config):
     app.register_blueprint(p2mtAdmin_bp)
     app.register_blueprint(parentsInfo_bp)
     app.register_blueprint(tmiTeacherReview_bp)
+    app.register_blueprint(tmiFinalApproval_bp)
 
     return app

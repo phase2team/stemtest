@@ -95,8 +95,8 @@ def displayClassAttendanceLog():
                         classAttendanceLog.assignTmi = False
                     if classAttendanceLog.attendanceCode == "E":
                         classAttendanceLog.assignTmi = False
-                    if classAttendanceLog.attendanceCode == "T":
-                        classAttendanceLog.assignTmi = True
+                    # if classAttendanceLog.attendanceCode == "T":
+                    #     classAttendanceLog.assignTmi = False
                     if classAttendanceLog.attendanceCode == "U":
                         classAttendanceLog.assignTmi = True
                     if classAttendanceLog.attendanceCode == "Q":

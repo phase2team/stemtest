@@ -1,0 +1,180 @@
+
+
+######################
+Example 1:
+######################
+
+Overview: 
+Executes a SQL query FROM Student with joins between ClassSchedule and Student  and between ClassSchedule and ClassAttendanceLog
+
+Note: the output produced distinct values even though distinct() was not included in the code. The output also differed from the output in DB Browser for SQLite which did not produce disctint results.  See Example 1a which is simular but does not limit results to disctint values.
+
+Code:
+
+tardyStudents = (
+    db.session.query(Student)
+    .join(ClassSchedule)
+    .join(ClassSchedule.ClassAttendanceLog)
+    .filter(
+        ClassAttendanceLog.classDate >= startTmiPeriod,
+        ClassAttendanceLog.classDate <= endTmiPeriod,
+        ClassAttendanceLog.attendanceCode == "T",
+    )
+).all()
+
+for tardyStudent in tardyStudents:
+        print(tardyStudent)
+
+SQL Output:
+SELECT "Student".id AS "Student_id", "Student"."chattStateANumber" AS "Student_chattStateANumber", "Student"."firstName" AS "Student_firstName", "Student"."lastName" AS "Student_lastName", "Student".email AS "Student_email", "Student"."yearOfGraduation" AS "Student_yearOfGraduation", "Student".house AS "Student_house", "Student"."googleCalendarId" AS "Student_googleCalendarId" 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ?
+
+######################
+Example 1a:
+######################
+
+Overview: Almost identical to Example 1 except this query limits the results to only one column.  Unlike Example 1, this query includes all results and includes duplicates, not just distinct values.
+
+
+Code:
+
+tardyStudents = (
+        db.session.query(Student.chattStateANumber)
+        .join(ClassSchedule)
+        .join(ClassSchedule.ClassAttendanceLog)
+        .filter(
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
+            ClassAttendanceLog.attendanceCode == "T",
+        )
+    ).all()
+
+SQL Output:
+
+SELECT "Student"."chattStateANumber" AS "Student_chattStateANumber" 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ?
+
+
+######################
+Example 2:
+######################
+
+Overview: 
+This example applies the query directly on the Student model rather than using db.session.query.  It produces the same output as Example 1.
+
+Code:
+
+tardyStudents = (
+        Student.query.join(ClassSchedule)
+        .join(ClassSchedule.ClassAttendanceLog)
+        .filter(
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
+            ClassAttendanceLog.attendanceCode == "T",
+        )
+    ).all()
+
+SQL Output:
+
+SELECT "Student".id AS "Student_id", "Student"."chattStateANumber" AS "Student_chattStateANumber", "Student"."firstName" AS "Student_firstName", "Student"."lastName" AS "Student_lastName", "Student".email AS "Student_email", "Student"."yearOfGraduation" AS "Student_yearOfGraduation", "Student".house AS "Student_house", "Student"."googleCalendarId" AS "Student_googleCalendarId" 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ?
+
+
+
+
+######################
+Example 3:
+######################
+
+Overview: 
+Executes a SQL query FROM Student with joins between ClassSchedule and Student  and between ClassSchedule and ClassAttendanceLog.  This example outputs both Student and ClassSchedule.  
+
+Note: the distinct outputs can be accessed by subscript notation
+
+Code:
+
+tardyStudents = (
+        db.session.query(Student, ClassSchedule)
+        .join(ClassSchedule)
+        .join(ClassSchedule.ClassAttendanceLog)
+        .filter(
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
+            ClassAttendanceLog.attendanceCode == "T",
+        )
+    ).all()
+
+for tardyStudent in tardyStudents:
+        print(tardyStudent[0])
+        print(tardyStudent[1])
+
+SQL Output:
+
+SELECT "Student".id AS "Student_id", "Student"."chattStateANumber" AS "Student_chattStateANumber", "Student"."firstName" AS "Student_firstName", "Student"."lastName" AS "Student_lastName", "Student".email AS "Student_email", "Student"."yearOfGraduation" AS "Student_yearOfGraduation", "Student".house AS "Student_house", "Student"."googleCalendarId" AS "Student_googleCalendarId", "ClassSchedule".id AS "ClassSchedule_id", "ClassSchedule"."schoolYear" AS "ClassSchedule_schoolYear", "ClassSchedule".semester AS "ClassSchedule_semester", "ClassSchedule"."chattStateANumber" AS "ClassSchedule_chattStateANumber", "ClassSchedule".campus AS "ClassSchedule_campus", "ClassSchedule"."className" AS "ClassSchedule_className", "ClassSchedule"."teacherLastName" AS "ClassSchedule_teacherLastName", "ClassSchedule"."staffID" AS "ClassSchedule_staffID", "ClassSchedule".online AS "ClassSchedule_online", "ClassSchedule"."indStudy" AS "ClassSchedule_indStudy", "ClassSchedule"."classDays" AS "ClassSchedule_classDays", "ClassSchedule"."startTime" AS "ClassSchedule_startTime", "ClassSchedule"."endTime" AS "ClassSchedule_endTime", "ClassSchedule".comment AS "ClassSchedule_comment", "ClassSchedule"."googleCalendarEventID" AS "ClassSchedule_googleCalendarEventID" 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ?
+
+######################
+Example 4:
+######################
+
+
+Overview:
+This example queries for specific columns from two tables (Student.chattStateANumber and ClassAttendanceLog.id).  It includes .select_from(Student).  Without this .select_from() method, it will result in this error message:
+
+sqlalchemy.exc.InvalidRequestError: Can't determine which FROM clause to join from, there are multiple FROMS which can join to this entity. Please use the .select_from() method to establish an explicit left side, as well as providing an explcit ON clause if not present already to help resolve the ambiguity.
+
+Code:
+
+tardyStudents = (
+        db.session.query(Student.chattStateANumber, ClassAttendanceLog.id)
+        .select_from(Student)
+        .join(ClassSchedule)
+        .join(ClassSchedule.ClassAttendanceLog)
+        .filter(
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
+            ClassAttendanceLog.attendanceCode == "T",
+        )
+    )
+
+SQL Output:
+
+SELECT "Student"."chattStateANumber" AS "Student_chattStateANumber", "ClassAttendanceLog".id AS "ClassAttendanceLog_id" 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ?
+
+######################
+Example 5:
+######################
+
+
+Overview:
+This example uses SQL COUNT() aggregate function which also requires including a group_by() method.  You must import func from sqlalchemy.  The select_from() method is not necessary in this example since the results come from one table.
+
+
+Code:
+tardyStudents = (
+        db.session.query(
+            Student.chattStateANumber, func.count(Student.chattStateANumber)
+        )
+        .select_from(Student)
+        .join(ClassSchedule)
+        .join(ClassSchedule.ClassAttendanceLog)
+        .filter(
+            ClassAttendanceLog.classDate >= startTmiPeriod,
+            ClassAttendanceLog.classDate <= endTmiPeriod,
+            ClassAttendanceLog.attendanceCode == "T",
+        )
+        .group_by(Student.chattStateANumber).all()
+    )
+
+SQL Output:
+
+SELECT "Student"."chattStateANumber" AS "Student_chattStateANumber", count("Student"."chattStateANumber") AS count_1 
+FROM "Student" JOIN "ClassSchedule" ON "Student"."chattStateANumber" = "ClassSchedule"."chattStateANumber" JOIN "ClassAttendanceLog" ON "ClassSchedule".id = "ClassAttendanceLog"."classSchedule_id" 
+WHERE "ClassAttendanceLog"."classDate" >= ? AND "ClassAttendanceLog"."classDate" <= ? AND "ClassAttendanceLog"."attendanceCode" = ? GROUP BY "Student"."chattStateANumber"
+
