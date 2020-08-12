@@ -115,6 +115,26 @@
     if (scrollpos) window.scrollTo(0, scrollpos);
   });
 
+  // Set the availability of the Assign TMI checkbox based on this criteria:
+  //  attendanceCode  |   assignTMI Checkbox
+  //      Present     |        Disabled
+  //      Tardy       |        Disabled
+  //      Excused     |        Enabled
+  //      Unexcused   |        Disabled
+  //      Question    |        Disabled
+  document.addEventListener("DOMContentLoaded", function (event) {
+    var checkBoxes = document.querySelectorAll("input[type=checkbox]");
+    var radioButtons = document.querySelectorAll("input[value='E']");
+    for (i = 0; i < radioButtons.length; i++) {
+      if (radioButtons[i].checked) {
+        checkBoxes[i].disabled = false;
+      } else {
+        checkBoxes[i].disabled = true;
+      }
+    }
+
+  });
+
   window.onbeforeunload = function (e) {
     localStorage.setItem('scrollpos', window.scrollY);
   };
@@ -123,17 +143,16 @@
   var radioButtons = document.querySelectorAll("input[type=radio]");
   for (i = 0; i < radioButtons.length; i++) {
     radioButtons[i].addEventListener("click", function () { submitUpdate(event); });
-    radioButtons[i].addEventListener("click", function () { setAssignTmiAvailability(event); });
   }
   // Set event listerners for updates to comment fields
-  var commentFields = document.querySelectorAll("input[type=text]");
+  var commentFields = document.querySelectorAll('input[type=text]:not([id="searchFilter"]');
   for (i = 0; i < commentFields.length; i++) {
     commentFields[i].addEventListener("blur", function () { submitUpdate(event); });
   }
 
   var checkBoxes = document.querySelectorAll("input[type=checkbox]");
   for (i = 0; i < checkBoxes.length; i++) {
-    checkBoxes[i].addEventListener("click", function () { submitUpdate(event); });
+    checkBoxes[i].addEventListener("change", function () { submitUpdate(event); });
   }
 
   // Set event listeners for updates to teacher, class, and class date filter selections
@@ -168,80 +187,6 @@
     console.log(classNameHiddenInput_id)
     document.getElementById(classNameHiddenInput_id).value = 'updated';
     form.submit();
-  }
-
-  // Set availability of Assign TMI checkbox depending on attendance code
-  function setAssignTmiAvailability(event) {
-    // Identify which radio button triggered the event
-    event_id = event.target.id;
-    console.log("radio id = " + event_id);
-    event_split_id = event_id.split('-');
-    attendanceType_id_prefix = event_split_id[0] + '-' + event_split_id[1] + '-attendanceCode-';
-    assignTmi_id = event_split_id[0] + '-' + event_split_id[1] + '-assignTmi';
-    // present_id = attendanceType_id_prefix + '0';
-    tardy_id = attendanceType_id_prefix + '1';
-    // excused_id = attendanceType_id_prefix + '2';
-    // unexcused_id = attendanceType_id_prefix + '3';
-    // question_id = attendanceType_id_prefix + '4';
-    if (document.getElementById(tardy_id).checked) {
-      console.log('Attendance Code = T');
-      console.log(document.getElementById(event.target.id).checked);
-      document.getElementById(assignTmi_id).disabled = false;
-    } else {
-      document.getElementById(assignTmi_id).disabled = true;
-    }
-  }
-
-
-  // Check attendanceType before making change to assignTmi 
-  function reviewBeforeUpdate(event) {
-    event.preventDefault()
-    console.log('Running reviewBeforeUpdate()')
-    // Identify the form which was updated
-    trigger_field = document.getElementById(event.target.id);
-    console.log('trigger_field = ' + trigger_field);
-    form = trigger_field.form;
-    console.log('trigger_form = ' + form)
-
-    // Update the hidden fields to capture the teacher name, class name, and class date
-    event_id = event.target.id;
-    console.log("checkbox id = " + event_id);
-    event_split_id = event_id.split('-');
-    attendanceType_id_prefix = event_split_id[0] + '-' + event_split_id[1] + '-attendanceCode-';
-    present_id = attendanceType_id_prefix + '0';
-    tardy_id = attendanceType_id_prefix + '1';
-    excused_id = attendanceType_id_prefix + '2';
-    unexcused_id = attendanceType_id_prefix + '3';
-    question_id = attendanceType_id_prefix + '4';
-    if (document.getElementById(tardy_id).checked) {
-      console.log('Attendance Code = T');
-      console.log(document.getElementById(event.target.id).checked);
-    }
-    if (document.getElementById(excused_id).checked) {
-      console.log('Attendance Code = E');
-      targetCheckbox = document.getElementById(event.target.id);
-      console.log(document.getElementById(event.target.id).checked);
-      console.log(targetCheckbox)
-      if (document.getElementById(event.target.id).checked == true) {
-        console.log('assignTMI checked');
-        document.getElementById(event.target.id).checked = null;
-      } else {
-        console.log('assignTMI NOT checked');
-        document.getElementById(event.target.id).checked = null;
-      }
-    }
-    if (document.getElementById(unexcused_id).checked) {
-      console.log('Attendance Code = U');
-    }
-    if (document.getElementById(question_id).checked) {
-      console.log('Attendance Code = ?');
-    }
-
-
-    classNameHiddenInput_id = event_split_id[0] + '-' + event_split_id[1] + '-updateFlag';
-    console.log(classNameHiddenInput_id)
-    document.getElementById(classNameHiddenInput_id).value = 'updated';
-    // form.submit();
   }
 
 </script>

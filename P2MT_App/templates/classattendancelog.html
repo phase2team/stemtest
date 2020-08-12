@@ -100,7 +100,7 @@
     radioButtons[i].addEventListener("click", function () { submitUpdate(event); });
   }
   // Set event listerners for updates to comment fields
-  var commentFields = document.querySelectorAll("input[type=text]");
+  var commentFields = document.querySelectorAll('input[type=text]:not([id="searchFilter"]');
   for (i = 0; i < commentFields.length; i++) {
     commentFields[i].addEventListener("blur", function () { submitUpdate(event); });
   }
