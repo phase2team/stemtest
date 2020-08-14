@@ -343,7 +343,10 @@ def propagateClassSchedule(startDate, endDate, schoolYear, semester):
     # Extract details from class schedule
     classSchedules = (
         ClassSchedule.query.filter(ClassSchedule.semester == semester)
-        .filter(ClassSchedule.schoolYear == schoolYear)
+        .filter(
+            ClassSchedule.schoolYear == schoolYear,
+            ClassSchedule.campus == "STEM School",
+        )
         .all()
     )
     print("Total number of rows in classSchedules:", len(classSchedules))
