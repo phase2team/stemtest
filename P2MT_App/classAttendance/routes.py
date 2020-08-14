@@ -17,7 +17,11 @@ def displayClassAttendanceLog():
     printLogEntry("Running displayClassAttendanceLog()")
     classAttendanceForm = updateClassAttendanceForm()
     classAttendanceForm.teacherName.choices = getTeachers()
-    classAttendanceForm.className.choices = getClassNames()
+    # Update class choices to remove blank choice and include "All Classes" as default
+    classNameChoices = list(getClassNames())
+    classNameChoices.remove(("", ""))
+    classNameChoices.insert(0, ("All Classes", "All Classes"))
+    classAttendanceForm.className.choices = tuple(classNameChoices)
 
     classDateTime = date.today()
     # classDateTime = datetime(
@@ -108,17 +112,41 @@ def displayClassAttendanceLog():
         classAttendanceForm.process()
 
     # Retrive updated fixed-value attendance fields from database
-    classAttendanceFixedFields = (
-        ClassAttendanceLog.query.filter(ClassAttendanceLog.classDate == classDateTime)
-        .join(ClassSchedule)
-        .join(ClassSchedule.Student)
-        .filter(
-            ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
+
+    # If "All Classes" is selected, display all clases
+    # Otherwise, only display classes for selecetd class
+    if classAttendanceForm.className.default == "All Classes":
+        print("All classes seleceted")
+        classAttendanceFixedFields = (
+            ClassAttendanceLog.query.filter(
+                ClassAttendanceLog.classDate == classDateTime
+            )
+            .join(ClassSchedule)
+            .join(ClassSchedule.Student)
+            .filter(
+                ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
+            )
+            .order_by(
+                ClassSchedule.startTime, ClassSchedule.className, Student.lastName
+            )
+            .all()
         )
-        .filter(ClassSchedule.className == classAttendanceForm.className.default)
-        .order_by(ClassSchedule.startTime, ClassSchedule.className, Student.lastName)
-        .all()
-    )
+    else:
+        classAttendanceFixedFields = (
+            ClassAttendanceLog.query.filter(
+                ClassAttendanceLog.classDate == classDateTime
+            )
+            .join(ClassSchedule)
+            .join(ClassSchedule.Student)
+            .filter(
+                ClassSchedule.teacherLastName == classAttendanceForm.teacherName.default
+            )
+            .filter(ClassSchedule.className == classAttendanceForm.className.default)
+            .order_by(
+                ClassSchedule.startTime, ClassSchedule.className, Student.lastName
+            )
+            .all()
+        )
 
     # Retrieve updated student attendance fields from database
     for studentAttendance in classAttendanceFixedFields:
