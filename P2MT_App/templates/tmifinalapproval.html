@@ -60,7 +60,7 @@
         <th>Last Name</th>
         <th>TMI Minutes</th>
         <th>Intervention Status</th>
-        <th>Timstamp</th>
+        <th>Timestamp</th>
       </tr>
     </thead>
     <tbody id="interventionLog">
@@ -74,7 +74,7 @@
         <td> {{ studentTmiLog.comment }}</td>
         <td> {{ studentTmiLog.createDate.strftime('%a %b %-d') }}</td>
       </tr>
-      <tr class="w3-amber" style="visibility:collapse;"
+      <tr class="w3-orange" style="visibility:collapse;"
         onclick="activateAccordion(this,'accordion_{{studentTmiLog.id}}')"
         data-identifier="accordion_{{studentTmiLog.id}}">
         <th></th>
@@ -134,11 +134,11 @@
     // Change the color of the selected row to highlight it
     // If deselecting the row, set it to the default row color
     // console.log('Index Of ' + selectedRow.className.indexOf("w3-dark-grey"));
-    if (selectedRow.className.indexOf("w3-amber") == 0) {
+    if (selectedRow.className.indexOf("w3-deep-orange") == 0) {
       selectedRow.className = "w3-light-grey";
       // console.log('new color ' + selectedRow.className);
     } else {
-      selectedRow.className = "w3-amber";
+      selectedRow.className = "w3-deep-orange";
       // console.log('new color ' + selectedRow.className);
     }
 
