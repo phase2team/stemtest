@@ -31,3 +31,4 @@ P2MT_App/static/download/daily_attendance_log_*
 P2MT_App/static/download/intervention_log_*
 test_db_data_population.py
 P2MT_App/templates/tmifinalapproval copy.html
+P2MT_App/templates/sandbox.html
