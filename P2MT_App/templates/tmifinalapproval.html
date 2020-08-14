@@ -37,10 +37,6 @@
   <div class="w3-third">
     <h2>{{title}}</h2>
   </div>
-  <div>
-    <input type="text" class="w3-third w3-margin w3-padding" size="25" id="searchFilter"
-      placeholder="Search by student name...">
-  </div>
 </div>
 
 <div class="w3-container">
@@ -56,6 +52,7 @@
   <table class="w3-table w3-border w3-bordered w3-hoverable">
     <thead>
       <tr class="w3-blue">
+        <th></th>
         <th>First Name</th>
         <th>Last Name</th>
         <th>TMI Minutes</th>
@@ -65,23 +62,28 @@
     </thead>
     <tbody id="interventionLog">
       {% for studentTmiLog in tmiInterventionLog %}
-      <tr class="w3-light-grey" style="visibility:visible;"
+      <tr class="w3-light-grey w3-hover-grey" style="visibility:visible;"
         onclick="activateAccordion(this,'accordion_{{studentTmiLog.id}}')" data-rowType="selectorRow"
         data-identifier="accordion_{{studentTmiLog.id}}">
+        <td><i class="fa fa-caret-right fa-fw" </i></td>
         <td> {{ studentTmiLog.Student.firstName }}</td>
         <td> {{ studentTmiLog.Student.lastName }} </td>
         <td> {{ studentTmiLog.tmiMinutes }}</td>
         <td> {{ studentTmiLog.comment }}</td>
         <td> {{ studentTmiLog.createDate.strftime('%a %b %-d') }}</td>
       </tr>
-      <tr class="w3-orange" style="visibility:collapse;"
+      <tr class="w3-amber" style="visibility:collapse;"
         onclick="activateAccordion(this,'accordion_{{studentTmiLog.id}}')"
         data-identifier="accordion_{{studentTmiLog.id}}">
+        <th class="w3-hide"> {{ studentTmiLog.Student.firstName }} </th>
+        <th class="w3-hide"> {{ studentTmiLog.Student.lastName }}</th>
         <th></th>
+
         <th>Class:</th>
         <th>Date:</th>
         <th>Attendance:</th>
         <th>Teacher:</th>
+        <th></th>
       </tr>
       {% for studentFixedFields in classAttendanceFixedFields %}
       {% if studentFixedFields.ClassSchedule.Student.id == studentTmiLog.student_id %}
@@ -91,10 +93,12 @@
         <td class="w3-hide"> {{ studentTmiLog.Student.firstName }} </td>
         <td class="w3-hide"> {{ studentTmiLog.Student.lastName }}</td>
         <td></td>
+
         <td>{{ studentFixedFields.ClassSchedule.className }}</td>
         <td>{{ studentFixedFields.classDate.strftime('%a %b %-d') }}</td>
         <td>{{ studentFixedFields.attendanceCode }}</td>
         <td>{{ studentFixedFields.ClassSchedule.teacherLastName }}</td>
+        <td></td>
       </tr>
       {% endif %}
       {% endfor %}
@@ -102,16 +106,6 @@
     </tbody>
   </table>
 </div>
-
-<!-- Search Filter -->
-<script type="text/javascript" src="{{ url_for('static', filename="js/searchFilters.js") }}"></script>
-<script>
-  var tableBody = document.getElementById('interventionLog');
-  var searchFilter = document.getElementById('searchFilter');
-  searchFilter.firstNameCellPosition = 0;
-  searchFilter.lastNameCellPosition = 1;
-  searchFilter.addEventListener('keyup', filterFirstLastNames);
-</script>
 
 <script>
   // Keep track of the scroll position so the page reloads to the same position 
@@ -127,65 +121,6 @@
   };
 </script>
 
-<script>
-  function activateAccordion(selectedRow, data_id) {
-
-    console.log('selectedRow = ' + selectedRow)
-    // Change the color of the selected row to highlight it
-    // If deselecting the row, set it to the default row color
-    // console.log('Index Of ' + selectedRow.className.indexOf("w3-dark-grey"));
-    if (selectedRow.className.indexOf("w3-deep-orange") == 0) {
-      selectedRow.className = "w3-light-grey";
-      // console.log('new color ' + selectedRow.className);
-    } else {
-      selectedRow.className = "w3-deep-orange";
-      // console.log('new color ' + selectedRow.className);
-    }
-
-    // Change all non-selected selectorRows to the default row color
-    x = document.querySelectorAll("tr[data-rowType=selectorRow");
-    for (i = 0; i < x.length; i++) {
-      if (x[i] != selectedRow) {
-        // console.log('selectorRow = ' + x[i])
-        x[i].className = "w3-light-grey";
-        console.log('Going grey');
-      } else {
-        console.log('Selected row found');
-      }
-    }
-
-    // Show the data rows associated with the selected row
-    // Hide all data rows associated with non-selected rows
-    var x = document.querySelectorAll("tr[data-identifier=" + data_id + "]");
-    for (i = 0; i < x.length; i++) {
-      if (x[i].hasAttribute('data-rowType')) {
-        console.log('Skip');
-      } else {
-        if (x[i].style.visibility == "collapse") {
-          x[i].style.visibility = "visible";
-          x[i].className = 'w3-amber';
-          console.log('Setting data row to visible');
-        } else {
-          x[i].style.visibility = "collapse";
-        }
-      }
-    }
-
-    // Hide all rows which do not match the data row identifier and aren't selector rows
-    var x = document.querySelectorAll("tr:not([data-identifier=" + data_id + "])");
-    // console.log('Number of non-data rows = ' + x.length);
-    for (i = 0; i < x.length; i++) {
-      if (x[i].hasAttribute('data-rowType')) {
-        console.log('Skip');
-      } else {
-        if (x[i].style.visibility == "visible") {
-          x[i].style.visibility = "collapse";
-          // console.log('collapsing: ' + x[i]);
-        }
-      }
-    }
-  }
-
-</script>
+<script type="text/javascript" src="{{ url_for('static', filename="js/activateAccordion.js") }}"></script>
 
 {% endblock content %}

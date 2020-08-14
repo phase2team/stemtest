@@ -16,28 +16,40 @@ function filterFirstLastNames(e) {
 
     firstNameCellPosition = e.target.firstNameCellPosition;
     lastNameCellPosition = e.target.lastNameCellPosition;
+    // console.log("firstNameCellPosition = ", firstNameCellPosition);
+    // console.log("lastNameCellPosition = ", lastNameCellPosition);
     // Convert search text to lowercase
     var searchText = e.target.value.toLowerCase();
     // Get all rows from the table body
     var tableRowsCollection = tableBody.getElementsByTagName('tr');
+    // console.log("tableRows = " + tableRowsCollection);
     // Convert rows from HTML collect to an array
     var tableRows = Array.from(tableRowsCollection);
+    // console.log("tableRows = " + tableRows);
+    // console.log("number tableRows = " + tableRows.length);
     // Use for loop to search each row and each name cell
     for (var j = 0; j < tableRows.length; j++) {
         var tableCellsCollection = tableRows[j].getElementsByTagName('td');
         var tableCells = Array.from(tableCellsCollection);
-        var firstName = tableCells[firstNameCellPosition].firstChild.textContent;
-        var lastName = tableCells[lastNameCellPosition].firstChild.textContent;
-        // Check if the search text is found in the table data text
-        if (firstName.toLowerCase().indexOf(searchText) != -1) {
-            // Make the row visible if the search text is found
-            tableRows[j].style.visibility = "visible";
-        } else if (lastName.toLowerCase().indexOf(searchText) != -1) {
-            // Make the row visible if the search text is found
-            tableRows[j].style.visibility = "visible";
-        } else {
-            // Use visibility property to hide table elements and preserve formatting
-            tableRows[j].style.visibility = "collapse";
+        // console.log("tableCells = " + tableCells);
+        // console.log("number tableCells = " + tableCells.length);
+        if (tableCells.length != 0) {
+            var firstName = tableCells[firstNameCellPosition].firstChild.textContent;
+            var lastName = tableCells[lastNameCellPosition].firstChild.textContent;
+            // console.log('firstName = ' + firstName + ' lastName = ' + lastName);
+            // Check if the search text is found in the table data text
+            if (firstName.toLowerCase().indexOf(searchText) != -1) {
+                // console.log("Found a first name => " + firstName.toLowerCase());
+                // Make the row visible if the search text is found
+                tableRows[j].style.visibility = "visible";
+            } else if (lastName.toLowerCase().indexOf(searchText) != -1) {
+                // console.log("Found a last name => " + lastName.toLowerCase());
+                // Make the row visible if the search text is found
+                tableRows[j].style.visibility = "visible";
+            } else {
+                // Use visibility property to hide table elements and preserve formatting
+                tableRows[j].style.visibility = "collapse";
+            }
         }
     }
 }
