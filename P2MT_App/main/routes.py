@@ -20,3 +20,8 @@ def displayAbout():
 @main_bp.route("/analytics")
 def displayAnalyticsTest():
     return render_template("analytics.html")
+
+
+@main_bp.route("/sandbox")
+def displaySandbox():
+    return render_template("sandbox.html")
