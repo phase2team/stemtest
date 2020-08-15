@@ -32,3 +32,9 @@ def createListOfDates(SchoolCalendarTableExtract):
     for day in SchoolCalendarTableExtract:
         dateList.append(day.classDate)
     return dateList
+
+
+def setToNoneIfEmptyString(parameter):
+    if len(parameter) == 0:
+        parameter = None
+    return parameter

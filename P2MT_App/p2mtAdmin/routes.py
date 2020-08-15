@@ -47,8 +47,12 @@ from P2MT_App.p2mtAdmin.p2mtAdmin import (
     uploadParentsList,
     addParentsToDatabase,
 )
-from P2MT_App.main.utilityfunctions import save_File
-from P2MT_App.main.utilityfunctions import printLogEntry, printFormErrors
+from P2MT_App.main.utilityfunctions import (
+    printLogEntry,
+    printFormErrors,
+    save_File,
+    setToNoneIfEmptyString,
+)
 
 p2mtAdmin_bp = Blueprint("p2mtAdmin_bp", __name__)
 
@@ -431,12 +435,22 @@ def updateStaff(staff_id):
             staff.lastName = updateStaffFormDetails.lastName.data
             staff.email = updateStaffFormDetails.email.data
             staff.position = updateStaffFormDetails.position.data
-            staff.chattStateANumber = updateStaffFormDetails.chattStateANumber.data
-            staff.phoneNumber = updateStaffFormDetails.phoneNumber.data
-            staff.house = updateStaffFormDetails.house.data
-            staff.houseGrade = updateStaffFormDetails.houseGrade.data
-            staff.myersBrigg = updateStaffFormDetails.myersBriggs.data
-            staff.twitterAccount = updateStaffFormDetails.twitterAccount.data
+            staff.chattStateANumber = setToNoneIfEmptyString(
+                updateStaffFormDetails.chattStateANumber.data
+            )
+            staff.phoneNumber = setToNoneIfEmptyString(
+                updateStaffFormDetails.phoneNumber.data
+            )
+            staff.house = setToNoneIfEmptyString(updateStaffFormDetails.house.data)
+            staff.houseGrade = setToNoneIfEmptyString(
+                updateStaffFormDetails.houseGrade.data
+            )
+            staff.myersBrigg = setToNoneIfEmptyString(
+                updateStaffFormDetails.myersBriggs.data
+            )
+            staff.twitterAccount = setToNoneIfEmptyString(
+                updateStaffFormDetails.twitterAccount.data
+            )
             db.session.commit()
             staffUpdateString = staff.firstName + " " + staff.lastName
             printLogEntry("Staff info updated for " + staffUpdateString)
@@ -449,6 +463,7 @@ def updateStaff(staff_id):
         updateStaffFormDetails.position.data = staff.position
         updateStaffFormDetails.email.data = staff.email
         updateStaffFormDetails.chattStateANumber.data = staff.chattStateANumber
+        updateStaffFormDetails.phoneNumber.data = staff.phoneNumber
         updateStaffFormDetails.house.data = staff.house
         updateStaffFormDetails.houseGrade.data = str(staff.houseGrade)
         updateStaffFormDetails.myersBriggs.data = staff.myersBrigg

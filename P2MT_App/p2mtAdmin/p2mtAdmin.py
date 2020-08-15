@@ -2,7 +2,7 @@ from flask import flash, current_app, send_file
 from P2MT_App import db
 from P2MT_App.models import Student, FacultyAndStaff, Parents
 from datetime import datetime, date, time
-from P2MT_App.main.utilityfunctions import printLogEntry
+from P2MT_App.main.utilityfunctions import printLogEntry, setToNoneIfEmptyString
 import csv
 import os
 
@@ -160,18 +160,12 @@ def addStaffToDatabase(
         == 0
     ):
         # Set empty strings to None (i.e. Null) for better data type management in database
-        if len(phoneNumber) == 0:
-            phoneNumber = None
-        if len(chattStateANumber) == 0:
-            chattStateANumber = None
-        if len(myersBriggs) == 0:
-            myersBriggs = None
-        if len(house) == 0:
-            house = None
-        if len(twitterAccount) == 0:
-            twitterAccount = None
-        if len(houseGrade) == 0:
-            houseGrade = None
+        phoneNumber = setToNoneIfEmptyString(phoneNumber)
+        chattStateANumber = setToNoneIfEmptyString(chattStateANumber)
+        myersBriggs = setToNoneIfEmptyString(myersBriggs)
+        house = setToNoneIfEmptyString(house)
+        twitterAccount = setToNoneIfEmptyString(twitterAccount)
+        houseGrade = setToNoneIfEmptyString(houseGrade)
         # Convert houseGrade from string to integer as required by database typing
         if isinstance(houseGrade, str):
             houseGrade = int(houseGrade)
