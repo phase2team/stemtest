@@ -32,11 +32,13 @@ def displayStudents():
         if dailyAttendanceForm.validate_on_submit():
             printLogEntry("Running dailyAttendanceForm")
             add_DailyAttendanceLog(
-                int(dailyAttendanceForm.studentID.data),
+                dailyAttendanceForm.chattStateANumber.data,
                 dailyAttendanceForm.absenceDate.data,
                 dailyAttendanceForm.attendanceCode.data,
                 dailyAttendanceForm.comment.data,
             )
+            db.session.commit()
+            flash("Daily attendance log has been added!", "success")
             printLogEntry("Completed add_DailyAttendanceLog.  Redirecting to students")
             return redirect(url_for("studentInfo_bp.displayStudents"))
 
@@ -44,13 +46,15 @@ def displayStudents():
         if interventionForm.validate_on_submit():
             printLogEntry("Running interventionForm")
             add_InterventionLog(
-                int(interventionForm.studentID.data),
+                interventionForm.chattStateANumber.data,
                 int(interventionForm.interventionType.data),
                 int(interventionForm.interventionLevel.data),
                 interventionForm.startDate.data,
                 interventionForm.endDate.data,
                 interventionForm.comment.data,
             )
+            db.session.commit()
+            flash("Intervention log has been added!", "success")
             printLogEntry("Completed add_InterventionLog.  Redirecting to students")
             return redirect(url_for("studentInfo_bp.displayStudents"))
 

@@ -32,3 +32,5 @@ P2MT_App/templates/tmifinalapproval copy.html
 P2MT_App/templates/sandbox.html
 P2MT_App/p2mt_old.db
 old_migrations/
+P2MT_App/p2mt.db
+P2MT_App/static/upload/Uploaded_Schedule_File.csv

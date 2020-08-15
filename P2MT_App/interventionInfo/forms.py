@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired
 
 class addInterventionLogForm(FlaskForm):
     studentID = StringField("Student ID")
+    chattStateANumber = StringField("Chatt State A Number")
     interventionType = SelectField(
         "Intervention Type", coerce=int, validators=[DataRequired()]
     )

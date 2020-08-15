@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 def add_InterventionLog(
-    student_id,
+    chattStateANumber,
     interventionType,
     interventionLevel,
     startDate,
@@ -17,20 +17,18 @@ def add_InterventionLog(
     tmiMinutes=None,
 ):
     printLogEntry("add_InterventionLog() function called")
-    print(student_id, interventionType, interventionLevel, startDate, endDate)
+    print(chattStateANumber, interventionType, interventionLevel, startDate, endDate)
     interventionLog = InterventionLog(
         intervention_id=interventionType,
         interventionLevel=interventionLevel,
         startDate=startDate,
         endDate=endDate,
         comment=comment,
-        staffID=5,
-        student_id=student_id,
+        staffID=1,
+        chattStateANumber=chattStateANumber,
         tmiMinutes=tmiMinutes,
     )
     db.session.add(interventionLog)
-    db.session.commit()
-    flash("Intervention log has been added!", "success")
     return
 
 

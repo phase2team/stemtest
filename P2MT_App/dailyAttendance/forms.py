@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired
 
 class addDailyAttendanceForm(FlaskForm):
     studentID = StringField("Student ID")
+    chattStateANumber = StringField("Chatt State A Number")
     attendanceCode = SelectField(
         "Attendance Code",
         choices=[

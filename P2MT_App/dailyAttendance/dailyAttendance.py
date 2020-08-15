@@ -7,19 +7,17 @@ import os
 from datetime import datetime
 
 
-def add_DailyAttendanceLog(student_id, absenceDate, attendanceCode, comment):
+def add_DailyAttendanceLog(chattStateANumber, absenceDate, attendanceCode, comment):
     printLogEntry("add_DailyAttendanceLog() function called")
-    print(student_id, attendanceCode, comment, absenceDate)
+    print(chattStateANumber, attendanceCode, comment, absenceDate)
     dailyAttendanceLog = DailyAttendanceLog(
         absenceDate=absenceDate,
         attendanceCode=attendanceCode,
         comment=comment,
-        staffID=5,
-        student_id=student_id,
+        staffID=1,
+        chattStateANumber=chattStateANumber,
     )
     db.session.add(dailyAttendanceLog)
-    db.session.commit()
-    flash("Daily attendance log has been added!", "success")
     return
 
 
