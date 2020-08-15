@@ -13,7 +13,6 @@ from P2MT_App.main.referenceData import (
     getCurrent_Start_End_Tmi_Dates,
 )
 from datetime import date
-from P2MT_App.tmiTeacherReview.tmiTeacherReview import test_setAttendanceForTmiTesting
 from P2MT_App.tmiFinalApproval.tmiFinalApproval import assignTmiForTardy
 
 
@@ -24,7 +23,6 @@ tmiTeacherReview_bp = Blueprint("tmiTeacherReview_bp", __name__)
 def displayTmiTeacherReview():
     printLogEntry("Running displayTmiTeacherReview()")
     startTmiPeriod, endTmiPeriod, tmiDay = getCurrent_Start_End_Tmi_Dates()
-    test_setAttendanceForTmiTesting(date(2020, 8, 5), date(2020, 8, 11))
     tmiTeacherReviewForm = updateTmiTeacherReviewForm()
     tmiTeacherReviewForm.teacherName.choices = getTeachers()
 
