@@ -331,10 +331,43 @@
 
 <div class="infoTab" id="P2MTSetupTab" style="display:none">
     <div class="w3-container w3-padding-large w3-margin-right w3-margin-left w3-section">
-        <a href="{{url_for('main_bp.setupP2mt')}}" target="blank">Setup P2MT</a>
+        <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <h3>Setup P2MT</h3>
+            <p>Use Setup P2MT to set these initial configurations for P2MT:</p>
+            <ul>
+                <li>Initialize types of interventions and max intervention levels</li>
+                <ul>
+                    <li>Conduct Behavior (Max Level: 6)</li>
+                    <li>Academic Behavior (Max Level: 4)</li>
+                    <li>Attendance (Max Level: 3)</li>
+                    <li>Dress Code (Max Level: 6)</li>
+                    <li>Bullying/Harrassment (Max Level: 4)</li>
+                    <li>Extended Remediation (Max Level: 1)</li>
+                </ul>
+                <li>Initialize the School Calendar *</li>
+                <ul>
+                    <li>Start Date = Monday, August 3, 2020</li>
+                    <li>End Date = Friday, June 4, 2021</li>
+                    <li>Set Mon-Fri as STEM School Days and Phase II Days </li>
+                    <li>Set all Wednesdays as Start TMI Period dates</li>
+                    <li>Set all Fridays as TMI Days</li>
+                </ul>
+            </ul>
+            <p> * It will be necessary to manually update school calendar days after initialization</p>
+            <p>Running Setup P2MT again will not overwrite any manual changes</p>
+            <a href="{{url_for('main_bp.setupP2mt')}}" target="blank" class="w3-btn w3-blue w3-large">Setup P2MT</a>
+        </fieldset>
     </div>
     <div class="w3-container w3-padding-large w3-margin-right w3-margin-left w3-section">
-        <a href="{{url_for('main_bp.testP2mt')}}" target="blank">Configure P2MT for testing</a>
+        <fieldset class="w3-container w3-padding-large w3-hover-border-green">
+            <h3>Configure P2MT for Testing</h3>
+            <p>Use Configure P2MT for Testing to set these settings for P2MT:</p>
+            <ul>
+                <li>Set null attendance values to P (present) for attendance logs through August 21, 2020</li>
+            </ul>
+            <a href="{{url_for('main_bp.testP2mt')}}" target="blank" class="w3-btn w3-blue w3-large">Configure P2MT for
+                Testing</a>
+        </fieldset>
     </div>
 </div>
 
