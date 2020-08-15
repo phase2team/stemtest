@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 9b5bc20d0835
+Revision ID: ed306c6b2697
 Revises: 
-Create Date: 2020-08-04 18:53:21.268482
+Create Date: 2020-08-15 11:56:52.528305
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9b5bc20d0835'
+revision = 'ed306c6b2697'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('firstName', sa.String(length=50), nullable=False),
     sa.Column('lastName', sa.String(length=50), nullable=False),
-    sa.Column('position', sa.String(length=50), nullable=False),
+    sa.Column('position', sa.String(length=50), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
     sa.Column('phoneNumber', sa.String(length=20), nullable=True),
     sa.Column('chattStateANumber', sa.String(length=20), nullable=True),
@@ -31,14 +31,13 @@ def upgrade():
     sa.Column('houseGrade', sa.Integer(), nullable=True),
     sa.Column('twitterAccount', sa.String(length=50), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('chattStateANumber')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_FacultyAndStaff'))
     )
     op.create_table('InterventionType',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('interventionType', sa.String(length=30), nullable=False),
     sa.Column('maxLevel', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_InterventionType'))
     )
     op.create_table('SchoolCalendar',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -52,7 +51,9 @@ def upgrade():
     sa.Column('seniorUpDay', sa.Boolean(), nullable=True),
     sa.Column('juniorErDay', sa.Boolean(), nullable=True),
     sa.Column('juniorUpDay', sa.Boolean(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('startTmiPeriod', sa.Boolean(), nullable=True),
+    sa.Column('tmiDay', sa.Boolean(), nullable=True),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_SchoolCalendar'))
     )
     op.create_table('Student',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -63,8 +64,8 @@ def upgrade():
     sa.Column('yearOfGraduation', sa.Integer(), nullable=False),
     sa.Column('house', sa.String(length=20), nullable=False),
     sa.Column('googleCalendarId', sa.String(length=100), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('chattStateANumber')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_Student')),
+    sa.UniqueConstraint('chattStateANumber', name=op.f('uq_Student_chattStateANumber'))
     )
     op.create_table('ClassSchedule',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -82,27 +83,26 @@ def upgrade():
     sa.Column('endTime', sa.Time(), nullable=True),
     sa.Column('comment', sa.String(length=250), nullable=True),
     sa.Column('googleCalendarEventID', sa.String(length=250), nullable=True),
-    sa.ForeignKeyConstraint(['chattStateANumber'], ['Student.chattStateANumber'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['chattStateANumber'], ['Student.chattStateANumber'], name=op.f('fk_ClassSchedule_chattStateANumber_Student'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], name=op.f('fk_ClassSchedule_staffID_FacultyAndStaff')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ClassSchedule'))
     )
     op.create_table('DailyAttendanceLog',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('chattStateANumber', sa.String(length=20), nullable=False),
     sa.Column('absenceDate', sa.Date(), nullable=False),
     sa.Column('createDate', sa.Date(), nullable=False),
     sa.Column('attendanceCode', sa.String(length=1), nullable=False),
     sa.Column('comment', sa.Text(), nullable=False),
     sa.Column('staffID', sa.Integer(), nullable=False),
     sa.Column('assignTmi', sa.Boolean(), nullable=False),
-    sa.Column('recordDeleted', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], ),
-    sa.ForeignKeyConstraint(['student_id'], ['Student.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['chattStateANumber'], ['Student.chattStateANumber'], name=op.f('fk_DailyAttendanceLog_chattStateANumber_Student'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], name=op.f('fk_DailyAttendanceLog_staffID_FacultyAndStaff')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_DailyAttendanceLog'))
     )
     op.create_table('InterventionLog',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('chattStateANumber', sa.String(length=20), nullable=False),
     sa.Column('intervention_id', sa.Integer(), nullable=False),
     sa.Column('interventionLevel', sa.Integer(), nullable=False),
     sa.Column('createDate', sa.Date(), nullable=False),
@@ -116,11 +116,27 @@ def upgrade():
     sa.Column('inTmiNow', sa.Boolean(), nullable=True),
     sa.Column('erSession', sa.String(length=50), nullable=True),
     sa.Column('interventionStatus', sa.String(length=50), nullable=True),
-    sa.Column('recordDeleted', sa.Boolean(), nullable=True),
-    sa.ForeignKeyConstraint(['intervention_id'], ['InterventionType.id'], ),
-    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], ),
-    sa.ForeignKeyConstraint(['student_id'], ['Student.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['chattStateANumber'], ['Student.chattStateANumber'], name=op.f('fk_InterventionLog_chattStateANumber_Student'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['intervention_id'], ['InterventionType.id'], name=op.f('fk_InterventionLog_intervention_id_InterventionType')),
+    sa.ForeignKeyConstraint(['staffID'], ['FacultyAndStaff.id'], name=op.f('fk_InterventionLog_staffID_FacultyAndStaff')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_InterventionLog'))
+    )
+    op.create_table('Parents',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('chattStateANumber', sa.String(length=20), nullable=False),
+    sa.Column('guardianship', sa.String(length=50), nullable=True),
+    sa.Column('motherName', sa.String(length=50), nullable=True),
+    sa.Column('motherEmail', sa.String(length=50), nullable=True),
+    sa.Column('motherHomePhone', sa.String(length=50), nullable=True),
+    sa.Column('motherDayPhone', sa.String(length=50), nullable=True),
+    sa.Column('fatherName', sa.String(length=50), nullable=True),
+    sa.Column('fatherEmail', sa.String(length=50), nullable=True),
+    sa.Column('fatherHomePhone', sa.String(length=50), nullable=True),
+    sa.Column('fatherDayPhone', sa.String(length=50), nullable=True),
+    sa.Column('guardianEmail', sa.String(length=50), nullable=True),
+    sa.Column('comment', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['chattStateANumber'], ['Student.chattStateANumber'], name=op.f('fk_Parents_chattStateANumber_Student'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_Parents'))
     )
     op.create_table('ClassAttendanceLog',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -130,9 +146,9 @@ def upgrade():
     sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('assignTmi', sa.Boolean(), nullable=False),
     sa.Column('interventionLog_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['classSchedule_id'], ['ClassSchedule.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['interventionLog_id'], ['InterventionLog.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['classSchedule_id'], ['ClassSchedule.id'], name=op.f('fk_ClassAttendanceLog_classSchedule_id_ClassSchedule'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['interventionLog_id'], ['InterventionLog.id'], name=op.f('fk_ClassAttendanceLog_interventionLog_id_InterventionLog')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ClassAttendanceLog'))
     )
     # ### end Alembic commands ###
 
@@ -140,6 +156,7 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('ClassAttendanceLog')
+    op.drop_table('Parents')
     op.drop_table('InterventionLog')
     op.drop_table('DailyAttendanceLog')
     op.drop_table('ClassSchedule')

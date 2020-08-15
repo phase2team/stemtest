@@ -108,8 +108,10 @@ class ClassAttendanceLog(db.Model):
 class DailyAttendanceLog(db.Model):
     __tablename__ = "DailyAttendanceLog"
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(
-        db.Integer, db.ForeignKey("Student.id", ondelete="CASCADE"), nullable=False
+    chattStateANumber = db.Column(
+        db.String(20),
+        db.ForeignKey("Student.chattStateANumber", ondelete="CASCADE"),
+        nullable=False,
     )
     absenceDate = db.Column(db.Date, nullable=False)
     createDate = db.Column(db.Date, nullable=False, default=datetime.utcnow)
@@ -117,7 +119,6 @@ class DailyAttendanceLog(db.Model):
     comment = db.Column(db.Text, nullable=False)
     staffID = db.Column(db.Integer, db.ForeignKey("FacultyAndStaff.id"), nullable=False)
     assignTmi = db.Column(db.Boolean, nullable=False, default=False)
-    recordDeleted = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f"DailyAttendanceLog('{self.absenceDate}','{self.attendanceCode}','{self.comment}')"
@@ -141,8 +142,10 @@ class InterventionType(db.Model):
 class InterventionLog(db.Model):
     __tablename__ = "InterventionLog"
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(
-        db.Integer, db.ForeignKey("Student.id", ondelete="CASCADE"), nullable=False
+    chattStateANumber = db.Column(
+        db.String(20),
+        db.ForeignKey("Student.chattStateANumber", ondelete="CASCADE"),
+        nullable=False,
     )
     intervention_id = db.Column(
         db.Integer, db.ForeignKey("InterventionType.id"), nullable=False
@@ -161,7 +164,6 @@ class InterventionLog(db.Model):
     erSession = db.Column(db.String(50), nullable=True)
     erSession = db.Column(db.String(50), nullable=True)
     interventionStatus = db.Column(db.String(50), nullable=True)
-    recordDeleted = db.Column(db.Boolean, nullable=True, default=False)
     classAttendanceLog_id = db.relationship(
         "ClassAttendanceLog", backref="InterventionLog", lazy=True
     )
@@ -175,10 +177,10 @@ class FacultyAndStaff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstName = db.Column(db.String(50), nullable=False)
     lastName = db.Column(db.String(50), nullable=False)
-    position = db.Column(db.String(50), nullable=False)
+    position = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(120), nullable=True)
     phoneNumber = db.Column(db.String(20), nullable=True)
-    chattStateANumber = db.Column(db.String(20), unique=True, nullable=True)
+    chattStateANumber = db.Column(db.String(20), nullable=True)
     myersBrigg = db.Column(db.Integer, nullable=True)
     house = db.Column(db.String(20), nullable=True)
     houseGrade = db.Column(db.Integer, nullable=True)

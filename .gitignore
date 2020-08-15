@@ -4,14 +4,12 @@ P2MT_App/__pycache__/__init__.cpython-38.pyc
 P2MT_App/__pycache__/models.cpython-38.pyc
 P2MT_App/__pycache__/routes.cpython-38.pyc
 .vscode
-P2MT_App/p2mt.db
 students_export.csv
 Input_Data_Files
 P2MT_App/templates/analytics.html
 P2MT_App/templates/bootstraptest copy.html
 P2MT_App/templates/bootstraptest.html
 P2MT_App/__pycache__
-P2MT_App/p2mt.db
 test 
 P2MT_App/Old
 *.pyc
@@ -32,3 +30,5 @@ P2MT_App/static/download/intervention_log_*
 test_db_data_population.py
 P2MT_App/templates/tmifinalapproval copy.html
 P2MT_App/templates/sandbox.html
+P2MT_App/p2mt_old.db
+old_migrations/
