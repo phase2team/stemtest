@@ -86,7 +86,7 @@
         <th></th>
       </tr>
       {% for studentFixedFields in classAttendanceFixedFields %}
-      {% if studentFixedFields.ClassSchedule.Student.id == studentTmiLog.student_id %}
+      {% if studentFixedFields.ClassSchedule.Student.chattStateANumber == studentTmiLog.chattStateANumber %}
       <tr class="w3-amber" style="visibility:collapse;"
         onclick="activateAccordion(this,'accordion_{{studentTmiLog.id}}')"
         data-identifier="accordion_{{studentTmiLog.id}}">

@@ -117,14 +117,16 @@ def findTmiClassesForStudent(startPeriod, endPeriod, chattStateANumber):
     return tmiClasses
 
 
-def updateInterventionLogForTmi(student_id, tmiDate, tmiMinutes, interventionStatus):
+def updateInterventionLogForTmi(
+    chattStateANumber, tmiDate, tmiMinutes, interventionStatus
+):
     # Check if there is existing TMI intervention for the student
     # If one exists, update the intervention status and TMI minutes
     # If one doesn't exist, add a new intervention for the student
     tmiInterventionForStudent = InterventionLog.query.filter(
         InterventionLog.intervention_id == 3,
         InterventionLog.startDate == tmiDate,
-        InterventionLog.student_id == student_id,
+        InterventionLog.chattStateANumber == chattStateANumber,
     ).first()
     if tmiInterventionForStudent:
         print("update tmi intervention")
@@ -136,7 +138,7 @@ def updateInterventionLogForTmi(student_id, tmiDate, tmiMinutes, interventionSta
     else:
         print("add new intervention")
         add_InterventionLog(
-            student_id=student_id,
+            chattStateANumber=chattStateANumber,
             interventionType=3,
             interventionLevel=1,
             startDate=tmiDate,
@@ -215,7 +217,9 @@ def calculateTmi(startTmiPeriod, endTmiPeriod, tmiDate):
             tmiMinutes = maxTmiMinutes
 
         interventionStatus = "Pending"
-        updateInterventionLogForTmi(student_id, tmiDate, tmiMinutes, interventionStatus)
+        updateInterventionLogForTmi(
+            chattStateANumber, tmiDate, tmiMinutes, interventionStatus
+        )
         print(chattStateANumber, classAttendanceLogIDList, tmiMinutes)
 
     return

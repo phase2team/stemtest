@@ -29,7 +29,9 @@ def displayTmiFinalApproval():
         .filter(ClassAttendanceLog.assignTmi == True)
         .join(ClassSchedule)
         .join(ClassSchedule.Student)
-        .order_by(Student.lastName, ClassAttendanceLog.classDate)
+        .order_by(
+            Student.lastName, ClassAttendanceLog.classDate, ClassSchedule.className
+        )
         .all()
     )
 
