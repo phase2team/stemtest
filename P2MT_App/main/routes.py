@@ -1,6 +1,10 @@
 from flask import render_template, redirect, url_for, flash, request, Blueprint
 from P2MT_App import db
-from P2MT_App.main.setupFunctions import initializeInterventionTypes
+from P2MT_App.main.setupFunctions import (
+    initializeInterventionTypes,
+    addSchoolCalendarDays,
+)
+from datetime import date
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -18,6 +22,8 @@ def displayAbout():
 @main_bp.route("/setupP2mt")
 def setupP2mt():
     initializeInterventionTypes()
+    addSchoolCalendarDays(date(2020, 8, 3), date(2021, 6, 4))
+    db.session.commit()
     return redirect(url_for("p2mtAdmin_bp.displayP2MTAdmin"))
 
 
