@@ -7,6 +7,7 @@ from P2MT_App.schoolCalendar.forms import (
     updateSchoolCalendarFieldListForm,
     updateSchoolCalendarContainerForm,
 )
+from P2MT_App.main.referenceData import getCurrent_Start_End_Tmi_Dates
 
 schoolCalendar_bp = Blueprint("schoolCalendar_bp", __name__)
 
@@ -17,6 +18,7 @@ def displaySchoolCalendar():
     updateSchoolCalendarContainerFormDetails = updateSchoolCalendarContainerForm()
 
     printLogEntry("Running displaySchoolCalendar()")
+    startTmiPeriod, endTmiPeriod, tmiDay = getCurrent_Start_End_Tmi_Dates()
 
     if updateSchoolCalendarContainerFormDetails.validate_on_submit():
         print("Form submitted!")
@@ -96,4 +98,7 @@ def displaySchoolCalendar():
         title="School Calendar",
         schoolCalendarForm=updateSchoolCalendarContainerFormDetails,
         schoolCalendarDates=schoolCalendarDays,
+        startTmiPeriod=startTmiPeriod,
+        endTmiPeriod=endTmiPeriod,
+        tmiDay=tmiDay,
     )

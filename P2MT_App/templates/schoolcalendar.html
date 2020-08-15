@@ -23,16 +23,31 @@
     </div>
 </div>
 
-<div class="w3-panel">
-    <h3>Important: Set these day correctly</h3>
-    <p>STEM School Day - Reserved for future use </p>
-    <p>Phase II Day - Used in calculating attendance rosters for normal class days</p>
-    <p>ER Days - Used in calculating attendance rosters for ER </p>
-    <p>UP Days - Used in calculating attendance rosters for UP Days </p>
-    <p> Start TMI Period - Used to detemine the start date for calculating TMI (normally Wednesday) </p>
-    <p> TMI Day - The day when TMI is served (normally Friday)</p>
-    <p> Note: The end date for calculating TMI is automatically set to the day before the next Start TMI Period date</p>
+
+<div class="w3-row-padding">
+    <div class="w3-half">
+        <h3>Important: Set these days correctly</h3>
+        <p><b>STEM School Day</b> - Reserved for future use </p>
+        <p><b>Phase II Day</b> - Used in calculating attendance rosters for normal class days</p>
+        <p><b>ER Days</b> - Used in calculating attendance rosters for ER </p>
+        <p><b>UP Days</b> - Used in calculating attendance rosters for UP Days </p>
+        <p><b>Start TMI Period</b> - Used to detemine the start date for calculating TMI (normally Wednesday of the week
+            prior to the TMI Day) </p>
+        <p><b>TMI Day</b> - The day when TMI is served (normally Friday)</p>
+        <p> Note: The end date for calculating TMI is automatically set to the day before the next Start TMI Period date
+        </p>
+    </div>
+    <div class="w3-third">
+        <h3>Current TMI Dates</h3>
+        <p><b>If the dates for the current TMI period are not correct, review the TMI period start dates and TMI
+                dates. The solution may require correcting TMI dates before the current period.</b>
+        </p>
+        <p><b>Start Date for TMI Period:</b> {{ startTmiPeriod.strftime('%a %b %-d') }}</p>
+        <p><b>End Date for TMI Period:</b> {{ endTmiPeriod.strftime('%a %b %-d') }}</p>
+        <p><b>TMI Date:</b> {{ tmiDay.strftime('%a %b %-d') }}</p>
+    </div>
 </div>
+
 
 <div class="w3-container w3-row w3-center" , id="myStickyHeader">
     <div class="w3-col s1">
