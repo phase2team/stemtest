@@ -50,6 +50,7 @@
         Info</button>
     <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'ParentInfoTab')">Parent Info</button>
     <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'StaffInfoTab')">Staff Info</button>
+    <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'P2MTSetupTab')">P2MT Setup</button>
 </div>
 
 <div class="infoTab" id="StudentInfoTab">
@@ -327,6 +328,13 @@
         </form>
     </div>
 </div>
+
+<div class="infoTab" id="P2MTSetupTab" style="display:none">
+    <div class="w3-container w3-padding-large w3-margin-right w3-margin-left w3-section">
+        <a href="{{url_for('main_bp.setupP2mt')}}" target="blank">Setup P2MT</a>
+    </div>
+</div>
+
 
 <script type="text/javascript" src="{{ url_for('static', filename="js/pageTabs.js") }}"></script>
 
