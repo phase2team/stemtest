@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, MetaData
 from sqlalchemy.engine import Engine
-from P2MT_App.config import Config
 from sqlite3 import Connection as SQLite3Connection
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -29,9 +28,9 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
 
 
-def create_app(config_class=Config):
+def create_app(config_class):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
     app.jinja_env.globals.update(zip=zip)
 
     db.init_app(app)

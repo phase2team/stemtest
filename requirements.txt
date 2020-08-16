@@ -24,3 +24,4 @@ typed-ast==1.4.1
 Werkzeug==1.0.1
 WTForms==2.3.1
 google-python-cloud-debugger
+google-cloud-storage
