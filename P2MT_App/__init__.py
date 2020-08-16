@@ -24,6 +24,7 @@ naming_convention = {
     "pk": "pk_%(table_name)s",
 }
 
+# Initializes the database
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
 
@@ -32,8 +33,9 @@ def create_app(config_class):
     app = Flask(__name__)
     app.config.from_object(config_class)
     app.jinja_env.globals.update(zip=zip)
-
+    # Initialize the database with the app
     db.init_app(app)
+    # Initialize Migrate with the app and the database
     migrate.init_app(app, db)
 
     from P2MT_App.main.routes import main_bp

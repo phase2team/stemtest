@@ -12,6 +12,8 @@ main_bp = Blueprint("main_bp", __name__)
 
 @main_bp.route("/")
 def home():
+    # Create all the database tables if not already created
+    db.create_all()
     return render_template("home.html", title="Home")
 
 
