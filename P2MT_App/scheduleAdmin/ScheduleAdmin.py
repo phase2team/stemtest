@@ -149,6 +149,7 @@ def downloadClassSchedule(schoolYear, semester):
     printLogEntry("downloadClassSchedule() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
+    output_file_path = "/tmp"
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_schedule_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
@@ -246,6 +247,7 @@ def downloadClassAttendanceLog(schoolYear, semester, teacherName, startDate, end
     printLogEntry("downloadClassAttendanceLog() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
+    output_file_path = "/tmp"
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "class_attendance_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")

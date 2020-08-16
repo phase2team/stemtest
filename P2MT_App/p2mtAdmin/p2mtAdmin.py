@@ -85,6 +85,7 @@ def downloadStudentList():
     printLogEntry("downloadStudentList() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
+    output_file_path = "/tmp"
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "student_list_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
@@ -194,6 +195,7 @@ def downloadStaffList():
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_file_path = "/tmp"
     csvFilename = output_file_path + "/" + "staff_list_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
     csvOutputWriter = csv.writer(
@@ -406,6 +408,7 @@ def downloadParentsList():
     printLogEntry("downloadParentsList() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
+    output_file_path = "/tmp"
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "parent_list_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")

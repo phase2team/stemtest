@@ -16,7 +16,9 @@ fetTools_bp = Blueprint("fetTools_bp", __name__)
 
 
 def save_csvFile(form_csvFetFile, filename):
-    file_path = os.path.join(current_app.root_path, "static/fet_data_files", filename)
+    output_file_path = "/tmp"
+    file_path = os.path.join(output_file_path, "static/fet_data_files", filename)
+    # file_path = os.path.join(current_app.root_path, "static/fet_data_files", filename)
     form_csvFetFile.save(file_path)
     # file1 = open(file_path, "w")
     # file1.write(form_csvFetFile.data)

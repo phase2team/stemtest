@@ -26,6 +26,7 @@ def downloadDailyAttendanceLog():
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_file_path = "/tmp"
     csvFilename = output_file_path + "/" + "daily_attendance_log_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
     csvOutputWriter = csv.writer(

@@ -36,6 +36,7 @@ def downloadInterventionLog():
     printLogEntry("downloadDailyAttendanceLog() function called")
     # Create a CSV output file and append with a timestamp
     output_file_path = os.path.join(current_app.root_path, "static/download")
+    output_file_path = "/tmp"
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     csvFilename = output_file_path + "/" + "intervention_log_" + timestamp + ".csv"
     csvOutputFile = open(csvFilename, "w")
