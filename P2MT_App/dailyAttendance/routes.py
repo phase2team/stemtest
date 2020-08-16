@@ -23,7 +23,7 @@ def displayDailyAttendanceLogs():
 @dailyAttendance_bp.route("/dailyattendancelog/<int:log_id>/delete", methods=["POST"])
 def delete_DailyAttendanceLog(log_id):
     log = DailyAttendanceLog.query.get_or_404(log_id)
-    LogDetails = f"{(log_id)} {log.student_id} {log.staffID}"
+    LogDetails = f"{(log_id)} {log.chattStateANumber} {log.staffID}"
     printLogEntry("Running delete_DailyAttendanceLog(" + LogDetails + ")")
     db.session.delete(log)
     db.session.commit()

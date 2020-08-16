@@ -21,7 +21,7 @@ def displayInterventionLogs():
 @interventionInfo_bp.route("/interventionlog/<int:log_id>/delete", methods=["POST"])
 def delete_InterventionLog(log_id):
     log = InterventionLog.query.get_or_404(log_id)
-    LogDetails = f"{(log_id)} {log.student_id} {log.staffID}"
+    LogDetails = f"{(log_id)} {log.chattStateANumber} {log.staffID}"
     printLogEntry("Running delete_InterventionLog(" + LogDetails + ")")
     db.session.delete(log)
     db.session.commit()
