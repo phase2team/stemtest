@@ -5,7 +5,6 @@ from P2MT_App.main.utilityfunctions import download_File, printLogEntry
 from datetime import datetime, date, time
 import re
 import os
-import pandas as pd
 import csv
 
 print("\n=========", __file__, "=========\n")
