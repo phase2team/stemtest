@@ -19,6 +19,11 @@ def displaySchoolCalendar():
 
     printLogEntry("Running displaySchoolCalendar()")
     startTmiPeriod, endTmiPeriod, tmiDay = getCurrent_Start_End_Tmi_Dates()
+    # Set default value to prevent error of NoneType values before initialization
+    if startTmiPeriod == None or endTmiPeriod == None or tmiDay == None:
+        startTmiPeriod = date(1970, 1, 1)
+        endTmiPeriod = date(1970, 1, 1)
+        tmiDay = date(1970, 1, 1)
 
     if updateSchoolCalendarContainerFormDetails.validate_on_submit():
         print("Form submitted!")
