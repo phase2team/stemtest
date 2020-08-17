@@ -7,6 +7,7 @@ import sys, traceback
 
 def getFetField(fetRow, element):
     fetField = fetRow[element].strip('"')
+    fetField = fetField.strip()
     return fetField
 
 
