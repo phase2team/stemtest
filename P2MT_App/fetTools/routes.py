@@ -8,16 +8,18 @@ from flask import (
     request,
     Blueprint,
     current_app,
+    send_file,
 )
 from P2MT_App.fetTools.forms import UploadFetDataForm
 from P2MT_App.fetTools.generateFetOutputFiles import ripFetFiles
+from P2MT_App.main.utilityfunctions import printLogEntry
 
 fetTools_bp = Blueprint("fetTools_bp", __name__)
 
 
 def save_csvFile(form_csvFetFile, filename):
     output_file_path = "/tmp"
-    file_path = os.path.join(output_file_path, "static/fet_data_files", filename)
+    file_path = os.path.join(output_file_path, filename)
     # file_path = os.path.join(current_app.root_path, "static/fet_data_files", filename)
     form_csvFetFile.save(file_path)
     # file1 = open(file_path, "w")
@@ -44,7 +46,8 @@ def displayFetTools():
                 form.csvFetTimetableInputFile.data, "FET_Timetable_File.csv"
             )
         flash("Your account has been updated!", "success")
-        output_file_path = os.path.join(current_app.root_path, "static/fet_data_files")
+        # output_file_path = os.path.join(current_app.root_path, "static/fet_data_files")
+        output_file_path = "/tmp"
         ripFetFiles(
             form.yearOfGraduation.data,
             form.schoolYear.data,
@@ -71,3 +74,17 @@ def displayFetTools():
 def fetOutputFiles():
     print("===  Arriving at fetOutputFiles   ===", datetime.now(), "   ===")
     return render_template("fetoutputfiles.html", title="FET Output Files")
+
+
+@fetTools_bp.route("/fetoutputfiles/downloadcsv")
+def download_FetCsvFile():
+    printLogEntry("download_FetCsvFile() function called")
+    csvFilename = "/tmp/FetOutputFile.csv"
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)
+
+
+@fetTools_bp.route("/fetoutputfiles/downloadjson")
+def download_FetJsonFile():
+    printLogEntry("download_FetJsonFile() function called")
+    csvFilename = "/tmp/FetOutputFile.json"
+    return send_file(csvFilename, as_attachment=True, cache_timeout=0)

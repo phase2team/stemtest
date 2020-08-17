@@ -478,7 +478,7 @@ def ripFetFiles(
 
         try:
             # Export the fullSchedule Python dictionary into a CSV file
-            csvFilename = output_file_path + "/" + "outputFile.csv"
+            csvFilename = output_file_path + "/" + "FetOutputFile.csv"
             csvOutputFile = open(csvFilename, "w")
             # Write header row for CSV file
             csvHeaderRow = "year,semester,Chatt_State_A_Number,CSname,firstName,lastName,HSclass,campus,courseNumber,courseName,sectionID,teacher,online,indStudy,days,times,startTime,endTime,comment\n"
@@ -600,7 +600,7 @@ def ripFetFiles(
 
             jsonSchedule = json.dumps(fullSchedule, indent=4, separators=("", " = "))
             # print(jsonSchedule)
-            jsonOutputFilename = output_file_path + "/" + "outputFile.json"
+            jsonOutputFilename = output_file_path + "/" + "FetOutputFile.json"
             jsonOutputFile = open(jsonOutputFilename, "w")
             jsonOutputFile.write(jsonSchedule)
             jsonOutputFile.close()
