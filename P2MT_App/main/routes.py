@@ -12,8 +12,6 @@ main_bp = Blueprint("main_bp", __name__)
 
 @main_bp.route("/")
 def home():
-    # Create all the database tables if not already created
-    db.create_all()
     return render_template("home.html", title="Home")
 
 
@@ -24,6 +22,8 @@ def displayAbout():
 
 @main_bp.route("/setupP2mt")
 def setupP2mt():
+    # Create all the database tables if not already created
+    db.create_all()
     initializeInterventionTypes()
     addSchoolCalendarDays(date(2020, 8, 3), date(2021, 6, 4))
     db.session.commit()
