@@ -115,7 +115,7 @@ class DailyAttendanceLog(db.Model):
     )
     absenceDate = db.Column(db.Date, nullable=False)
     createDate = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-    attendanceCode = db.Column(db.String(1), nullable=False, default="P")
+    attendanceCode = db.Column(db.String(50), nullable=False, default="P")
     comment = db.Column(db.Text, nullable=False)
     staffID = db.Column(db.Integer, db.ForeignKey("FacultyAndStaff.id"), nullable=False)
     assignTmi = db.Column(db.Boolean, nullable=False, default=False)
