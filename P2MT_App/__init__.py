@@ -6,6 +6,16 @@ from sqlite3 import Connection as SQLite3Connection
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
+# Third-party libraries for login authorization and management
+from authlib.integrations.flask_client import OAuth
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+
 
 # This function is necessary to perform cacade deletes in SQLite
 @event.listens_for(Engine, "connect")
@@ -24,9 +34,13 @@ naming_convention = {
     "pk": "pk_%(table_name)s",
 }
 
-# Initializes the database
+# Instantiate the database
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
+# Instantiate up the login_manager
+login_manager = LoginManager()
+# Instantiate oauth for managing authentication
+oauth = OAuth()
 
 
 def create_app(config_class):
@@ -37,6 +51,25 @@ def create_app(config_class):
     db.init_app(app)
     # Initialize Migrate with the app and the database
     migrate.init_app(app, db)
+
+    # Set up for using Google Login and API (if running on Google Cloud)
+    useGoogleLoginAndAPI = app.config.get("USE_GOOGLE_LOGIN_AND_API")
+    print("useGoogleLoginAndAPI =", useGoogleLoginAndAPI)
+    if useGoogleLoginAndAPI:
+        # User session management setup
+        # https://flask-login.readthedocs.io/en/latest
+        login_manager.init_app(app)
+
+        # OAuth 2 client setup
+        GOOGLE_DISCOVERY_URL = (
+            "https://accounts.google.com/.well-known/openid-configuration"
+        )
+        oauth.init_app(app)
+        oauth.register(
+            name="google",
+            server_metadata_url=GOOGLE_DISCOVERY_URL,
+            client_kwargs={"scope": "openid email profile"},
+        )
 
     from P2MT_App.main.routes import main_bp
     from P2MT_App.classAttendance.routes import classAttendance_bp
@@ -51,6 +84,7 @@ def create_app(config_class):
     from P2MT_App.parentInfo.routes import parentsInfo_bp
     from P2MT_App.tmiTeacherReview.routes import tmiTeacherReview_bp
     from P2MT_App.tmiFinalApproval.routes import tmiFinalApproval_bp
+    from P2MT_App.googleAPI.routes import googleAPI_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(classAttendance_bp)
@@ -65,5 +99,6 @@ def create_app(config_class):
     app.register_blueprint(parentsInfo_bp)
     app.register_blueprint(tmiTeacherReview_bp)
     app.register_blueprint(tmiFinalApproval_bp)
+    app.register_blueprint(googleAPI_bp)
 
     return app

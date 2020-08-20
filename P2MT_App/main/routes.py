@@ -6,6 +6,7 @@ from P2MT_App.main.setupFunctions import (
 )
 from P2MT_App.main.testFunctions import setAttendanceForTmiTesting
 from datetime import date
+from flask_login import current_user, login_required
 
 main_bp = Blueprint("main_bp", __name__)
 

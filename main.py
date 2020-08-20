@@ -12,4 +12,4 @@ except ImportError:
     pass
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run("localhost", 8080, debug=True)

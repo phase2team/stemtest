@@ -1,5 +1,12 @@
-from P2MT_App import db
+from P2MT_App import db, login_manager
 from datetime import datetime
+from flask_login import UserMixin
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    print("Running load_user() with ", user_id)
+    return FacultyAndStaff.query.filter(FacultyAndStaff.id == user_id).first()
 
 
 class Student(db.Model):
@@ -172,7 +179,7 @@ class InterventionLog(db.Model):
         return f"InterventionLog('{self.id}','{self.intervention_id}','{self.startDate}','{self.endDate}')"
 
 
-class FacultyAndStaff(db.Model):
+class FacultyAndStaff(db.Model, UserMixin):
     __tablename__ = "FacultyAndStaff"
     id = db.Column(db.Integer, primary_key=True)
     firstName = db.Column(db.String(50), nullable=False)
