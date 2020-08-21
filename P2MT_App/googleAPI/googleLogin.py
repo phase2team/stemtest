@@ -1,5 +1,7 @@
 import requests
 
+from P2MT_App.models import FacultyAndStaff
+
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 # Included for reference. AuthLib handles retrieval of authorization endpoint.
@@ -14,3 +16,17 @@ def get_google_provider_cfg():
     print("userinfo_endpoint:", userinfo_endpoint)
     return google_provider_cfg
 
+
+def updateProfilePic(user_id, profilePicUrl):
+    user = FacultyAndStaff.query.get(user_id)
+    print("user_id =", user_id)
+    print("user =", user)
+    print("profilePicUrl =", profilePicUrl)
+    user.google_picture = profilePicUrl
+    return
+
+
+def updateGoogleSub(user_id, googleSubId):
+    user = FacultyAndStaff.query.get(user_id)
+    user.google_sub = googleSubId
+    return

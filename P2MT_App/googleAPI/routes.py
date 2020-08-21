@@ -18,6 +18,7 @@ from P2MT_App import db, oauth
 from P2MT_App.models import FacultyAndStaff
 from P2MT_App.googleAPI.googleLogin import get_google_provider_cfg
 from P2MT_App.main.utilityfunctions import printLogEntry
+from P2MT_App.googleAPI.googleLogin import updateProfilePic, updateGoogleSub
 
 googleAPI_bp = Blueprint("googleAPI_bp", __name__)
 
@@ -70,6 +71,14 @@ def auth():
             if user:
                 printLogEntry("This is a valid user")
                 # Begin user session by logging the user in
+                try:
+                    updateProfilePic(user.id, picture)
+                    updateGoogleSub(user.id, unique_id)
+                    db.session.commit()
+                    printLogEntry("Updated Google profile pic and unique id")
+                except:
+                    printLogEntry("Unable to update Google profile pic or unique id")
+                    pass
                 login_user(user)
 
     # if False:

@@ -202,6 +202,8 @@ class FacultyAndStaff(db.Model, UserMixin):
     ClassSchedule = db.relationship(
         "ClassSchedule", backref="FacultyAndStaff", lazy=True
     )
+    google_sub = db.Column(db.Integer, nullable=True)
+    google_picture = db.Column(db.String(256), nullable=True)
 
     def __repr__(self):
         return (
