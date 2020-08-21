@@ -118,9 +118,9 @@ def displayP2MTAdmin():
     deleteStaffFormDetails = deleteStaffForm()
     deleteStaffFormDetails.staffName.choices = getStaffFromFacultyAndStaff()
 
-    # Retrieve staff info for display (except for phase2team@students.hcde.org system account)
+    # Retrieve staff info for display (except for system account)
     staffInfo = FacultyAndStaff.query.filter(
-        FacultyAndStaff.email != "phase2team@students.hcde.org"
+        FacultyAndStaff.lastName != "System"
     ).order_by(FacultyAndStaff.lastName.asc())
 
     if request.method == "POST":

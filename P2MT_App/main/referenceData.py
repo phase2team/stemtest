@@ -19,11 +19,12 @@ def getInterventionTypes():
 
 
 def getStaffFromFacultyAndStaff():
+    # Get list of staff to display as dropdown choices but exclude system account
     teacherTupleList = (
         db.session.query(
             FacultyAndStaff.id, FacultyAndStaff.firstName, FacultyAndStaff.lastName
         )
-        .filter(FacultyAndStaff.email != "phase2team@students.hcde.org")
+        .filter(FacultyAndStaff.lastName != "System")
         .distinct()
         .order_by(FacultyAndStaff.lastName)
         .all()
