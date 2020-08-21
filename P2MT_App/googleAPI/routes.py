@@ -95,5 +95,5 @@ def logintest():
 @login_required
 def logout():
     logout_user()
-    return redirect("/homepage")
+    return redirect("/")
 
