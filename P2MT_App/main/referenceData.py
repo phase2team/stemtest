@@ -23,6 +23,7 @@ def getStaffFromFacultyAndStaff():
         db.session.query(
             FacultyAndStaff.id, FacultyAndStaff.firstName, FacultyAndStaff.lastName
         )
+        .filter(FacultyAndStaff.email != "phase2team@students.hcde.org")
         .distinct()
         .order_by(FacultyAndStaff.lastName)
         .all()
