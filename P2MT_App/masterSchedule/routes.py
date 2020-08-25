@@ -1,4 +1,5 @@
 from flask import render_template, redirect, url_for, flash, Blueprint, request
+from datetime import date
 from P2MT_App import db
 from P2MT_App.main.utilityfunctions import printLogEntry
 from P2MT_App.models import ClassSchedule, ClassAttendanceLog
@@ -56,6 +57,11 @@ def edit_ClassSchedule(log_id):
 
     if "submitEditSingleClassSchedule" in request.form:
         print("submitEditSingleClassSchedule submitted")
+        # Get the pre-update class days and times for use in log comment later
+        preUpdateClassDays = log.classDays
+        preUpdateStartTime = log.startTime
+        preUpdateEndTime = log.endTime
+
         # Update the database with the values submitted in the form
         log.schoolYear = editSingleClassScheduleDetails.schoolYear.data
         log.semester = editSingleClassScheduleDetails.semester.data
@@ -69,13 +75,22 @@ def edit_ClassSchedule(log_id):
         print("classDaysList=", classDaysList)
         # Set updatedClassDays to True if the classDays are updated
         # updatedClassDays is used to determine whether to delete attendance logs
-        if classDays == log.classDays:
+        if classDays == preUpdateClassDays:
             updatedClassDays = False
         else:
             updatedClassDays = True
             log.classDays = classDays
-        log.startTime = editSingleClassScheduleDetails.startTime.data
-        log.endTime = editSingleClassScheduleDetails.endTime.data
+        startTime = editSingleClassScheduleDetails.startTime.data
+        endTime = editSingleClassScheduleDetails.endTime.data
+        updatedTimes = False
+        # Set updatedTimes to True if the class times are updated
+        # updatedTimes is used to determine whether to append comment to attendance logs
+        if startTime != preUpdateStartTime:
+            updatedTimes = True
+            log.startTime = startTime
+        if endTime != preUpdateEndTime:
+            updatedTimes = True
+            log.endTime = endTime
         log.online = editSingleClassScheduleDetails.online.data
         log.indStudy = editSingleClassScheduleDetails.indStudy.data
         log.comment = editSingleClassScheduleDetails.comment.data
@@ -85,21 +100,46 @@ def edit_ClassSchedule(log_id):
         db.session.commit()
 
         # If classDays change, delete any class attendance logs that are null
-        if updatedClassDays:
-            print("classDays updated -- deleting associated class attendance logs")
+        # If logs have attendance code, append a comment explaining the original class days and times
+        # If class days or class times changes, append a comment on logs with an attendance code
+        if updatedClassDays or updatedTimes:
+            print(
+                "classDays or class times updated -- reviewing associated class attendance logs"
+            )
             attendanceLogs = ClassAttendanceLog.query.filter(
-                ClassAttendanceLog.classSchedule_id == log.id,
-                ClassAttendanceLog.attendanceCode == None,
+                ClassAttendanceLog.classSchedule_id == log.id
             ).all()
             for attendanceLog in attendanceLogs:
-                db.session.delete(attendanceLog)
-                db.session.commit()
-                print(
-                    "Deleting attendance log for ",
-                    log.className,
-                    "on",
-                    attendanceLog.classDate,
-                )
+                # Delete class logs with null attendance codes and new days
+                if attendanceLog.attendanceCode == None and updatedClassDays:
+                    db.session.delete(attendanceLog)
+                    db.session.commit()
+                    print(
+                        "Deleting attendance log for ",
+                        log.className,
+                        "on",
+                        attendanceLog.classDate,
+                    )
+                # Append comment to logs with attendance codes noting the original class schedule info
+                if attendanceLog.attendanceCode != None and (
+                    updatedTimes or updatedClassDays
+                ):
+                    scheduleComment = (
+                        "[Class schedule changed from: "
+                        + preUpdateClassDays
+                        + " "
+                        + preUpdateStartTime.strftime("%-I:%M")
+                        + "-"
+                        + preUpdateEndTime.strftime("%-I:%M")
+                        + " on "
+                        + date.today().strftime("%-m/%-d/%Y")
+                        + "] "
+                    )
+                    if attendanceLog.comment == None:
+                        attendanceLog.comment = ""
+                    attendanceLog.comment = scheduleComment + attendanceLog.comment
+                    db.session.commit()
+                    print("Appending attendanceLog.comment:", attendanceLog.comment)
 
         return redirect(url_for("masterSchedule_bp.displayMasterSchedule"))
 
