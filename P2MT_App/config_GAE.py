@@ -16,3 +16,4 @@ class Config:
     USE_GOOGLE_LOGIN_AND_API = "True"
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    WTF_CSRF_TIME_LIMIT = None
