@@ -16,3 +16,8 @@ class Config:
     USE_GOOGLE_LOGIN_AND_API = "True"
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+    # When running locally, disable OAuthlib's HTTPs verification.
+    # ACTION ITEM for developers:
+    #     When running in production *do not* leave this option enabled.
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"

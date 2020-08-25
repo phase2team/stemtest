@@ -204,6 +204,7 @@ class FacultyAndStaff(db.Model, UserMixin):
     )
     google_sub = db.Column(db.String(256), nullable=True)
     google_picture = db.Column(db.String(256), nullable=True)
+    google_credentials = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return (
