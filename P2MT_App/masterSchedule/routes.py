@@ -1,9 +1,19 @@
-from flask import render_template, redirect, url_for, flash, Blueprint
+from flask import render_template, redirect, url_for, flash, Blueprint, request
 from P2MT_App import db
 from P2MT_App.main.utilityfunctions import printLogEntry
-from P2MT_App.models import ClassSchedule
+from P2MT_App.models import ClassSchedule, ClassAttendanceLog
 from P2MT_App.scheduleAdmin.ScheduleAdmin import downloadClassSchedule
-from P2MT_App.main.referenceData import getCurrentSchoolYear, getCurrentSemester
+from P2MT_App.main.referenceData import (
+    getCurrentSchoolYear,
+    getCurrentSemester,
+    getStudentName,
+    getSchoolYear,
+    getSemester,
+    getTeachers,
+    getStemAndChattStateClassNames,
+    getCampusChoices,
+)
+from P2MT_App.masterSchedule.forms import editSingleClassSchedule
 
 masterSchedule_bp = Blueprint("masterSchedule_bp", __name__)
 
@@ -35,3 +45,111 @@ def delete_ClassSchedule(log_id):
     db.session.commit()
     flash("Class schedule has been deleted!", "success")
     return redirect(url_for("masterSchedule_bp.displayMasterSchedule"))
+
+
+@masterSchedule_bp.route("/masterschedule/<int:log_id>/edit", methods=["POST"])
+def edit_ClassSchedule(log_id):
+    editSingleClassScheduleDetails = editSingleClassSchedule()
+    log = ClassSchedule.query.get_or_404(log_id)
+    LogDetails = f"{(log_id)} {log.chattStateANumber} {log.className}"
+    printLogEntry("Running update_ClassSchedule(" + LogDetails + ")")
+
+    if "submitEditSingleClassSchedule" in request.form:
+        print("submitEditSingleClassSchedule submitted")
+        # Update the database with the values submitted in the form
+        log.schoolYear = editSingleClassScheduleDetails.schoolYear.data
+        log.semester = editSingleClassScheduleDetails.semester.data
+        log.campus = editSingleClassScheduleDetails.campus.data
+        log.className = editSingleClassScheduleDetails.className.data
+        log.teacherLastName = editSingleClassScheduleDetails.teacherName.data
+        classDaysList = editSingleClassScheduleDetails.classDays.data
+        classDays = ""
+        for classDay in classDaysList:
+            classDays = classDays + classDay
+        print("classDaysList=", classDaysList)
+        # Set updatedClassDays to True if the classDays are updated
+        # updatedClassDays is used to determine whether to delete attendance logs
+        if classDays == log.classDays:
+            updatedClassDays = False
+        else:
+            updatedClassDays = True
+            log.classDays = classDays
+        log.startTime = editSingleClassScheduleDetails.startTime.data
+        log.endTime = editSingleClassScheduleDetails.endTime.data
+        log.online = editSingleClassScheduleDetails.online.data
+        log.indStudy = editSingleClassScheduleDetails.indStudy.data
+        log.comment = editSingleClassScheduleDetails.comment.data
+        log.googleCalendarEventID = (
+            editSingleClassScheduleDetails.googleCalendarEventID.data
+        )
+        db.session.commit()
+
+        # If classDays change, delete any class attendance logs that are null
+        if updatedClassDays:
+            print("classDays updated -- deleting associated class attendance logs")
+            attendanceLogs = ClassAttendanceLog.query.filter(
+                ClassAttendanceLog.classSchedule_id == log.id,
+                ClassAttendanceLog.attendanceCode == None,
+            ).all()
+            for attendanceLog in attendanceLogs:
+                db.session.delete(attendanceLog)
+                db.session.commit()
+                print(
+                    "Deleting attendance log for ",
+                    log.className,
+                    "on",
+                    attendanceLog.classDate,
+                )
+
+        return redirect(url_for("masterSchedule_bp.displayMasterSchedule"))
+
+    studentName = getStudentName(log.chattStateANumber)
+    print("studentName =", studentName)
+    if log:
+        editSingleClassScheduleDetails.schoolYear.choices = getSchoolYear()
+        editSingleClassScheduleDetails.semester.choices = getSemester()
+        editSingleClassScheduleDetails.teacherName.choices = getTeachers()
+        editSingleClassScheduleDetails.campus.choices = getCampusChoices()
+        editSingleClassScheduleDetails.className.choices = (
+            getStemAndChattStateClassNames()
+        )
+        editSingleClassScheduleDetails.classDays.choices = [
+            ("M", "M"),
+            ("T", "T"),
+            ("W", "W"),
+            ("R", "R"),
+            ("F", "F"),
+        ]
+
+        editSingleClassScheduleDetails.log_id.data = log.id
+        editSingleClassScheduleDetails.schoolYear.data = log.schoolYear
+        editSingleClassScheduleDetails.semester.data = log.semester
+        editSingleClassScheduleDetails.campus.data = log.campus
+        editSingleClassScheduleDetails.className.data = log.className
+        editSingleClassScheduleDetails.teacherName.data = log.teacherLastName
+        # Set classDays by creating list of days from string (e.g., 'MWF' -> [M, W, F])
+        classDaysList = []
+        for classDay in log.classDays:
+            classDaysList.append(classDay)
+        editSingleClassScheduleDetails.classDays.data = classDaysList
+
+        editSingleClassScheduleDetails.startTime.data = log.startTime
+        editSingleClassScheduleDetails.endTime.data = log.endTime
+        editSingleClassScheduleDetails.online.data = log.online
+        editSingleClassScheduleDetails.indStudy.data = log.indStudy
+        editSingleClassScheduleDetails.comment.data = log.comment
+        editSingleClassScheduleDetails.googleCalendarEventID.data = (
+            log.googleCalendarEventID
+        )
+        print(
+            "editSingleClassScheduleDetails=",
+            editSingleClassScheduleDetails.log_id.data,
+            editSingleClassScheduleDetails.schoolYear.data,
+            editSingleClassScheduleDetails.classDays.data,
+        )
+    return render_template(
+        "updatemasterschedule.html",
+        title="Update Master Schedule",
+        editSingleClassSchedule=editSingleClassScheduleDetails,
+        studentName=studentName,
+    )

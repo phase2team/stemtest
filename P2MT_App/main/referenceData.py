@@ -67,6 +67,21 @@ def getClassNames():
     return classNameValueLabelTupleList
 
 
+def getStemAndChattStateClassNames():
+    classNameValueLabelTupleList = (
+        db.session.query(ClassSchedule.className, ClassSchedule.className)
+        .distinct()
+        .order_by(ClassSchedule.className)
+        .all()
+    )
+    # insert a blank option into the list as the default choice
+    # Note: need to convert the tuple to a list and then back to a tuple
+    classList = list(classNameValueLabelTupleList)
+    classList.insert(0, ("", ""))
+    classNameValueLabelTupleList = tuple(classList)
+    return classNameValueLabelTupleList
+
+
 def getCampusChoices():
     campusValueLabelTupleList = (
         db.session.query(ClassSchedule.campus, ClassSchedule.campus)

@@ -31,6 +31,7 @@
       <th scope="col">End Time</th>
       <th scope="col">Comment</th>
       <th scope="col">Actions</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody id="filteredTable">
@@ -50,6 +51,11 @@
       <td>{{ ClassSchedule.startTime.strftime('%-I:%M') }}</td>
       <td>{{ ClassSchedule.endTime.strftime('%-I:%M') }}</td>
       <td>{{ ClassSchedule.comment }}</td>
+      <td>
+        <form action="{{ url_for('masterSchedule_bp.edit_ClassSchedule', log_id=ClassSchedule.id) }}" method="POST">
+          <input class="w3-button w3-green" type="submit" value="Edit">
+        </form>
+      </td>
       <td><button type="button" class="w3-btn w3-red"
           onclick="document.getElementById('deleteModal{{ClassSchedule.id}}').style.display='block'">Delete</button>
       </td>
