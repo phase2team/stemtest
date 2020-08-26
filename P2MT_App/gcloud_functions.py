@@ -50,6 +50,9 @@ def getSqlEngineOptions():
         # Connections that live longer than the specified amount of time will be
         # reestablished
         "pool_recycle": 1800,  # 30 minutes
+        "pool_pre_ping": True,  # enable the connection pool “pre-ping” feature
+        # that tests connections for liveness upon each checkout.  Added to
+        # address error 'Lost connection to MySQL server during query'
         # [END cloud_sql_mysql_sqlalchemy_lifetime]
     }
     return db_config
