@@ -213,7 +213,7 @@ def displayLearningLab():
     ).all()
 
     return render_template(
-        "learninglab.html",
+        "learninglabmanager.html",
         title="Learning Lab",
         addSingleClassSchedule=addLearningLabDetails,
         ClassSchedules=LearningLabSchedules,
