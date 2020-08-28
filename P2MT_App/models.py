@@ -84,7 +84,9 @@ class ClassSchedule(db.Model):
     comment = db.Column(db.String(250), nullable=True)
     googleCalendarEventID = db.Column(db.String(250), nullable=True)
     interventionLog_id = db.Column(
-        db.Integer, db.ForeignKey("InterventionLog.id"), nullable=True,
+        db.Integer,
+        db.ForeignKey("InterventionLog.id", ondelete="CASCADE"),
+        nullable=True,
     )
     learningLab = db.Column(db.Boolean, nullable=False, default=False)
     ClassAttendanceLog = db.relationship(
@@ -179,7 +181,7 @@ class InterventionLog(db.Model):
         "ClassAttendanceLog", backref="InterventionLog", lazy=True
     )
     classSchedule_id = db.relationship(
-        "ClassSchedule", backref="InterventionLog", lazy=True
+        "ClassSchedule", backref="InterventionLog", passive_deletes=True, lazy=True
     )
 
     def __repr__(self):
