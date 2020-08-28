@@ -41,3 +41,6 @@ P2MT_App/static/upload/Uploaded_Schedule_File.csv
 alpha816-28a8f5a8d8ff.json
 P2MT_App/templates/mailresults.html
 webapptest.json
+P2MT_App/p2mt google.db
+P2MT_App/p2mt_manual_cascade.db
+P2MT_App/p2mt_pre_learningLab.db
