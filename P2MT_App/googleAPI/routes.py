@@ -47,7 +47,10 @@ CLIENT_SECRETS_FILE = "webapptest.json"
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
 # SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
-SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/calendar",
+]
 
 ########################
 #   Routes for Login   #
@@ -396,3 +399,171 @@ def print_index_table():
         + "</td></tr></table>"
     )
 
+
+###########################
+#   Routes for Calendar   #
+###########################
+
+# Provide authentication credentials to your application code by setting the
+# environment variable GOOGLE_APPLICATION_CREDENTIALS. Replace [PATH] with
+# the file path of the JSON file that contains your service account key.
+# This variable only applies to your current shell session, so if you open
+# a new session, set the variable again.
+# Example: export GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
+# See https://cloud.google.com/docs/authentication/production
+
+
+from google.oauth2 import service_account
+
+
+@googleAPI_bp.route("/submitcalendarevent")
+def submitCalendarEvent():
+    return render_template(
+        "calendartest.html", title="Submit Calendar Event", calendarResult=None,
+    )
+
+
+@googleAPI_bp.route("/addcalendarevent")
+def addCalendarEvent():
+    SCOPES = ["https://www.googleapis.com/auth/calendar"]
+    SERVICE_ACCOUNT_FILE = "google_credentials/p2mt_service_account_alpha816.json"
+
+    credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    )
+
+    service = googleapiclient.discovery.build("calendar", "v3", credentials=credentials)
+
+    event = {
+        "summary": "Google I/O 2015",
+        "location": "800 Howard St., San Francisco, CA 94103",
+        "description": "A chance to hear more about Google's developer products.",
+        "start": {
+            "dateTime": "2020-08-19T09:00:00-07:00",
+            "timeZone": "America/Los_Angeles",
+        },
+        "end": {
+            "dateTime": "2020-08-19T17:00:00-07:00",
+            "timeZone": "America/Los_Angeles",
+        },
+        "recurrence": ["RRULE:FREQ=DAILY;COUNT=2"],
+        "attendees": [{"email": "lpage@example.com"}, {"email": "sbrin@example.com"},],
+        "reminders": {
+            "useDefault": False,
+            "overrides": [
+                {"method": "email", "minutes": 24 * 60},
+                {"method": "popup", "minutes": 10},
+            ],
+        },
+    }
+    calendarId = "k4p5gughd8coai0f8j2afbc1m4@group.calendar.google.com"
+    # event = service.events().insert(calendarId='primary', body=event).execute()
+    event = service.events().insert(calendarId=calendarId, body=event).execute()
+    print("Event created: %s" % (event.get("htmlLink")))
+    eventLink = event.get("htmlLink")
+    return render_template(
+        "calendartest.html",
+        title="Submit Calendar Event",
+        calendarResult=flask.jsonify(eventLink),
+    )
+
+
+    printLogEntry("runnning sendMail()")
+    requiredScope = ["https://www.googleapis.com/auth/gmail.send"]
+    if "credentials" not in session:
+        return redirect("authorize")
+    print('session["credentials"] =', session["credentials"])
+    # Load credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(**session["credentials"])
+    print("Credentials from DB:", retrieveGoogleCredentials(current_user.id))
+    # Create a Gmail API service with the authorized user credentials
+    apiServiceName = "gmail"
+    apiVersion = "v1"
+    gmailService = googleapiclient.discovery.build(
+        apiServiceName, apiVersion, credentials=credentials
+    )
+
+    # Call the Gmail API service to send the message
+    sent = send_message(gmailService, "me", message)
+
+    # Save credentials back to session in case access token was refreshed.
+    # ACTION ITEM: In a production app, you likely want to save these
+    #              credentials in a persistent database instead.
+    # session["credentials"] = credentials_to_dict(credentials)
+    # credentials_json = json.dumps(credentials_to_dict(credentials))
+    credentials_json = credentials.to_json()
+    print("credentials_json:", credentials_json)
+    saveGoogleCredentialsAsJson(current_user.id, credentials_json)
+    db.session.commit()
+    return redirect("/emailresult")
+    # return jsonify(credentials_to_dict(credentials))
+
+
+# Initiating user authorization via Google for required Google API scopes
+@googleAPI_bp.route("/authorizecalendar")
+def authorize():
+    printLogEntry("runnning authorize()")
+    # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+    # This version uses a client config mapping
+    googleClientConfig = getGoogleClientConfig()
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(
+        googleClientConfig, scopes=SCOPES
+    )
+    # This version uses the json (but not safe to upload json to GitHub)
+    # flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+    #     CLIENT_SECRETS_FILE, scopes=SCOPES
+    # )
+
+    # The URI created here must exactly match one of the authorized redirect URIs
+    # for the OAuth 2.0 client, which you configured in the API Console. If this
+    # value doesn't match an authorized URI, you will get a 'redirect_uri_mismatch'
+    # error.
+    flow.redirect_uri = url_for("googleAPI_bp.sendmailCallback", _external=True)
+
+    authorization_url, state = flow.authorization_url(
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission. Recommended for web server apps.
+        access_type="offline",
+        state="thisisthestate",
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes="false",
+    )
+
+    # Store the state so the callback can verify the auth server response.
+    session["state"] = state
+    print("state =", state)
+
+    return redirect(authorization_url)
+
+
+# Handle the response from Google authorization server with authorization code and request token
+@googleAPI_bp.route("/addcalendarevent/callback")
+def addCalendarEventCallback():
+
+    # Specify the state when creating the flow in the callback so that it can
+    # verified in the authorization server response.
+    state = session["state"]
+    googleClientConfig = getGoogleClientConfig()
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(
+        googleClientConfig, scopes=SCOPES, state=state
+    )
+    # flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+    #     CLIENT_SECRETS_FILE, scopes=SCOPES, state=state
+    # )
+    flow.redirect_uri = url_for("googleAPI_bp.sendmailCallback", _external=True)
+
+    # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+    authorization_response = request.url
+    print("authorization_response =", authorization_response)
+    flow.fetch_token(authorization_response=authorization_response)
+
+    # Store credentials in the session.
+    # ACTION ITEM: In a production app, you likely want to save these
+    #              credentials in a persistent database instead.
+    credentials = flow.credentials
+    # session["credentials"] = credentials_to_dict(credentials)
+    credentials_json = credentials.to_json()
+    print("credentials_json from flow:", credentials_json)
+    saveGoogleCredentialsAsJson(current_user.id, credentials_json)
+    db.session.commit()
+    return redirect(url_for("googleAPI_bp.sendMail"))

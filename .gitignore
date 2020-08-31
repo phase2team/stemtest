@@ -42,3 +42,6 @@ alpha816-28a8f5a8d8ff.json
 webapptest.json
 P2MT_App/templates/mailresults.html
 P2MT_App/p2mt google.db
+P2MT_App/p2mt_manual_cascade.db
+P2MT_App/p2mt_pre_learningLab.db
+google_credentials/p2mt_service_account_alpha816.json
